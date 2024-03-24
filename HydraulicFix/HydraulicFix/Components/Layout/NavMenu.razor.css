@@ -122,4 +122,17 @@
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
+    .container-fluid {
+        background-color: #5CB1F1;
+    }
+
+    .bg {
+        background-color: #82B7E0;
+    }
+
+    .navbarNav {
+        background-color: #16A085;
+    }
+
+
 }
