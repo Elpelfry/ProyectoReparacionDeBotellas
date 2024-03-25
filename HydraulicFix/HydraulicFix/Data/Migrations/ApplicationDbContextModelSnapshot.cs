@@ -33,8 +33,8 @@ namespace HydraulicFix.Migrations
                     b.Property<string>("Apellido")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Cedula")
-                        .HasColumnType("int");
+                    b.Property<string>("Cedula")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -52,6 +52,9 @@ namespace HydraulicFix.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NickName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
@@ -397,7 +400,7 @@ namespace HydraulicFix.Migrations
                         new
                         {
                             EstadoId = 2,
-                            NombreEstado = "En Proceso"
+                            NombreEstado = "EnProceso"
                         },
                         new
                         {

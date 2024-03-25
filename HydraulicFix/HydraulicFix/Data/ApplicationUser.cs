@@ -8,5 +8,7 @@ public class ApplicationUser : IdentityUser
 
     public string? Apellido { get; set; }
 
-    public int Cedula { get; set; }
+    public string? Cedula { get; set; }
+
+    public string? NickName { get; set; }
 }

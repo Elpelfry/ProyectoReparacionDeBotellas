@@ -19,12 +19,17 @@ namespace HydraulicFix.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.AddColumn<string>(
                 name: "Cedula",
                 table: "AspNetUsers",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+                type: "nvarchar(max)",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "NickName",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Nombre",
@@ -279,7 +284,7 @@ namespace HydraulicFix.Migrations
                 values: new object[,]
                 {
                     { 1, "Pendiente" },
-                    { 2, "En Proceso" },
+                    { 2, "EnProceso" },
                     { 3, "Terminado" },
                     { 4, "Cancelado" }
                 });
@@ -357,6 +362,10 @@ namespace HydraulicFix.Migrations
 
             migrationBuilder.DropColumn(
                 name: "Cedula",
+                table: "AspNetUsers");
+
+            migrationBuilder.DropColumn(
+                name: "NickName",
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
