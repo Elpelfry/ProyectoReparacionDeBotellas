@@ -6,7 +6,9 @@ using HydraulicFix.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 using Shared.Interfaces;
+using Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +22,18 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
 
+//Servicios
 builder.Services.AddScoped<IHydraulicAsp<ApplicationUser>, UsersService>();
 builder.Services.AddScoped<IHydraulicAsp<IdentityRole>, RolesService>();
 builder.Services.AddScoped<IHydraulicAsp<IdentityUserRole<string>>, UserRolesService>();
+builder.Services.AddScoped<IHydraulic<Abonos>, AbonosService>();
+builder.Services.AddScoped<IHydraulic<CategoriaProductos>, CategoriaProductosService>();
+builder.Services.AddScoped<IHydraulic<Configuraciones>, ConfiguracionesService>();
+builder.Services.AddScoped<IHydraulic<Productos>, ProductosService>();
+builder.Services.AddScoped<IHydraulic<Proveedores>, ProveedoresService>();
+builder.Services.AddScoped<IHydraulic<Reparaciones>, ReparacionesService>();
+builder.Services.AddScoped<IHydraulic<Ventas>, VentasService>();
+builder.Services.AddScoped<NotificationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

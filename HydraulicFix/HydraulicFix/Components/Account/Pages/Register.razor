@@ -3,9 +3,12 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text
 @using System.Text.Encodings.Web
+@using HydraulicFix.Client.Services
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using HydraulicFix.Data
+@using HydraulicFix.Services
+
 
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole> RoleManager
@@ -17,7 +20,6 @@
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Register</PageTitle>
-
 <h1>Register</h1>
 
 <div class="row">
@@ -86,6 +88,7 @@
         {
             await RoleManager.CreateAsync(new IdentityRole("Admin"));
             await UserManager.AddToRoleAsync(user, "Admin");
+            await UserManager.ConfirmEmailAsync(user, await UserManager.GenerateEmailConfirmationTokenAsync(user));
         }
         else
         {
@@ -96,8 +99,9 @@
 
             }
             await UserManager.AddToRoleAsync(user, "Cliente");
+            await UserManager.ConfirmEmailAsync(user, await UserManager.GenerateEmailConfirmationTokenAsync(user));
         }
-
+        
         Logger.LogInformation("User created a new account with password.");
 
         var userId = await UserManager.GetUserIdAsync(user);
@@ -105,7 +109,7 @@
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = NavigationManager.GetUriWithQueryParameters(
             NavigationManager.ToAbsoluteUri("Account/Login").AbsoluteUri,
-            new Dictionary<string, object?> {  ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+            new Dictionary<string, object?> {  ["userId"] = userId, ["code"] = code, ["mensaje"] = "hey", ["returnUrl"] = ReturnUrl });
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
@@ -113,7 +117,7 @@
         {
             RedirectManager.RedirectTo(
                 "Account/Login",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+                new() { ["email"] = Input.Email, ["mensaje"] = "hey", ["returnUrl"] = ReturnUrl });
         }
 
         await SignInManager.SignInAsync(user, isPersistent: false);

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HydraulicFix", "HydraulicFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HydraulicFix.Client", "HydraulicFix.Client\HydraulicFix.Client.csproj", "{E1C16BE5-62AB-4BB8-BEAD-CF58FB9CC570}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{259194C4-183E-4AA1-9F99-F5B01E5B2956}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{259194C4-183E-4AA1-9F99-F5B01E5B2956}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
