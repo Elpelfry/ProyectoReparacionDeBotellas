@@ -5,6 +5,7 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IdentityUserService UserService
 
 <PageTitle>Registrarse</PageTitle>
 <RadzenNotification />
@@ -12,11 +13,9 @@
 <div class="row justify-content-center blue-background">
 	<div class="col-md-6">
 		<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7; margin-top: 50px;">
-			<StatusMessage Message="@Message" />
 
-			<EditForm Model="Input" OnValidSubmit="RegisterUser" FormName="register">
+			<EditForm Model="Input" OnValidSubmit="CreateUser">
 				<DataAnnotationsValidator />
-
 				<div style="text-align: center;">
 					<img src="/bootstrap/img/ejemplo.png" width="90" height="90">
 					<h3 class="fw-bold text-center">Crea una cuenta nueva</h3>
@@ -50,7 +49,6 @@
 		</div>
 	</div>
 </div>
-
 
 @code {
   
