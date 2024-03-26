@@ -115,24 +115,41 @@
     }
 
     .nav-scrollable {
-        /* Never collapse the sidebar for wide screens */
+       
         display: block;
 
-        /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 3rem);
         overflow-y: auto;
     }
-    .container-fluid {
-        background-color: #5CB1F1;
-    }
+   
+}
+.container-fluid {
+    background-color: #5CB1F1;
+}
 
-    .bg {
-        background-color: #82B7E0;
-    }
+.bg {
+    background-color: #82B7E0;
+}
 
-    .navbarNav {
-        background-color: #16A085;
-    }
+.navbarNav {
+    background-color: #16A085;
+}
 
 
+
+.btn-custom {
+    background-color: #dc3545; 
+    color: #fff; 
+    border: 2px solid #dc3545; 
+  /
+    width: 80px; 
+    height: 40px; 
+    padding: 0; 
+    font-size: 16px; 
+    font-weight: bold; 
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    cursor: pointer; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
 }

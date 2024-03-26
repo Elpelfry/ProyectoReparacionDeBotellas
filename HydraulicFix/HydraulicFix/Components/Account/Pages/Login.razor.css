@@ -1,0 +1,49 @@
+﻿/* Estilos generales */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Estilos para el botón personalizado */
+.btn-primary.custom-color {
+    background-color: #D3ECFF;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+    .btn-primary.custom-color:hover {
+        background-color: #9BC2E6;
+    }
+
+.blue-background {
+    background-color: #E7F5FF;
+    padding: 0;
+}
+
+
+.content-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 100px auto; 
+    width: 500px; 
+    height: 455px; 
+
+}
+
+
+@media (max-width: 768px) {
+    .blue-background {
+        padding: 20px;
+    }
+
+    .content-container {
+        padding: 12px;
+    }
+}

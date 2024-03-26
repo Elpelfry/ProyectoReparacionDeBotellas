@@ -1,16 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @layout AccountLayout
-
-<h1>Manage your account</h1>
-
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
+<div class="container-fluid">
+    <div class="row justify-content-center">
         <div class="col-md-3">
+            <!-- Contenido para la primera columna -->
             <ManageNavMenu />
         </div>
         <div class="col-md-9">
+            <!-- Contenido para la segunda columna -->
             @Body
         </div>
     </div>

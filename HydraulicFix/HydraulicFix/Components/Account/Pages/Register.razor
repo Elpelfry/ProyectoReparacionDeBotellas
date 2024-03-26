@@ -1,72 +1,59 @@
-﻿@page "/Account/Register"
+@page "/Account/Register"
 
 @rendermode InteractiveServer
-<PageTitle>Registro</PageTitle>
 
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Registrarse</PageTitle>
 <RadzenNotification />
-@inject IdentityUserService UserService
 
+<div class="row justify-content-center blue-background">
+	<div class="col-md-6">
+		<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7; margin-top: 50px;">
+			<StatusMessage Message="@Message" />
 
-<div style="width: 35rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);">
-    <EditForm Model="Input" OnValidSubmit="CreateUser">
-        <DataAnnotationsValidator />
-        <h2>Create a new account.</h2>
-        <hr />
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.NombreUsuario" class="form-control" autocomplete="username" aria-required="true" placeholder="Juan123" />
-            <label for="email">Nombre de Usuario</label>
-            <ValidationMessage For="() => Input.NombreUsuario" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.Email" class="form-control" autocomplete="new-password" aria-required="true" placeholder="examplo@email.com" />
-            <label for="password">Correo</label>
-            <ValidationMessage For="() => Input.Email" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-            <InputText type="@tipo" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="contraseña" />
-            <label for="confirm-password">Contraseña</label>
-            <ValidationMessage For="() => Input.Password" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-            <InputText type="@tipo" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="username" aria-required="true" placeholder="contraseña" />
-            <label for="email">Confirmar Contraseña</label>
-            <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
-        </div>
+			<EditForm Model="Input" OnValidSubmit="RegisterUser" FormName="register">
+				<DataAnnotationsValidator />
 
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.Nombre" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Nombre" />
-            <label for="password">Nombre</label>
-            <ValidationMessage For="() => Input.Nombre" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.Apellido" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Apellido" />
-            <label for="confirm-password">Apellido</label>
-            <ValidationMessage For="() => Input.Apellido" class="text-danger" />
-        </div>
+				<div style="text-align: center;">
+					<img src="/bootstrap/img/ejemplo.png" width="90" height="90">
+					<h3 class="fw-bold text-center">Crea una cuenta nueva</h3>
+				</div>
+				<hr />
 
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.Cedula" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Cedula" />
-            <label for="confirm-password">Cedula</label>
-            <ValidationMessage For="() => Input.Cedula" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Input.Telefono" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Telefono" />
-            <label for="confirm-password">Telefono</label>
-            <ValidationMessage For="() => Input.Telefono" class="text-danger" />
-        </div>
-        <div class="row fs-4">
-            <div class="col-7">
-                <label class="form-check-label"> <input type="checkbox" class="form-check-input fs-4" @onclick="CambiarTipo" />  Mostrar contraseña</label>
-            </div>
-        </div>
-        <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-    </EditForm>
+				<ValidationSummary class="text-danger" />
+
+				<div class="form-floating mb-3">
+					<InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" placeholder="n" />
+					<label for="email">Correo</label>
+					<ValidationMessage For="() => Input.Email" class="text-danger" />
+				</div>
+
+				<div class="form-floating mb-3">
+					<InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" placeholder="password" />
+					<label for="password">Contraseña</label>
+					<ValidationMessage For="() => Input.Password" class="text-danger" />
+				</div>
+
+				<div class="form-floating mb-3">
+					<InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="password" />
+					<label for="confirm-password">Confirmar Contraseña</label>
+					<ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+				</div>
+
+				<div class="text-center">
+					<button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
+				</div>
+			</EditForm>
+		</div>
+	</div>
 </div>
 
-@code {
 
+@code {
+  
     private InputModel Input { get; set; } = new();
     public string tipo = "password";
 
@@ -193,3 +180,4 @@
         public string? NombreUsuario { get; set; } = "";
     }
 }
+
