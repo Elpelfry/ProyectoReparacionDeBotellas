@@ -1,22 +1,13 @@
-﻿@page "/Account/Register"
+@page "/Account/Register"
 
-@using System.ComponentModel.DataAnnotations
-@using System.Text
-@using System.Text.Encodings.Web
-@using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.WebUtilities
-@using HydraulicFix.Data
+@rendermode InteractiveServer
 
-@inject UserManager<ApplicationUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager
-@inject IUserStore<ApplicationUser> UserStore
-@inject SignInManager<ApplicationUser> SignInManager
-@inject IEmailSender<ApplicationUser> EmailSender
-@inject ILogger<Register> Logger
+@inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Registrarse</PageTitle>
+<RadzenNotification />
 
 <div class="row justify-content-center blue-background">
 	<div class="col-md-6">
@@ -62,108 +53,131 @@
 
 
 @code {
-	private IEnumerable<IdentityError>? identityErrors;
+  
+    private InputModel Input { get; set; } = new();
+    public string tipo = "password";
 
-	[SupplyParameterFromForm]
-	private InputModel Input { get; set; } = new();
+    private async Task CreateUser()
+    {
+        if (await UserService.EmailExisteAsync(Input.Email))
+        {
+            var mensaje = new NotificationMessage { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = "Correo Ya Existe", 
+                Duration = 4_000 };
+            NotificationService.Notify(mensaje);
+            return;
+        }
+        if (Input.Password != Input.ConfirmPassword)
+        {
+            var mensaje = new NotificationMessage { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = "Las Contraseñas Deben Ser Iguales", 
+                Duration = 4_000 };
+            NotificationService.Notify(mensaje);
+            return;
+        }
+        if (await UserService.GetNickNameAsync(Input.NombreUsuario!))
+        {
+            var mensaje = new NotificationMessage { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = "El Nombre De Usuario Existe", 
+                Duration = 4_000 };
+            NotificationService.Notify(mensaje);
+            return;
+        }
 
-	[SupplyParameterFromQuery]
-	private string? ReturnUrl { get; set; }
+        var user = new ApplicationUser
+            {
+                UserName = Input.Email,
+                Email = Input.Email,
+                Nombre = Input.Nombre,
+                Apellido = Input.Apellido,
+                PhoneNumber = Input.Telefono,
+                Cedula = Input.Cedula,
+                NickName = Input.NombreUsuario
+            };
+        var result = await UserService.CreateUserAsync(user, Input.Password);
+        if (result.Succeeded)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Exito",
+                    Detail = "Usuario Creado",
+                    Duration = 5_000
+                };
+            NotificationService.Notify(mensaje);
+            Input = new InputModel();
+            await Task.Delay(3_000);
+            NavigationManager.NavigateTo("Account/Login");
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Usuario No Creado",
+                    Duration = 5_000
+                };
+            NotificationService.Notify(mensaje);
+        }
+    }
 
-	private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    public void CambiarTipo()
+    {
+        if (tipo == "password")
+        {
+            tipo = "text";
+        }
+        else
+        {
+            tipo = "password";
+        }
+    }
 
-	public async Task RegisterUser(EditContext editContext)
-	{
-		var user = CreateUser();
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
 
-		await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-		var emailStore = GetEmailStore();
-		await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-		var result = await UserManager.CreateAsync(user, Input.Password);
+        [Required]
+        [StringLength(100, ErrorMessage = "El intervalo de caracteres debe estar entre 8-100", MinimumLength = 8)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
 
-		if (!result.Succeeded)
-		{
-			identityErrors = result.Errors;
-			return;
-		}
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        public string ConfirmPassword { get; set; } = "";
 
-		var RolAdmin = await RoleManager.FindByNameAsync("Admin");
-		if (RolAdmin != null)
-		{
-			await RoleManager.CreateAsync(new IdentityRole("Admin"));
-			await UserManager.AddToRoleAsync(user, "Admin");
-		}
-		else
-		{
-			var Rol = await RoleManager.FindByNameAsync("Cliente");
-			if (Rol == null)
-			{
-				await RoleManager.CreateAsync(new IdentityRole("Cliente"));
+        [Required]
+        [Display(Name = "Name")]
+        public string? Nombre { get; set; } = "";
 
-			}
-			await UserManager.AddToRoleAsync(user, "Cliente");
-		}
+        [Required]
+        [Display(Name = "Apellido")]
+        public string? Apellido { get; set; } = "";
 
-		Logger.LogInformation("User created a new account with password.");
+        [Required]
+        [Display(Name = "Telefono")]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "El número de teléfono debe tener 10 dígitos")]
+        public string? Telefono { get; set; } = "";
 
-		var userId = await UserManager.GetUserIdAsync(user);
-		var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-		code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-		var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-		NavigationManager.ToAbsoluteUri("Account/Login").AbsoluteUri,
-		new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+        [Required]
+        [Display(Name = "Cedula")]
+        [RegularExpression(@"^[0-9]{11}$", ErrorMessage = "La cédula debe tener 11 dígitos")]
+        public string? Cedula { get; set; } = "";
 
-		await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+        [Required]
+        [Display(Name = "Nombre Usuario")]
+        public string? NombreUsuario { get; set; } = "";
+    }
+}
 
-		if (UserManager.Options.SignIn.RequireConfirmedAccount)
-		{
-			RedirectManager.RedirectTo(
-			"Account/Login",
-			new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
-		}
-
-		await SignInManager.SignInAsync(user, isPersistent: false);
-		RedirectManager.RedirectTo(ReturnUrl);
-	}
-
-	private ApplicationUser CreateUser()
-	{
-		try
-		{
-			return Activator.CreateInstance<ApplicationUser>();
-		}
-		catch
-		{
-			throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-			$"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
-		}
-	}
-
-	private IUserEmailStore<ApplicationUser> GetEmailStore()
-	{
-		if (!UserManager.SupportsUserEmail)
-		{
-			throw new NotSupportedException("The default UI requires a user store with email support.");
-		}
-		return (IUserEmailStore<ApplicationUser>)UserStore;
-	}
-
-	private sealed class InputModel
-	{
-		[Required]
-		[EmailAddress]
-		[Display(Name = "Email")]
-		public string Email { get; set; } = "";
-
-		[Required]
-		[StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-		[DataType(DataType.Password)]
-		[Display(Name = "Password")]
-		public string Password { get; set; } = "";
-
-		[DataType(DataType.Password)]
-		[Display(Name = "Confirm password")]
-		[Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-		public string ConfirmPassword { get; set; } = "";
-	}
-	}

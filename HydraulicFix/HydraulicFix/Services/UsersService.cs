@@ -4,7 +4,7 @@ using Shared.Interfaces;
 
 namespace HydraulicFix.Services;
 
-public class UsersService(ApplicationDbContext _contexto) : IHydraulicAsp<ApplicationUser>
+public class UsersService(ApplicationDbContext _contexto) : IServerAsp<ApplicationUser>
 {
     public async Task<ApplicationUser> GetObject(string id)
     {

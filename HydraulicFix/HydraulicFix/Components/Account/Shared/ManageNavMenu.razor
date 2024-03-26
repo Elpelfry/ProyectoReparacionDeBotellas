@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using HydraulicFix.Data
 
 @inject SignInManager<ApplicationUser> SignInManager
@@ -13,13 +13,13 @@
     <li class="nav-item">
         <NavLink class="nav-link" href="Account/Manage/ChangePassword">Contraseña</NavLink>
     </li> 
+
     @if (hasExternalLogins)
     {
         <li class="nav-item">
             <NavLink class="nav-link" href="Account/Manage/ExternalLogins">External logins</NavLink>
         </li>
     }
-   
 </ul>
 
 @code {
