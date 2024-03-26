@@ -1,10 +1,10 @@
 ﻿namespace Shared.Interfaces;
 
-public interface IHydraulicAsp<T>
+public interface IServer<T>
 {
     public Task<T> AddObject(T type);
-    public Task<T> GetObject(string id);
+    public Task<T> GetObject(int id);
     public Task<bool> UpdateObject(T type);
-    public Task<bool> DeleteObject(string id);
+    public Task<bool> DeleteObject(int id);
     public Task<List<T>> GetAllObject();
 }

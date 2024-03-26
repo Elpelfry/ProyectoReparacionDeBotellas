@@ -6,7 +6,7 @@ namespace HydraulicFix.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(IHydraulicAsp<ApplicationUser> _service) : ControllerBase
+public class UsersController(IServerAsp<ApplicationUser> _service) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ApplicationUser>>> Get()

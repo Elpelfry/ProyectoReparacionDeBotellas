@@ -6,7 +6,7 @@ namespace HydraulicFix.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ConfiguracionesController(IHydraulic<Configuraciones> _service) : ControllerBase
+public class ConfiguracionesController(IServer<Configuraciones> _service) : ControllerBase
 {
     // GET: api/Configuraciones
     [HttpGet]

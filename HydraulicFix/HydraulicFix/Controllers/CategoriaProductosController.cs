@@ -6,7 +6,7 @@ namespace HydraulicFix.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoriaProductosController(IHydraulic<CategoriaProductos> _service): ControllerBase
+public class CategoriaProductosController(IServer<CategoriaProductos> _service): ControllerBase
 {
     // GET: api/CategoriaProductos
     [HttpGet]

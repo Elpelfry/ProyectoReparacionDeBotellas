@@ -4,12 +4,12 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class ConfiguracionesService(HttpClient _httpClient) : IHydraulic<Configuraciones>
+public class ConfiguracionesServiceClient(HttpClient _httpClient) : IClient<Configuraciones>
 {
     public async Task<List<Configuraciones>> GetAllObject()
     {
         var response = await _httpClient.GetAsync("api/Configuraciones");
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             return (await response.Content.ReadFromJsonAsync<List<Configuraciones>>())!;
         }

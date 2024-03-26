@@ -4,12 +4,12 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class ProductosService(HttpClient _httpClient) : IHydraulic<Productos>
+public class ProductosServiceClient(HttpClient _httpClient) : IClient<Productos>
 {
     public async Task<List<Productos>> GetAllObject()
     {
         var response = await _httpClient.GetAsync("api/Productos");
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             return (await response.Content.ReadFromJsonAsync<List<Productos>>())!;
         }

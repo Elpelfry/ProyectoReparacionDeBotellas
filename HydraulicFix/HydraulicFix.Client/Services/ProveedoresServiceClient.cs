@@ -4,12 +4,12 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class ProveedoresService(HttpClient _httpClient) : IHydraulic<Proveedores>
+public class ProveedoresServiceClient(HttpClient _httpClient) : IClient<Proveedores>
 {
     public async Task<List<Proveedores>> GetAllObject()
     {
         var response = await _httpClient.GetAsync("api/Proveedores");
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             return (await response.Content.ReadFromJsonAsync<List<Proveedores>>())!;
         }

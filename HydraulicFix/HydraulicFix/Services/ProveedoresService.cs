@@ -5,7 +5,7 @@ using Shared.Models;
 
 namespace HydraulicFix.Services;
 
-public class ProveedoresService(ApplicationDbContext _contexto) : IHydraulic<Proveedores>
+public class ProveedoresService(ApplicationDbContext _contexto) : IServer<Proveedores>
 {
     public async Task<List<Proveedores>> GetAllObject()
     {

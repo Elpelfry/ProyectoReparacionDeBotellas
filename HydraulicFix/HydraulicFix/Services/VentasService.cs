@@ -5,7 +5,7 @@ using Shared.Models;
 
 namespace HydraulicFix.Services;
 
-public class VentasService(ApplicationDbContext _contexto): IHydraulic<Ventas>
+public class VentasService(ApplicationDbContext _contexto): IServer<Ventas>
 {
     public async Task<List<Ventas>> GetAllObject()
     {

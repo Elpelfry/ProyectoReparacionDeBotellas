@@ -4,14 +4,14 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class UserRolesService(HttpClient _httpClient) : IHydraulicAsp<IdentityUserRole<string>>
+public class UserRolesServiceClient(HttpClient _httpClient) : IClientAsp<IdentityUserRole<string>>
 {
     public async Task<List<IdentityUserRole<string>>> GetAllObject()
     {
         var roles = await _httpClient.GetAsync("api/UserRoles");
-        if(roles.IsSuccessStatusCode)
+        if (roles.IsSuccessStatusCode)
         {
-            return (await roles.Content.ReadFromJsonAsync <List<IdentityUserRole<string>>>())!;
+            return (await roles.Content.ReadFromJsonAsync<List<IdentityUserRole<string>>>())!;
         }
         return null!;
     }

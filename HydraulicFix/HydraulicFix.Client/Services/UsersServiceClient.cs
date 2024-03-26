@@ -4,12 +4,12 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class UsersService(HttpClient _httpClient) : IHydraulicAsp<ApplicationUserDto>
+public class UsersServiceClient(HttpClient _httpClient) : IClientAsp<ApplicationUserDto>
 {
     public async Task<List<ApplicationUserDto>> GetAllObject()
     {
         var user = await _httpClient.GetAsync("api/Users");
-        if(user.IsSuccessStatusCode)
+        if (user.IsSuccessStatusCode)
         {
             return (await user.Content.ReadFromJsonAsync<List<ApplicationUserDto>>())!;
         }

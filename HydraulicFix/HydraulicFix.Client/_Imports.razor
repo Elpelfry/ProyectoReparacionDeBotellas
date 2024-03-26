@@ -14,16 +14,4 @@
 @using Shared.Models
 @using Shared.Dto
 @using Microsoft.AspNetCore.Identity;
-
-@inject IHydraulic<AbonosDto> AbonosService
-@inject IHydraulic<CategoriaProductosDto> CategoriaProductosService
-@inject IHydraulic<ConfiguracionesDto> ConfiguracionesService
-@inject IHydraulic<ProductosDto> ProductossService
-@inject IHydraulic<ProveedoresDto> ProveedoresService
-@inject IHydraulic<ReparacionesDto> ReparacionesService
-@inject IHydraulic<VentasDto> VentasService
-@inject IHydraulicAsp<ApplicationUserDto> UsersService
-@inject IHydraulicAsp<IdentityRole> RolesService
-@inject IHydraulicAsp<IdentityUserRole<string>> UserRolesService
-
 @inject AuthenticationStateProvider AuthenticationStateProvider

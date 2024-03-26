@@ -1,6 +1,6 @@
 ﻿namespace Shared.Interfaces;
 
-public interface IHydraulic<T>
+public interface IClient<T>
 {
     public Task<T> AddObject(T type);
     public Task<T> GetObject(int id);

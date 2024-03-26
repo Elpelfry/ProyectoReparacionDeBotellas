@@ -5,7 +5,7 @@ using Shared.Models;
 
 namespace HydraulicFix.Services;
 
-public class ReparacionesService(ApplicationDbContext _contexto) : IHydraulic<Reparaciones>
+public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Reparaciones>
 {
     public Task<List<Reparaciones>> GetAllObject()
     {

@@ -6,7 +6,7 @@ namespace HydraulicFix.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AbonosController(IHydraulic<Abonos> _service) : ControllerBase
+public class AbonosController(IServer<Abonos> _service) : ControllerBase
 {
     // GET: api/Abonos
     [HttpGet]

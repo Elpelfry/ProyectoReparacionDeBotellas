@@ -5,7 +5,7 @@ using Shared.Interfaces;
 
 namespace HydraulicFix.Services;
 
-public class UserRolesService(ApplicationDbContext _contexto) : IHydraulicAsp<IdentityUserRole<string>>
+public class UserRolesService(ApplicationDbContext _contexto) : IServerAsp<IdentityUserRole<string>>
 {
     public async Task<List<IdentityUserRole<string>>> GetAllObject()
     {

@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace HydraulicFix.Client.Services;
 
-public class AbonosService(HttpClient _httpClient) : IHydraulic<Abonos>
+public class AbonosServiceClient(HttpClient _httpClient) : IClient<Abonos>
 {
     public async Task<List<Abonos>> GetAllObject()
     {

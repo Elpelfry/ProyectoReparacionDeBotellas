@@ -6,7 +6,7 @@ namespace HydraulicFix.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserRolesController(IHydraulicAsp<IdentityUserRole<string>> _service) : ControllerBase
+public class UserRolesController(IServerAsp<IdentityUserRole<string>> _service) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<IdentityUserRole<string>>>> Get()
