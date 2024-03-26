@@ -5,26 +5,8 @@ using Shared.Interfaces;
 
 namespace HydraulicFix.Services;
 
-public class UserRolesService(ApplicationDbContext _contexto) : IHydraulicAsp<IdentityUserRole<string>>
+public class UserRolesService(ApplicationDbContext _contexto) : IServerAsp<IdentityUserRole<string>>
 {
-    public async Task<IdentityUserRole<string>> AddObject(IdentityUserRole<string> type)
-    {
-        _contexto.UserRoles.Add(type);
-        await _contexto.SaveChangesAsync();
-        return type;
-    }
-
-    public async Task<bool> DeleteObject(string id)
-    {
-        var user = await _contexto.UserRoles.FindAsync(id);
-        if (user == null)
-        {
-            return false;
-        }
-        _contexto.UserRoles.Remove(user);
-        return await _contexto.SaveChangesAsync() > 0;
-    }
-
     public async Task<List<IdentityUserRole<string>>> GetAllObject()
     {
         return await _contexto.UserRoles.ToListAsync();
@@ -35,9 +17,27 @@ public class UserRolesService(ApplicationDbContext _contexto) : IHydraulicAsp<Id
         return (await _contexto.UserRoles.FirstOrDefaultAsync(r => r.RoleId == id))!;
     }
 
+    public async Task<IdentityUserRole<string>> AddObject(IdentityUserRole<string> type)
+    {
+        _contexto.UserRoles.Add(type);
+        await _contexto.SaveChangesAsync();
+        return type;
+    }
+
     public async Task<bool> UpdateObject(IdentityUserRole<string> type)
     {
         _contexto.Entry(type).State = EntityState.Modified;
+        return await _contexto.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteObject(string id)
+    {
+        var user = await _contexto.UserRoles.FindAsync(id);
+        if (user == null)
+        {
+            return false;
+        }
+        _contexto.UserRoles.Remove(user);
         return await _contexto.SaveChangesAsync() > 0;
     }
 }

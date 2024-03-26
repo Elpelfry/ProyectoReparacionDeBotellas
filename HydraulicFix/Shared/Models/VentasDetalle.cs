@@ -1,21 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+namespace Shared.Models;
 
-namespace Shared.Models
+public class VentasDetalle
 {
-	public class VentasDetalle
-	{
-		[Key]
-		public int DetalleID { get; set; }
+	[Key]
+	public int DetalleID { get; set; }
 
-		[ForeignKey("Venta")]
-		public int VentaId { get; set; }
+	[ForeignKey("Ventas")]
+	public int VentaId { get; set; }
 
-		[ForeignKey("Producto")]
-		public int ProductoId { get; set; }
+	[ForeignKey("Productos")]
+	public int ProductoId { get; set; }
 
-		[Required(ErrorMessage = "Es requerida la cantidad")]
-		public int Cantidad { get; set; }
-	}
+	[Required(ErrorMessage = "Es requerida la cantidad")]
+	public int Cantidad { get; set; }
 }

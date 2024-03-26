@@ -1,12 +1,15 @@
-using HydraulicFix.Client.Pages;
+using HydraulicFix.Services;
 using HydraulicFix.Components;
 using HydraulicFix.Components.Account;
 using HydraulicFix.Data;
-using HydraulicFix.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 using Shared.Interfaces;
+using Shared.Models;
+using Shared.Dto;
+using HydraulicFix.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +23,31 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddScoped<IHydraulicAsp<ApplicationUser>, UsersService>();
-builder.Services.AddScoped<IHydraulicAsp<IdentityRole>, RolesService>();
-builder.Services.AddScoped<IHydraulicAsp<IdentityUserRole<string>>, UserRolesService>();
+//Servicios
+builder.Services.AddScoped<IServerAsp<ApplicationUser>, UsersService>();
+builder.Services.AddScoped<IServerAsp<IdentityRole>, RolesService>();
+builder.Services.AddScoped<IServerAsp<IdentityUserRole<string>>, UserRolesService>();
+builder.Services.AddScoped<IServer<Abonos>, AbonosService>();
+builder.Services.AddScoped<IServer<CategoriaProductos>, CategoriaProductosService>();
+builder.Services.AddScoped<IServer<Configuraciones>, ConfiguracionesService>();
+builder.Services.AddScoped<IServer<Productos>, ProductosService>();
+builder.Services.AddScoped<IServer<Proveedores>, ProveedoresService>();
+builder.Services.AddScoped<IServer<Reparaciones>, ReparacionesService>();
+builder.Services.AddScoped<IServer<Ventas>, VentasService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<IdentityUserService>();
+
+builder.Services.AddScoped<IClient<Abonos>, AbonosServiceClient>();
+builder.Services.AddScoped<IClientAsp<ApplicationUserDto>, UsersServiceClient>();
+builder.Services.AddScoped<IClientAsp<IdentityRole>, RolesServiceClient>();
+builder.Services.AddScoped<IClientAsp<IdentityUserRole<string>>, UserRolesServiceClient>();
+builder.Services.AddScoped<IClient<Abonos>, AbonosServiceClient>();
+builder.Services.AddScoped<IClient<CategoriaProductos>, CategoriaProductosServiceClient>();
+builder.Services.AddScoped<IClient<Configuraciones>, ConfiguracionesServiceClient>();
+builder.Services.AddScoped<IClient<Productos>, ProductosServiceClient>();
+builder.Services.AddScoped<IClient<Proveedores>, ProveedoresServiceClient>();
+builder.Services.AddScoped<IClient<Reparaciones>, ReparacionesServiceClient>();
+builder.Services.AddScoped<IClient<Ventas>, VentasServiceClient>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
