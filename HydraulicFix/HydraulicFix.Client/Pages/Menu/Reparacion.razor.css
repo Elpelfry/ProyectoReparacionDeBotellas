@@ -1,5 +1,23 @@
-﻿body {
-    background-color: #f8f9fa;
+﻿.row {
+    list-style-type: none;
+    padding: 0;
+}
+
+.nav-link {
+    background-color: #399CE7;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+    .nav-link:hover {
+        background-color: #74B4E5;
+        color: #fff;
+    }
+
+body {
+    background-color: #74B4E5;
 }
 
 .container {

@@ -12,46 +12,47 @@
 
 <PageTitle>Iniciar Sesión</PageTitle>
 
-<div class="row justify-content-center blue-background">
-	<div class="col-md-4">
-		<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7; margin-top: 50px;">
-			<StatusMessage Message="@errorMessage" />
-			<EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-				<DataAnnotationsValidator />
+<div class="page-wrapper">
+	<div class="row justify-content-center">
+		<div>
+			<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7; margin-top: 50px;">
+				<EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+					<DataAnnotationsValidator />
 
-				<div style="text-align: center;">
-					<img src="/bootstrap/img/ejemplo.png" width="90" height="90">
-					<h3 class="fw-bold mb-4">Iniciar Sesión</h3>
-				</div>
-				<hr />
-
-				<ValidationSummary class="text-danger" role="alert" />
-				<div class="form-floating mb-3">
-					<InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="n" />
-					<label for="email" class="form-label">Correo</label>
-					<ValidationMessage For="() => Input.Email" class="text-danger" />
-				</div>
-				<div class="form-floating mb-3">
-					<InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-					<label for="password" class="form-label">Contraseña</label>
-					<ValidationMessage For="() => Input.Password" class="text-danger" />
-				</div>
-				<div class="checkbox mb-3">
-					<label class="form-label">
-						<InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-						Recordarme
-					</label>
-				</div>
-
-				<div>
-					<div class="text-center mt-3">
-						<button class="w-100 btn btn-lg btn-primary" type="submit">Ingresar</button>
-						<p class="text-center">
-							<a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">¿Aún no tienes cuenta?</a>
-						</p>
+					<div style="text-align: center;">
+						<img src="/bootstrap/img/ejemplo.png" width="90" height="90">
+						<h3 class="fw-bold mb-4">Iniciar Sesión</h3>
 					</div>
-				</div>
-			</EditForm>
+					<hr />
+
+					<ValidationSummary class="text-danger" role="alert" />
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="n" />
+						<label for="email" class="form-label">Correo</label>
+						<ValidationMessage For="() => Input.Email" class="text-danger" />
+					</div>
+					<div class="form-floating mb-3">
+						<InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+						<label for="password" class="form-label">Contraseña</label>
+						<ValidationMessage For="() => Input.Password" class="text-danger" />
+					</div>
+					<div class="checkbox mb-3">
+						<label class="form-label">
+							<InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
+							Recordarme
+						</label>
+					</div>
+
+					<div>
+						<div class="text-center mt-3">
+							<button class="w-100 btn btn-lg btn-primary" type="submit">Ingresar</button>
+							<p class="text-center">
+								<a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">¿Aún no tienes cuenta?</a>
+							</p>
+						</div>
+					</div>
+				</EditForm>
+			</div>
 		</div>
 	</div>
 </div>

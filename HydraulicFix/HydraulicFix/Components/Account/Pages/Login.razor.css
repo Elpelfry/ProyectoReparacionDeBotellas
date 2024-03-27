@@ -1,11 +1,10 @@
-﻿/* Estilos generales */
-body, html {
+﻿body, html {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
 
-/* Estilos para el botón personalizado */
+
 .btn-primary.custom-color {
     background-color: #D3ECFF;
     color: #fff;
@@ -24,7 +23,7 @@ body, html {
     padding: 0;
 }
 
-
+/*
 .content-container {
     background-color: #fff;
     border-radius: 10px;
@@ -35,7 +34,7 @@ body, html {
     width: 500px; 
     height: 455px; 
 
-}
+}*/
 
 
 @media (max-width: 768px) {
@@ -46,4 +45,30 @@ body, html {
     .content-container {
         padding: 12px;
     }
+}
+
+
+
+.page-wrapper {
+    width: 100%;
+    height: 100vh;
+    background-color: #D3ECFF; /* Color de fondo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-container {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    color: #399ce7;
+    box-shadow: 0px 0px 35px #399ce7;
+    margin-top: 10px;
+    width: 100%; /* Cambia el ancho máximo según tus necesidades */
+    max-width: 500px; /* Ancho máximo para evitar que el contenedor se extienda demasiado en pantallas grandes */
+}
+
+body {
+    margin: 0;
 }
