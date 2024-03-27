@@ -1,4 +1,5 @@
 ﻿using HydraulicFix.Data;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
@@ -39,6 +40,31 @@ public class ConfiguracionesService(ApplicationDbContext _contexto) : IServer<Co
         }
         _contexto.Configuraciones.Remove(configuracion);
         return await _contexto.SaveChangesAsync() > 0;
+    }
+    public async Task<string> GuardarImagenYObtenerUrl(byte[] imagenBytes, NavigationManager navigationManager)
+    {
+        string nombreArchivo = $"imagen_{DateTime.Now.Ticks}.jpg";
+        string rutaArchivo = Path.Combine("wwwroot", "boostrap", nombreArchivo);
+
+        await File.WriteAllBytesAsync(rutaArchivo, imagenBytes);
+
+        string urlImagen = $"{navigationManager.BaseUri}uploads/{nombreArchivo}";
+
+        return urlImagen;
+    }
+    public async Task<Configuraciones> ObtenerConfiguracionActual()
+    {
+
+        var configuracionActual = new Configuraciones
+        {
+            NombreEmpresa = "HydraulicFix",
+            Direccion = "Calle Primera",
+            Nota = "Devoluciones hasta 3 días. Gracias por su compra",
+            NFC = "11111111111111",
+            Telefono = "809-244-6767"
+        };
+
+        return configuracionActual;
     }
 }
 

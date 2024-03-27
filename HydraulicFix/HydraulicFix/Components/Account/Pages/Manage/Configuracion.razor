@@ -1,17 +1,114 @@
-﻿@page "/Account/Manage/Configuracion"
+﻿@page "/Account/Pages/Manage/Configuracion"
+@using HydraulicFix.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using global::Shared.Models
 
-
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Identity
-@using HydraulicFix.Data
-
-
+@inject ConfiguracionesService ConfiguracionesService
+@inject Radzen.NotificationService NotificationService
 @inject NavigationManager NavigationManager
-@inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
-@inject IdentityUserAccessor UserAccessor
-@inject IdentityRedirectManager RedirectManager
-@inject ILogger<ChangePassword> Logger
-
+<PageTitle>Configuraci&oacute;n</PageTitle>
 <h3>Configuración</h3>
 
+<div class="container-fluid">
+	<div class="col-md-6">
+		<EditForm Model="@configuracion" OnValidSubmit="GuardarConfiguracion" @ref="editForm" @form="configuracionForm">
+			<DataAnnotationsValidator />
+
+			<div class="form-group">
+				<label for="imagen">Imagen:</label>
+				<InputFile id="imagen" OnChange="HandleFileSelected" accept=".jpg,.jpeg,.png" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label for="nombreEmpresa">Nombre de la empresa:</label>
+				<InputText id="nombreEmpresa" @bind-Value="configuracion.NombreEmpresa" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label for="direccion">Dirección:</label>
+				<InputText id="direccion" @bind-Value="configuracion.Direccion" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label for="nota">Nota:</label>
+				<InputText id="nota" @bind-Value="configuracion.Nota" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label for="nfc">NFC:</label>
+				<InputText id="nfc" @bind-Value="configuracion.NFC" class="form-control" />
+			</div>
+
+			<div class="form-group">
+				<label for="telefono">Teléfono:</label>
+				<InputText id="telefono" @bind-Value="configuracion.Telefono" class="form-control" />
+			</div>
+
+			<div class="form-group text-center">
+				<button type="submit" class="btn btn-primary">Guardar</button>
+				<button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+			</div>
+		</EditForm>
+	</div>
+</div>
+
+
+@code {
+	private Configuraciones configuracion = new Configuraciones();
+	private IBrowserFile? archivo;
+	private EditForm editForm;
+
+	protected override async Task OnInitializedAsync()
+	{
+		configuracion = await ConfiguracionesService.ObtenerConfiguracionActual();
+	}
+	private async Task GuardarConfiguracion()
+	{
+		if (archivo != null)
+		{
+			using var memoryStream = new MemoryStream();
+			await archivo.OpenReadStream().CopyToAsync(memoryStream);
+			configuracion.Imagen = memoryStream.ToArray();
+
+			var url = await ConfiguracionesService.GuardarImagenYObtenerUrl(configuracion.Imagen, NavigationManager);
+			configuracion.ImagenUrl = url;
+		}
+
+		var result = await ConfiguracionesService.UpdateObject(configuracion);
+		if (result)
+		{
+			var mensaje = new NotificationMessage
+				{
+					Severity = NotificationSeverity.Success,
+					Summary = "Éxito",
+					Detail = "Configuración guardada correctamente",
+					Duration = 5000
+				};
+			NotificationService.Notify(mensaje);
+
+			NavigationManager.NavigateTo("/");
+		}
+		else
+		{
+			var mensaje = new NotificationMessage
+				{
+					Severity = NotificationSeverity.Error,
+					Summary = "Error",
+					Detail = "No se pudo guardar la configuración",
+					Duration = 5000
+				};
+			NotificationService.Notify(mensaje);
+		}
+	}
+
+	private void Cancelar()
+	{
+		NavigationManager.NavigateTo("/Pages/Menu/");
+	}
+
+	private void HandleFileSelected(InputFileChangeEventArgs e)
+	{
+		archivo = e.File;
+	}
+}

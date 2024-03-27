@@ -38,6 +38,7 @@ builder.Services.AddScoped<IServer<Reparaciones>, ReparacionesService>();
 builder.Services.AddScoped<IServer<Ventas>, VentasService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IdentityUserService>();
+builder.Services.AddScoped<ConfiguracionesService>();
 
 builder.Services.AddScoped<IClient<Abonos>, AbonosServiceClient>();
 builder.Services.AddScoped<IClientAsp<ApplicationUserDto>, UsersServiceClient>();
