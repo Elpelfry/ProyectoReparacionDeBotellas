@@ -52,4 +52,8 @@ public class IdentityUserService(UserManager<ApplicationUser> _userManager, Role
     {
         return await _contexto.Users.FirstOrDefaultAsync(x => x.NickName == user) != null;
     }
+    public async Task<bool> CedulaExistAsync(string user)
+    {
+        return await _contexto.Users.FirstOrDefaultAsync(x => x.Cedula == user) != null;
+    }
 }

@@ -9,7 +9,7 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>Perfil</PageTitle>
 
 
 <StatusMessage />
@@ -21,11 +21,11 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
-                    <input type="text" value="@username" class="form-control" placeholder="Please choose your username." disabled />
+                    <input type="text" value="@username" class="form-control" placeholder="Por favor elija su nombre de usario" disabled />
                     <label for="username" class="form-label">Username</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
+                    <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Ingrese su número de teléfono" />
                     <label for="phone-number" class="form-label">Phone number</label>
                     <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
                 </div>
