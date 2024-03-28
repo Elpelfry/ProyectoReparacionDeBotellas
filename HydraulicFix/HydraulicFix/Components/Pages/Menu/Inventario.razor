@@ -1,7 +1,11 @@
 ﻿@page "/Inventario"
+@inject NavigationManager NavigationManager
+@inject ProductosService productoService
+@inject ApplicationDbContext dbContext
+@using Shared.Models
 @rendermode InteractiveServer
-<PageTitle>Inventario</PageTitle>
 
+<PageTitle>Inventario</PageTitle>
 <div class="container">
     <div class="card shadow">
         <div class="card-header">
@@ -9,10 +13,10 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <button class="btn btn-custom w-40 mb-5">Agregar producto</button>
+                <div class="col-md-3 mb-4 d-flex justify-content-end">
+                    <button class="btn btn-custom w-40 mb-5" @onclick="AbrirModal">Agregar producto</button>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-7">
                     <div class="input-group">
                         <input type="text" id="buscar" class="form-control" placeholder="Buscar producto">
                         <div class="input-group-append">
@@ -23,6 +27,51 @@
                     </div>
                 </div>
             </div>
+
+            <table class="table table-striped table-bordered justify-content">
+                <thead>
+                    <tr class="text-center">
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Descuento Aplicable</th>
+                        <th>ITBIS</th>
+                        <th>Disponible</th>
+                        <th>Editar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var producto in listaproductos)
+                    {
+                        <tr class="text-center">
+                            <td>@producto.Nombre</td>
+                            <td>@producto.Precio.ToString("N2")</td>
+                            <td>@producto.Descuento.ToString("N2")</td>
+                            <td>@producto.ITBIS.ToString("N2")</td>
+                            <td>@producto.Cantidad</td>
+                            <td class="text-center">
+                                <a class="btn btn-success bi bi-pencil"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+@code {
+
+    public List<Productos> listaproductos{ get; set; } = new List<Productos>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaproductos = await productoService.GetAllObject();
+    }
+
+
+    public void AbrirModal()
+    {
+        NavigationManager.NavigateTo("/modal");
+    }
+}

@@ -40,4 +40,6 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         _contexto.Productos.Remove(producto);
         return await _contexto.SaveChangesAsync() > 0;
     }
+   
+
 }
