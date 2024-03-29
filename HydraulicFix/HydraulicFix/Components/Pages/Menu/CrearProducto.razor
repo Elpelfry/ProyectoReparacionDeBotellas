@@ -95,11 +95,11 @@
 		}
 	}
 
-
 	private void Cancelar()
 	{
 		NavigationManager.NavigateTo("/Inventario");
 	}
+
 	public async Task Codigo()
 	{
 		productos.Codigo = await productosService.Random();

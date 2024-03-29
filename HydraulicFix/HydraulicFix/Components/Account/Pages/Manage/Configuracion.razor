@@ -8,7 +8,6 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Configuraci&oacute;n</PageTitle>
-<h3>Configuración</h3>
 
 <div class="container-fluid">
 	<div class="col-md-6">
@@ -18,8 +17,8 @@
 			<div class="d-flex justify-content-center">
 				<div class="row">
 					<div class="input-group">
-						<img class="text-center" src="@getLogo()" style="width: 100px;  height: 100px"  />
-						<label class="btn btn-primary" >
+						<img class="text-center" src="@getLogo()" style="width: 100px; height: 100px;" />
+						<label class="btn btn-primary " style="height: 40px; margin-top: 40px;">
 							<InputFile style="display: none;" accept=".png,.jpg,.jpeg" OnChange="cambiar" /> Cambiar logo
 						</label>
 					</div>
@@ -115,6 +114,6 @@
 	}
 	private void Cancelar()
 	{
-		NavigationManager.NavigateTo("/Pages/Menu/");
+		NavigationManager.NavigateTo("/Account/Manage");
 	}
 }
