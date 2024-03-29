@@ -34,6 +34,9 @@ builder.Services.AddScoped<IServer<Productos>, ProductosService>();
 builder.Services.AddScoped<IServer<Proveedores>, ProveedoresService>();
 builder.Services.AddScoped<IServer<Reparaciones>, ReparacionesService>();
 builder.Services.AddScoped<IServer<Ventas>, VentasService>();
+builder.Services.AddScoped<IServer<MetodoPagos>, MetodosPagosService>();
+builder.Services.AddScoped<IServer<Estados>, EstadosService>();
+builder.Services.AddScoped<IServer<Condiciones>, CondicionesService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IdentityUserService>();
 

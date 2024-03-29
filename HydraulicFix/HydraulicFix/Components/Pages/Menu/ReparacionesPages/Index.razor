@@ -1,0 +1,448 @@
+﻿@page "/Reparacion"
+
+@attribute [Authorize]
+
+@inject IServer<Reparaciones> reparacionesService
+@inject IServer<Estados> estadosService
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject IServer<Ventas> ventasService
+@inject IServer<Configuraciones> configuracionesService
+@inject IServer<Condiciones> condicionesService
+@inject IServer<MetodoPagos> metodosPagosService
+
+@inject AuthenticationStateProvider AuthenticationState
+@rendermode InteractiveServer
+
+<PageTitle>Reparaci&oacute;n</PageTitle>
+<AuthorizeView Roles="Admin">
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold text-center">Reparaciones</h3>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <div style="margin-left: 4px;">
+                        <div class="row">
+                            <label>Filtrar por:</label>
+                            <div class="col-2">
+                                <InputSelect @bind-Value="Opcion" class="form-select">
+                                    <option value="1">Reparaci&oacute;n Id</option>
+                                    <option value="2">T&eacute;cnico</option>
+                                    <option value="3">Fecha</option>
+                                    <option value="4">Todo</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-auto">
+                                @switch (Opcion)
+                                {
+                                    case 1:
+                                        <div class="input-group justify-content-end">
+                                            <InputNumber @bind-Value="reparacion.ReparacionId" class="form-control" min="0"></InputNumber>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 2:
+                                        <div class="input-group justify-content-end">
+                                            <InputText @bind-Value="reparacion.Tecnico" class="form-control"></InputText>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 3:
+                                        <div class="input-group justify-content-end">
+                                            <InputDate @bind-Value="reparacion.Fecha" class="form-control"></InputDate>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 4:
+                                        <div class="input-group justify-content-end">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                        break;
+                                }
+                            </div>
+                            <div class="col text-end">
+                                <div class="col-auto">
+                                    <a href="/Reparaciones/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-sm justify-content-center text-center">
+                        <thead>
+                            <tr>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Completado"))> Completado</button></th>
+                                <th> <button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("En Proceso"))>En Proceso</button></th>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Pendiente"))>Pendiente</button></th>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Cancelado"))>Cancelado</button></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <table class="table table-light table-hover table-striped table-bordered text-center">
+                    <thead>
+                        <tr class="fw-bold">
+                            <th scope="col">Reparaci&oacute;n Id</th>
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">T&eacute;cnico</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Editar</th>
+                            <th scope="col">Ver</th>
+                            <th scope="col">Vender</th>
+                            <th scope="col">Factura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in reparaciones)
+                        {
+                            var usuario = usuarios.FirstOrDefault(x => x.Id == item.ClienteId);
+                            <tr>
+                                <td>@item.ReparacionId</td>
+                                @if(usuario != null)
+                                {
+                                    <td>@usuario!.NickName</td>
+                                }
+                                else
+                                {
+                                    <td>Usuario no registrado</td>
+                                }
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Tecnico</td>
+                                @if (item.EstadoId == 1)
+                                {
+                                    var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                    <td class="text-secondary fw-bold">@estado!.NombreEstado</td>
+                                }
+                                else if (item.EstadoId == 2)
+                                {
+                                    var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                    <td class="text-info fw-bold">@estado!.NombreEstado</td>
+                                }
+                                else if (item.EstadoId == 3)
+                                {
+                                    var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                    <td class="text-success fw-bold">@estado!.NombreEstado</td>
+                                }
+                                else if (item.EstadoId == 4)
+                                {
+                                    var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                    <td class="text-danger fw-bold">@estado!.NombreEstado</td>
+                                }
+                                @if (item.EstadoId == 4 || item.EstadoId == 3)
+                                {
+                                    <td>
+                                        <a class="btn btn-secondary bi bi-pencil" disabled="true" style="height: 38px;"></a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <a href="/Reparaciones/Edit/@item.ReparacionId" class="btn btn-warning bi bi-pencil" style="height: 38px;"></a>
+                                    </td>
+                                }
+                                <td>
+                                    <a href="/Reparaciones/Ver/@item.ReparacionId" class="btn btn-warning bi bi-eye" style="height: 38px;"></a>
+                                </td>
+                                @if (item.EstadoId == 2)
+                                {
+                                    <td>
+                                        <a href="/ventas/@item.ReparacionId" style="background: transparent; border: none;" >
+                                            <img style="height: 38px;" src="/bootstrap/img/venta.png" />
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+                                @if (item.EstadoId == 3)
+                                {
+                                    <td>
+                                        <button type="button" style="background: transparent; border: none;">
+                                            <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                        </button>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</AuthorizeView>
+<AuthorizeView Roles="Cliente">
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold text-center">Reparaciones</h3>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <div style="margin-left: 4px;">
+                        <div class="row">
+                            <label>Filtrar por:</label>
+                            <div class="col-2">
+                                <InputSelect @bind-Value="Opcion" class="form-select">
+                                    <option value="2">T&eacute;cnico</option>
+                                    <option value="3">Fecha</option>
+                                    <option value="4">Todo</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-auto">
+                                @switch (Opcion)
+                                {               
+                                    case 2:
+                                        <div class="input-group justify-content-end">
+                                            <InputText @bind-Value="reparacion.Tecnico" class="form-control"></InputText>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 3:
+                                        <div class="input-group justify-content-end">
+                                            <InputDate @bind-Value="reparacion.Fecha" class="form-control"></InputDate>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 4:
+                                        <div class="input-group justify-content-end">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                        break;
+                                }
+                            </div>
+                            @if(!bandera){
+                                <div class="col text-end">
+                                    <div class="col-auto">
+                                        <a href="/Reparaciones/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Solicitar</a>
+                                    </div>
+                                </div>
+                            }
+                            
+                        </div>
+                    </div>
+                    <table class="table table-sm justify-content-center text-center">
+                        <thead>
+                            <tr>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Completado"))> Completado</button></th>
+                                <th> <button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("En Proceso"))>En Proceso</button></th>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Pendiente"))>Pendiente</button></th>
+                                <th><button class="nav-link text-white form-control" @onclick=@(() => CambiarEstado("Cancelado"))>Cancelado</button></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </div>
+            <div>
+                <table class="table table-light table-hover table-striped table-bordered text-center">
+                    <thead>
+                        <tr class="fw-bold">
+                            <th scope="col">Usuario</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">T&eacute;cnico</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Ver</th>
+                            <th scope="col">Factura</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in reparaciones)
+                        {
+                            var usu = usuarios.FirstOrDefault(x => x.Id == item.ClienteId);
+                            if(item.ClienteId == usuario!.Id)
+                            {
+                                <tr>
+                                    <td>@usu!.NickName</td>
+                                    <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                    @if(item.Tecnico != null)
+                                    {
+                                        <td>@item.Tecnico</td>
+                                    }
+                                    else
+                                    {
+                                        <td>Sin t&eacute;cnico asignado</td>
+                                    }
+                                    @if (item.EstadoId == 1)
+                                    {
+                                        var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                        <td class="text-secondary fw-bold">@estado!.NombreEstado</td>
+                                    }
+                                    else if (item.EstadoId == 2)
+                                    {
+                                        var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                        <td class="text-info fw-bold">@estado!.NombreEstado</td>
+                                    }
+                                    else if (item.EstadoId == 3)
+                                    {
+                                        var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                        <td class="text-success fw-bold">@estado!.NombreEstado</td>
+                                    }
+                                    else if (item.EstadoId == 4)
+                                    {
+                                        var estado = estados.FirstOrDefault(x => x.EstadoId == item.EstadoId);
+                                        <td class="text-danger fw-bold">@estado!.NombreEstado</td>
+                                    }
+                                    <td>
+                                        <a href="/Reparaciones/Ver/@item.ReparacionId" class="btn btn-warning bi bi-eye" style="height: 38px;"></a>
+                                    </td>
+                                    @if (item.EstadoId == 3)
+                                    {
+                                        <td>
+                                            <button type="button" style="background: transparent; border: none;">
+                                                <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                            </button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+           <h5><strong>Nota:</strong> Solo puedes hacer una nueva solicitud de reparaci&oacute;n siempre y cuando no tengas solicitudes pendientes</h5>
+        </div>
+    </div>
+
+</AuthorizeView>
+
+
+@if (Vender)
+{
+    <div class="modal d-block opaco">
+        <div style="width: 55rem;" class="position-fixed top-50 start-50 translate-middle">
+
+            <div class="modal-content" style="border-radius: 32px;">
+
+                <div class="card-header text-white bg-gradient" style="height: 35px; border-radius: 30px 30px 0px 0px;">
+                    <h4 class="fs-6 fw-bold"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h4>
+                    <div class="text-end d-flex justify-content-end align-items-end" style="margin-top: -30px;">
+                        <button style="border-radius: 50%; background-color: red; border: none; width: 20px; height: 20px; margin-left: 3px" @onclick="CerrarVenta" ></button>
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    public int Opcion { get; set; }
+    public bool bandera =false, Vender = false;
+
+    public Reparaciones reparacion { get; set; } = new Reparaciones();
+    public List<Reparaciones> reparaciones = new List<Reparaciones>();
+    public List<Estados> estados = new List<Estados>();
+
+    public List<ApplicationUser> usuarios { get; set; } = new List<ApplicationUser>();
+    public ApplicationUser usuario { get; set; } = new ApplicationUser();
+    public AuthenticationState authState { get; set; } = default!;
+
+    public Ventas venta { get; set; } = new Ventas();
+    public Configuraciones configuracion { get; set; } = new Configuraciones();
+    public Condiciones condicion { get; set; } = new Condiciones();
+    public MetodoPagos metodoPago { get; set; } = new MetodoPagos();
+
+    public List<Condiciones> condiciones { get; set; } = new List<Condiciones>();
+    public List<MetodoPagos> metodosPagos { get; set; } = new List<MetodoPagos>();
+    public List<Configuraciones> configuraciones { get; set; } = new List<Configuraciones>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        reparaciones = await reparacionesService.GetAllObject();
+        estados = await estadosService.GetAllObject();
+        usuarios = await usuariosService.GetAllObject();
+        authState = await AuthenticationState.GetAuthenticationStateAsync();
+        usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+        bandera = reparaciones.Any(r => r.EstadoId == 1 && r.ClienteId == usuario.Id);
+
+        condiciones = await condicionesService.GetAllObject();
+        metodosPagos = await metodosPagosService.GetAllObject();
+        configuraciones = await configuracionesService.GetAllObject();
+    }
+
+    public async Task Buscar()
+    {
+        if (Opcion == 1 && reparacion.ReparacionId > 0)
+        {
+            reparaciones = await reparacionesService.GetObjectByCondition(x => x.ReparacionId == reparacion.ReparacionId);
+
+        }
+        else if (Opcion == 2 && !string.IsNullOrEmpty(reparacion.Tecnico))
+        {
+            reparaciones = await reparacionesService.GetObjectByCondition(x => x.Tecnico!.ToLower().Contains(reparacion.Tecnico.ToLower()));
+        }
+        else if (Opcion == 3 && reparacion.Fecha != default)
+        {
+            reparaciones = await reparacionesService.GetObjectByCondition(x => x.Fecha.Date == reparacion.Fecha.Date);
+        }
+        else if (Opcion == 4)
+        {
+            reparaciones = await reparacionesService.GetObjectByCondition(x => true);
+        }
+    }
+
+    public async Task CambiarEstado(string estado)
+    {
+        var esta = await estadosService.GetObjectByCondition(x => x.NombreEstado == estado);
+        Estados es = esta.FirstOrDefault(x => x.NombreEstado == estado)!;
+        reparaciones = await reparacionesService.GetObjectByCondition(x => x.EstadoId == es.EstadoId);
+    }
+
+    public void CerrarVenta()
+    {
+        Vender = false;
+    }
+
+    public async Task VenderReparacion(Reparaciones reparacion)
+    {
+        venta.ClienteId = reparacion.ClienteId;
+        venta.ReparacionId = reparacion.ReparacionId;
+        venta.Fecha = DateTime.Now;
+        
+        foreach(var item in reparacion.ReparacionDetalle)
+        {
+            venta.VentasDetalle.Add(new VentasDetalle
+            {
+                VentaId = venta.VentaId,
+                ProductoId = item.ProductoId,
+                Cantidad = item.CantidadUsada
+            });
+        }
+    }
+}
