@@ -1,27 +1,11 @@
-﻿.row {
-    list-style-type: none;
-    padding: 0;
-}
-
-.nav-link {
-    background-color: #399CE7;
-    padding: 10px;
-    margin: 5px 0;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-    .nav-link:hover {
-        background-color: #74B4E5;
-        color: #fff;
-    }
-
-body {
-    background-color: #74B4E5;
+﻿body {
+    background-color: #f8f9fa;
 }
 
 .container {
-    padding-top: 20px;
+    width: 1920px;
+    height: 1080px;
+    padding-top: 50px;
 }
 
 .card {
@@ -34,6 +18,10 @@ body {
     background-color: #399ce7;
     color: white;
     border-radius: 10px 10px 0 0;
+}
+.card-header-sub {
+    background-color: #399ce7;
+    color: white;
 }
 
 .card-body {
@@ -53,3 +41,16 @@ body {
 .input-group {
     margin-bottom: 30px;
 }
+
+.nav-link {
+    background-color: #399CE7;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+    .nav-link:hover {
+        background-color: #74B4E5;
+        color: #fff;
+    }
