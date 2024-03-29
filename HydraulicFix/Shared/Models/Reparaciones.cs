@@ -16,7 +16,7 @@ public class Reparaciones
 
     [Required(ErrorMessage = "El Técnico es obligatorio")]
     [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "El Nombre debe contener solo letras.")]
-    public string? TecnicoId { get; set; }
+    public string? Tecnico { get; set; }
 
     [ForeignKey("Estados")]
     public int EstadoId { get; set; }
@@ -38,6 +38,9 @@ public class Reparaciones
     [Required(ErrorMessage = "El Teléfono es obligatori")]
     [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "El número de teléfono debe tener 10 dígitos")]
     public string? Telefono { get; set; }
+
+    [Required(ErrorMessage = "La Fecha es obligatoria")]
+    public DateTime Fecha { get; set; } = DateTime.Now;
 
     [ForeignKey("ReparacionId")]
     public ICollection<ReparacionesDetalle> ReparacionDetalle { get; set; } = new List<ReparacionesDetalle>();

@@ -1,5 +1,6 @@
 ﻿namespace HydraulicFix.Services;
 
+using HydraulicFix.Components.Account;
 using HydraulicFix.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public class IdentityUserService(UserManager<ApplicationUser> _userManager, RoleManager<IdentityRole> _roleManager, ApplicationDbContext _contexto)
+public class IdentityUserService(UserManager<ApplicationUser> _userManager,
+    RoleManager<IdentityRole> _roleManager, ApplicationDbContext _contexto)
 {
     public async Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password)
     {
@@ -51,5 +53,19 @@ public class IdentityUserService(UserManager<ApplicationUser> _userManager, Role
     public async Task<bool> GetNickNameAsync(string user)
     {
         return await _contexto.Users.FirstOrDefaultAsync(x => x.NickName == user) != null;
+    }
+
+    public async Task<IdentityRole> GetRoleAsync(ApplicationUser user)
+    {   
+        IdentityUserRole<string> roles = (await _contexto.UserRoles.FirstOrDefaultAsync(x => x.UserId == user.Id))!;
+
+        if (roles != null)
+        {
+            return (await _contexto.Roles.FirstOrDefaultAsync(r => r.Id == roles.RoleId))!; 
+        }
+        else
+        {
+            return null!;
+        }
     }
 }

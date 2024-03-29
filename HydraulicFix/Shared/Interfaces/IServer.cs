@@ -1,4 +1,6 @@
-﻿namespace Shared.Interfaces;
+﻿using System.Linq.Expressions;
+
+namespace Shared.Interfaces;
 
 public interface IServer<T>
 {
@@ -7,4 +9,5 @@ public interface IServer<T>
     public Task<bool> UpdateObject(T type);
     public Task<bool> DeleteObject(int id);
     public Task<List<T>> GetAllObject();
+    public Task<List<T>> GetObjectByCondition(Expression<Func<T, bool>> expression);
 }

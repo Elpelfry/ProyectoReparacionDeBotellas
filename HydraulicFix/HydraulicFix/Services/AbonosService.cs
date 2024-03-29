@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
+using System.Linq.Expressions;
 
 namespace HydraulicFix.Services;
 
@@ -26,10 +27,6 @@ public class AbonosService(ApplicationDbContext _contexto) : IServer<Abonos>
 
     public async Task<bool> UpdateObject(Abonos type)
     {
-        await _contexto.AbonosDetalle.Where(x => x.AbonoId == type.AbonoId).ExecuteDeleteAsync();
-        foreach (var item in type.AbonoDetalle)
-           _contexto.AbonosDetalle.Add(item);
-
         _contexto.Entry(type).State = EntityState.Modified;
         return await _contexto.SaveChangesAsync() > 0;
     }
@@ -42,5 +39,13 @@ public class AbonosService(ApplicationDbContext _contexto) : IServer<Abonos>
         await _contexto.AbonosDetalle.Where(x => x.AbonoId == id).ExecuteDeleteAsync();
         _contexto.Abonos.Remove(abono);
        return await _contexto.SaveChangesAsync() > 0;  
+    }
+
+    public async Task<List<Abonos>> GetObjectByCondition(Expression<Func<Abonos, bool>> expression)
+    {
+        return await _contexto.Abonos.Include(a => a.AbonoDetalle).
+            AsNoTracking().
+            Where(expression)
+                .ToListAsync();
     }
 }

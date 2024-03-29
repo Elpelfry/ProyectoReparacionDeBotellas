@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
+using System.Linq.Expressions;
 
 namespace HydraulicFix.Services;
 
@@ -39,5 +40,12 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         }
         _contexto.Productos.Remove(producto);
         return await _contexto.SaveChangesAsync() > 0;
+    }
+    public async Task<List<Productos>> GetObjectByCondition(Expression<Func<Productos, bool>> expression)
+    {
+        return await _contexto.Productos
+            .AsNoTracking()
+            .Where(expression)
+            .ToListAsync();
     }
 }

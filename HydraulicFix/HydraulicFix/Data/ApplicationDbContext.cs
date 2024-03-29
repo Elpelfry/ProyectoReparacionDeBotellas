@@ -29,8 +29,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         );
         modelBuilder.Entity<Estados>().HasData(
              new Estados { EstadoId = 1, NombreEstado = "Pendiente" },
-             new Estados { EstadoId = 2, NombreEstado = "EnProceso" },
-             new Estados { EstadoId = 3, NombreEstado = "Terminado" },
+             new Estados { EstadoId = 2, NombreEstado = "En Proceso" },
+             new Estados { EstadoId = 3, NombreEstado = "Completado" },
              new Estados { EstadoId = 4, NombreEstado = "Cancelado" }
         );
         modelBuilder.Entity<MetodoPagos>().HasData(

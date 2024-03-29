@@ -22,6 +22,8 @@ public class Productos
     [Required(ErrorMessage = "Indique la Cantidad")]
     [Range(1, 1000, ErrorMessage = "El Monto debe estar 1 y 1000")]
     public int Cantidad { get; set; }
+    [Required]
+    public string? Nombre { get; set; }
     public double Descuento { get; set; }
     public int ITBIS { get; set; }
     public bool EsDisponible { get; set; }

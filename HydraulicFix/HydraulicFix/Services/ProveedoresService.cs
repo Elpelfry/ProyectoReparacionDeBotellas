@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
+using System.Linq.Expressions;
 
 namespace HydraulicFix.Services;
 
@@ -37,5 +38,12 @@ public class ProveedoresService(ApplicationDbContext _contexto) : IServer<Provee
             return false;
         _contexto.Proveedores.Remove(pro);
         return await _contexto.SaveChangesAsync() > 0;
+    }
+    public async Task<List<Proveedores>> GetObjectByCondition(Expression<Func<Proveedores, bool>> expression)
+    {
+        return await _contexto.Proveedores
+            .AsNoTracking()
+            .Where(expression)
+            .ToListAsync();
     }
 }
