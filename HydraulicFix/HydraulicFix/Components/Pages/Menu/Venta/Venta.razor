@@ -138,14 +138,14 @@
                                         <td>@item.Precio.ToString("N2")</td>
                                         <td>
                                             <div class="input-group text-center">
-                                                <button type="button" class="btn btn-success bi bi-dash" @onclick=@(() => DisminuirCantidad(item)) ></button>
+                                                <button type="button" class="btn btn-success bi bi-dash" @onclick=@(() => DisminuirCantidad(item))></button>
                                                 <label class="form-control text-center">@item.Cantidad.ToString("00")</label>
-                                                <button type="button" class="btn btn-success bi bi-plus" @onclick=@(() => AumentarCantidad(item)) ></button>
+                                                <button type="button" class="btn btn-success bi bi-plus" @onclick=@(() => AumentarCantidad(item))></button>
                                             </div>
                                         </td>
                                         <td>@item.ITBIS.ToString("N2")%</td>
                                         <td>@item.Descuento.ToString("N2")%</td>
-                                        <td class="justify-content-center"><button type="button" class="btn btn-muted bi bi-plus" @onclick=@(() => AgregarProducto(producto!)) style="background:#2ca4f2"></button></td>
+                                        <td class="justify-content-center"><button type="button" class="btn btn-muted text-white" @onclick=@(() => AgregarProducto(producto!)) style="background:#2ca4f2"><i class="bi bi-plus "></i></button></td>
                                     </tr>
                                 }
                             </tbody>
@@ -161,32 +161,153 @@
 @if (Vender)
 {
     <div class="modal d-block opaco">
-        <div style="width: 55rem;" class="position-fixed top-50 start-50 translate-middle">
+        @* <div style="width: 55rem;" class="position-fixed top-50 start-50 translate-middle">
 
-            <div class="modal-content" style="border-radius: 35px;">
+    <div class="modal-content" style="border-radius: 35px;">
 
-                <RadzenNotification />
-                <div class="card-header text-white bg-gradient" style="height: 35px; border-radius: 30px 30px 0px 0px;">
-                    <h4 class="fs-6 fw-bold"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h4>
-                    <div class="text-end d-flex justify-content-end align-items-end" style="margin-top: -30px;">
-                        <button class="btn btn-danger" style=" background-color: red; border: none; width: 20px; height: 20px; margin-left: 3px" @onclick="CerrarVenta"></button>
-                    </div>
+    <RadzenNotification />
+    <div class="card-header text-white bg-gradient" style="height: 35px; border-radius: 30px 30px 0px 0px;">
+    <h4 class="fs-6 fw-bold"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h4>
+    <div class="text-end d-flex justify-content-end align-items-end" style="margin-top: -30px;">
+    <button class="btn btn-danger" style=" background-color: red; border: none; width: 20px; height: 20px; margin-left: 3px" @onclick="CerrarVenta"></button>
+    </div>
+    </div>
+
+    <div class="modal-body">
+    <div class="row">
+    <div class="col-4">
+    <label class="form-label"><strong>Sub-Total:</strong></label>
+    <label class="form-control">RD$ @venta.SubTotal.ToString("N2")</label>
+    </div>
+    <div class="col-4">
+    <label class="form-label"><strong>ITBIS:</strong></label>
+    <label class="form-control">RD$ @venta.ITBS.ToString("N2")</label>
+    </div>
+    <div class="col-4">
+    <label class="form-label"><strong>Total:</strong></label>
+    <label class="form-control">RD$ @venta.Total.ToString("N2")</label>
+    </div>
+    <div class="col-6">
+    <label class="fw-bold">Condici&oacute;n:</label>
+    <InputSelect @bind-Value="venta.CondicionId" class="form-select">
+    @foreach (var item in condiciones)
+    {
+    <option value="@item.CondicionId">@item.Nombre</option>
+    }
+    </InputSelect>
+    </div>
+    <div class="col-6">
+    @if (venta.CondicionId == 2)
+    {
+    <label class="fw-bold">Metodo de Pago:</label>
+    <InputSelect @bind-Value="venta.MetodoPagoId" class="form-select">
+    @foreach (var item in metodosPagos)
+    {
+    <option value="@item.MetodoPagoId">@item.Nombre</option>
+    }
+    </InputSelect>
+
+    }
+    </div>
+
+
+    @if (usuario.Nombre != null && reparacion.ReparacionId > 0)
+    {
+    <div class="col-12">
+    <label class="form-control fw-bold text-center">@usuario.Nombre @usuario.Apellido</label>
+    </div>
+    }
+    else
+    {
+    <div class="col-6">
+    <label class="fw-bold">Cedula:</label>
+    <div class="input-group">
+    <InputText @bind-Value="usuario!.Cedula" class="form-control" placeholder="Cedula del Cliente"></InputText>
+    <button class="btn btn-info" @onclick="BuscarUsuario">Buscar</button>
+    </div>
+    </div>
+    <div class="col-6">
+    @if (usuario.Cedula != "" && usuario.Nombre != null)
+    {
+    <label class="fw-bold">Nombre de Cliente:</label>
+    <label class="form-control fw-bold">@usuario.Nombre @usuario.Apellido</label>
+    }
+    </div>
+    }
+
+    @if (venta.CondicionId == 2 && venta.MetodoPagoId == 2)
+    {
+    <EditForm Model="input" OnValidSubmit="RealizarVenta">
+    <DataAnnotationsValidator />
+    <div class="col-4">
+    <label class="fw-bold">Numero de Tarjeta:</label>
+    <InputText @bind-Value="input.NumeroTarjeta" class="form-control"></InputText>
+    <ValidationMessage For="@(() => input.NumeroTarjeta)" />
+    </div>
+    <div class="col-4">
+    <label class="fw-bold">Numero de Seguridad:</label>
+    <InputText @bind-Value="input.NumeroSeguridad" class="form-control"></InputText>
+    <ValidationMessage For="@(() => input.NumeroSeguridad)" />
+    </div>
+    <div class="col-4">
+    <label class="fw-bold">Fecha de Expiraci&oacute;n:</label>
+    <InputDate @bind-Value="input.FechaExpiracion" class="form-control"></InputDate>
+    <ValidationMessage For="@(() => input.FechaExpiracion)" />
+    </div>
+    </EditForm>
+    }
+    else if(venta.CondicionId == 2 && venta.MetodoPagoId == 1)
+    {
+    <div class="col-6">
+    <EditForm Model="venta.Recibido" OnValidSubmit="RealizarVenta">
+    <DataAnnotationsValidator />
+    <label class="fw-bold">Recibido:</label>
+    <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0.01"></InputNumber>
+    <ValidationMessage For="@(() => venta.Recibido)" />
+    </EditForm>
+    </div>
+    }
+
+
+    </div>
+    </div>
+    </div>
+    </div> *@
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h5>
+                    <button type="button" class="btn bg-danger text-white" @onclick="CerrarVenta">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
-
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-4">
-                            <label class="form-label"><strong>Sub-Total:</strong></label>
-                            <label class="form-control">RD$ @venta.SubTotal.ToString("N2")</label>
-                        </div>
-                        <div class="col-4">
-                            <label class="form-label"><strong>ITBIS:</strong></label>
-                            <label class="form-control">RD$ @venta.ITBS.ToString("N2")</label>
-                        </div>
-                        <div class="col-4">
-                            <label class="form-label"><strong>Total:</strong></label>
-                            <label class="form-control">RD$ @venta.Total.ToString("N2")</label>
-                        </div>
+
+                        @if (usuario.Nombre != null && reparacion.ReparacionId > 0)
+                        {
+                            <div class="col-12">
+                                <label class="form-control fw-bold text-center">@usuario.Nombre @usuario.Apellido</label>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-6">
+                                <label class="fw-bold">Cedula:</label>
+                                <div class="input-group">
+                                    <InputText @bind-Value="usuario!.Cedula" class="form-control" placeholder="Cedula del Cliente"></InputText>
+                                    <button class="btn btn-info" @onclick="BuscarUsuario" style="background: #0174BE">Buscar</button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                @if (usuario.Cedula != "" && usuario.Nombre != null)
+                                {
+                                    <label class="fw-bold">Nombre de Cliente:</label>
+                                    <label class="form-control fw-bold">@usuario.Nombre @usuario.Apellido</label>
+                                }
+                            </div>
+                        }
                         <div class="col-6">
                             <label class="fw-bold">Condici&oacute;n:</label>
                             <InputSelect @bind-Value="venta.CondicionId" class="form-select">
@@ -209,56 +330,76 @@
 
                             }
                         </div>
-                        
 
-                        @if (usuario.Nombre != null && reparacion.ReparacionId > 0)
-                        {
-                            <div class="col-12">
-                                <label class="form-control fw-bold text-center">@usuario.Nombre @usuario.Apellido</label>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="col-6">
-                                <label class="fw-bold">Cedula:</label>
-                                <div class="input-group">
-                                    <InputText @bind-Value="usuario!.Cedula" class="form-control" placeholder="Cedula del Cliente"></InputText>
-                                    <button class="btn btn-info" @onclick="BuscarUsuario">Buscar</button>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                @if (usuario.Cedula != "" && usuario.Nombre != null)
-                                {
-                                    <label class="fw-bold">Nombre de Cliente:</label>
-                                    <label class="form-control fw-bold">@usuario.Nombre @usuario.Apellido</label>
-                                }
-                            </div>
-                        }
+
+
 
                         @if (venta.CondicionId == 2 && venta.MetodoPagoId == 2)
                         {
                             <EditForm Model="input" OnValidSubmit="RealizarVenta">
                                 <DataAnnotationsValidator />
-                            <div class="col-4">
-                                <label class="fw-bold">Numero de Tarjeta:</label>
-                                <InputText @bind-Value="input.NumeroTarjeta" class="form-control"></InputText>
-                                <ValidationMessage For="@(() => input.NumeroTarjeta)" />
-                            </div>
-                            <div class="col-4">
-                                <label class="fw-bold">Numero de Seguridad:</label>
-                                <InputText @bind-Value="input.NumeroSeguridad" class="form-control"></InputText>
-                                <ValidationMessage For="@(() => input.NumeroSeguridad)" />
-                            </div>
-                            <div class="col-4">
-                                <label class="fw-bold">Fecha de Expiraci&oacute;n:</label>
-                                <InputDate @bind-Value="input.FechaExpiracion" class="form-control"></InputDate>
-                                <ValidationMessage For="@(() => input.FechaExpiracion)" />
-                            </div>
+
+                                <div class="col-12">
+                                    <label class="fw-bold">Numero de Tarjeta:</label>
+                                    <div class="input-group">
+                                        <InputText @bind-Value="input.NumeroTarjeta" class="form-control">
+                                        </InputText>
+
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <img src="/bootstrap/img/mastercard.svg" class="img-fluid" alt="Mastercard Logo" style="width: 25px; height: 25px;">
+                                                <img src="/bootstrap/img/visa.svg" class="img-fluid" alt="Visa Logo" style="width: 25px; height: 25px;">
+                                                <img src="/bootstrap/img/amex.svg" class="img-fluid" alt="Visa Logo" style="width: 25px; height: 25px;">
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <ValidationMessage For="@(() => input.NumeroTarjeta)" class="alert alert-danger" />
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="fw-bold">Numero de Seguridad:</label>
+                                            <div class="input-group">
+                                                <InputText @bind-Value="input.NumeroSeguridad" class="form-control"></InputText>
+
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <img src="/bootstrap/img/cvv_card.svg" class="img-fluid" alt="Mastercard Logo" style="width: 25px; height: 25px;">
+                                                    </span>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-6">
+                                            <label class="fw-bold">Fecha de Expiraci&oacute;n:</label>
+
+
+                                            <InputDate @bind-Value="input.FechaExpiracion" class="form-control"></InputDate>
+
+
+                                        </div>
+                                        <ValidationMessage For="@(() => input.NumeroSeguridad)" class="alert alert-danger" />
+                                        
+                                        @if(input.FechaExpiracion <= DateTime.Now)
+                                        {
+                                            var validationMessage = ValidateFechaExpiracion(input.FechaExpiracion);
+                                            if (validationMessage != null)
+                                            {
+                                                <div class="alert alert-info" role="alert">@validationMessage</div>
+                                                
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
                             </EditForm>
                         }
-                        else if(venta.CondicionId == 2 && venta.MetodoPagoId == 1)
+                        else if (venta.CondicionId == 2 && venta.MetodoPagoId == 1)
                         {
-                            <div class="col-6">
+                            <div class="col-12">
                                 <EditForm Model="venta.Recibido" OnValidSubmit="RealizarVenta">
                                     <DataAnnotationsValidator />
                                     <label class="fw-bold">Recibido:</label>
@@ -267,13 +408,26 @@
                                 </EditForm>
                             </div>
                         }
-                        
+                        <div class="col-4">
+                            <label class="form-label"><strong>Sub-Total:</strong></label>
+                            <label class="form-control">RD$ @venta.SubTotal.ToString("N2")</label>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label"><strong>ITBIS:</strong></label>
+                            <label class="form-control">RD$ @venta.ITBS.ToString("N2")</label>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label"><strong>Total:</strong></label>
+                            <label class="form-control">RD$ @venta.Total.ToString("N2")</label>
+                        </div>
 
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+
 }
 
 
@@ -437,12 +591,12 @@
 
     private sealed class Input
     {
-        [Required(ErrorMessage = "Es requerido")]
+        [Required(ErrorMessage = "El número de la tarjeta es requerido")]
         [RegularExpression(@"^[0-9]{16}$", ErrorMessage = "El número de tarjeta debe tener 16 dígitos")]
         [Display(Name = "Numero de la Tarjeta")]
         public string? NumeroTarjeta { get; set; }
 
-        [Required(ErrorMessage = "Es requerido")]
+        [Required(ErrorMessage = "El número de seguridad es requerido")]
         [RegularExpression(@"^[0-9]+$", ErrorMessage = "El número de seguridad solo puede contener dígitos")]
         [StringLength(4, MinimumLength = 3, ErrorMessage = "El número de seguridad debe tener entre 3 y 4 dígitos")]
         [Display(Name = "Numero de Seguridad")]
@@ -450,7 +604,7 @@
 
         [Required(ErrorMessage = "Es requerido")]
         [Display(Name = "Fecha de Expiración")]
-        public DateTime FechaExpiracion { get; set; }
+        public DateTime FechaExpiracion { get; set; } 
     }
 
     public async Task AgregarDetalle(ICollection<ReparacionesDetalle> detalle)
@@ -488,7 +642,7 @@
 
     public async Task RealizarVenta()
     {
-        if(venta.CondicionId == 1)
+        if (venta.CondicionId == 1)
         {
 
         }
@@ -512,8 +666,17 @@
             }
             else
             {
-                
+
             }
         }
+    }
+
+    private string ValidateFechaExpiracion(DateTime fecha)
+    {
+        if (fecha <= DateTime.Now)
+        {
+            return "La fecha de expiración debe ser posterior a la fecha actual.";
+        }
+        return null!;
     }
 }
