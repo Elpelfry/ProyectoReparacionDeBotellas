@@ -1,0 +1,80 @@
+﻿@page "/EditarProductos"
+@page "/EditarProductos/{ProductoId:int}"
+@rendermode InteractiveServer
+@inject ProductosService productosService
+@using Shared.Models
+
+<PageTitle>Editar</PageTitle>
+<EditForm Model="productos" OnValidSubmit="Editar">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header">
+				<h3 class="fw-bold">Editar</h3>
+			</div>
+			<div class="card-body">
+				<div class="input-group">
+
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6">
+								<label class="fw-bold">Nombre</label>
+								<InputText @bind-Value="productos.Nombre" class="form-control" />
+							
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<label class="fw-bold">Producto Id</label>
+								<InputNumber @bind-Value="productos.ProductoId" class="form-control" />
+							
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<label class="fw-bold">Precio</label>
+								<InputNumber @bind-Value="productos.Precio" class="form-control" />
+								
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<label class="fw-bold">C&oacute;digo</label>
+								<InputText @bind-Value="productos.Codigo" class="form-control" />
+							
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<label class="fw-bold">Cantidad</label>
+								<InputNumber @bind-Value="productos.Cantidad" class="form-control" />
+							
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card-footer">
+				<a href="/Inventario" class="btn btn-danger">Retroceder</a>
+				<button @onclick="Editar" class="btn btn-primary bi bi-check">Listo</button>
+			</div>
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	[Parameter]
+	public int ProductoId { get; set; }
+	public Productos productos { get; set; } = new Productos();
+
+	protected override async Task OnInitializedAsync() => await productosService.Search(ProductoId);
+
+	public async Task Editar()
+	{
+		var buscado = await productosService.UpdateObject(productos);
+
+	}
+
+}

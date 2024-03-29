@@ -1,23 +1,29 @@
 ﻿@page "/Account/Pages/Manage/Configuracion"
 @using HydraulicFix.Services
+@inject ConfiguracionesService configuracionesService
 @using Microsoft.AspNetCore.Components.Forms
-@using System.IO
 @using global::Shared.Models
-
-@inject ConfiguracionesService ConfiguracionesService
+@rendermode InteractiveServer
 @inject Radzen.NotificationService NotificationService
 @inject NavigationManager NavigationManager
+
 <PageTitle>Configuraci&oacute;n</PageTitle>
 <h3>Configuración</h3>
 
 <div class="container-fluid">
 	<div class="col-md-6">
-		<EditForm Model="@configuracion" OnValidSubmit="GuardarConfiguracion" @ref="editForm" @form="configuracionForm">
+		<EditForm Model="@configuracion" OnValidSubmit="Guardar">
 			<DataAnnotationsValidator />
 
-			<div class="form-group">
-				<label for="imagen">Imagen:</label>
-				<InputFile id="imagen" OnChange="HandleFileSelected" accept=".jpg,.jpeg,.png" class="form-control" />
+			<div class="d-flex justify-content-center">
+				<div class="row">
+					<div class="input-group">
+						<img class="text-center" src="@getLogo()" style="width: 100px;  height: 100px"  />
+						<label class="btn btn-primary" >
+							<InputFile style="display: none;" accept=".png,.jpg,.jpeg" OnChange="cambiar" /> Cambiar logo
+						</label>
+					</div>
+				</div>
 			</div>
 
 			<div class="form-group">
@@ -55,60 +61,64 @@
 
 
 @code {
-	private Configuraciones configuracion = new Configuraciones();
-	private IBrowserFile? archivo;
-	private EditForm editForm;
+	public Configuraciones configuracion = new Configuraciones();
+	private string? mensaje = "";
 
 	protected override async Task OnInitializedAsync()
 	{
-		configuracion = await ConfiguracionesService.ObtenerConfiguracionActual();
-	}
-	private async Task GuardarConfiguracion()
-	{
-		if (archivo != null)
+		var buscar = await configuracionesService.Search(2);
+		if (buscar != null)
 		{
-			using var memoryStream = new MemoryStream();
-			await archivo.OpenReadStream().CopyToAsync(memoryStream);
-			configuracion.Imagen = memoryStream.ToArray();
-
-			var url = await ConfiguracionesService.GuardarImagenYObtenerUrl(configuracion.Imagen, NavigationManager);
-			configuracion.ImagenUrl = url;
+			configuracion = buscar;
 		}
+	}
 
-		var result = await ConfiguracionesService.UpdateObject(configuracion);
-		if (result)
+	public string getLogo()
+	{
+		
+		if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
 		{
-			var mensaje = new NotificationMessage
-				{
-					Severity = NotificationSeverity.Success,
-					Summary = "Éxito",
-					Detail = "Configuración guardada correctamente",
-					Duration = 5000
-				};
-			NotificationService.Notify(mensaje);
-
-			NavigationManager.NavigateTo("/");
+			string base64String = Convert.ToBase64String(configuracion.Imagen);
+			return $"data:image/png;base64,{base64String}";
 		}
 		else
 		{
-			var mensaje = new NotificationMessage
-				{
-					Severity = NotificationSeverity.Error,
-					Summary = "Error",
-					Detail = "No se pudo guardar la configuración",
-					Duration = 5000
-				};
-			NotificationService.Notify(mensaje);
+			return "/bootstrap/img/ejemplo.png";
 		}
 	}
 
+
+
+	public async Task cambiar(InputFileChangeEventArgs e)
+	{
+		var archivo = e.File;
+		if (archivo != null)
+		{
+			var stream = archivo.OpenReadStream();
+			using (var memoryStream = new MemoryStream())
+			{
+				await stream.CopyToAsync(memoryStream);
+				configuracion.Imagen = memoryStream.ToArray();
+			}
+		}
+	}
+
+	public async Task Guardar()
+	{
+		var guardado = await configuracionesService.UpdateObject(configuracion);
+		if (guardado)
+		{
+			 mensaje = "guardado";
+		}
+		else
+		{
+			 mensaje = "error";
+		}
+	}
 	private void Cancelar()
 	{
 		NavigationManager.NavigateTo("/Pages/Menu/");
 	}
 
-	private void HandleFileSelected(InputFileChangeEventArgs e)
-	{
-		archivo = e.File;
-	}
+	
 }

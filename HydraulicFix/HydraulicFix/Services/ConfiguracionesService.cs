@@ -24,8 +24,11 @@ public class ConfiguracionesService(ApplicationDbContext _contexto) : IServer<Co
         await _contexto.SaveChangesAsync();
         return type;
     }
-
-    public async Task<bool> UpdateObject(Configuraciones type)
+	public async Task<Configuraciones?> Search(int configuracionesId)
+	{
+		return await _contexto.Configuraciones.AsNoTracking().FirstOrDefaultAsync(a => a.ConfiguracionId == configuracionesId);
+	}
+	public async Task<bool> UpdateObject(Configuraciones type)
     {
         _contexto.Entry(type).State = EntityState.Modified;
         return await _contexto.SaveChangesAsync() > 0;

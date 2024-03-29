@@ -30,6 +30,11 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         return await _contexto.SaveChangesAsync() > 0;
     }
 
+    public async Task<Productos?> Search(int productoId)
+    {
+        return await _contexto.Productos.AsNoTracking().FirstOrDefaultAsync(a => a.ProductoId == productoId);
+    }
+
     public async Task<bool> DeleteObject(int id)
     {
         var producto = await _contexto.Productos.FindAsync(id);

@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shared.Models
 {
-
     public class Productos
     {
         [Key]
