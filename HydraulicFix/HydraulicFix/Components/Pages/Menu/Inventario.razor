@@ -34,10 +34,13 @@
 					<thead>
 						<tr class="text-center">
 							<th>Nombre</th>
+							<th>Producto</th>
 							<th>Precio</th>
-							<th>Descuento Aplicable</th>
+							<th>Descuento</th>
 							<th>ITBIS</th>
-							<th>Disponible</th>
+							<th>Categor&iacute;a </th>
+							<th>Proveedor</th>
+							<th>Cantidad</th>
 							<th>Editar</th>
 						</tr>
 					</thead>
@@ -47,13 +50,17 @@
 						{
 							<tr class="text-center">
 								<td>@producto.Nombre</td>
+								<td>@producto.ProductoId</td>
 								<td>@producto.Precio.ToString("N2")</td>
 								<td>@producto.Descuento.ToString("N2")</td>
 								<td>@producto.ITBIS.ToString("N2")</td>
+								<td>@producto.CategoriaId</td>
+								<td>@producto.ProveedorId</td>
 								<td>@producto.Cantidad</td>
 								<td class="text-center">
-									<a class="btn btn-success bi bi-pencil" href="/EditarProductos"></a>
+								<td><button type="button" class="btn btn-primary" @onclick="()=> Editar(producto.ProductoId)"><i class="bi bi-pencil"/></button></td>
 								</td>
+
 							</tr>
 						}
 					</tbody>
@@ -136,4 +143,9 @@
 				break;
 		}
 	}
+	void Editar(int ProductoId)
+	{
+		NavigationManager.NavigateTo($"/EditarProductos/{ProductoId}");
+	}
+
 }

@@ -1,4 +1,4 @@
-@page "/Account/Login"
+@page "/"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
@@ -15,7 +15,7 @@
 <div class="page-wrapper">
 	<div class="row justify-content-center">
 		<div>
-			<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7; margin-top: 50px;">
+			<div class="content-container" style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; color: #399ce7; box-shadow: 0px 0px 35px #399ce7;">
 				<EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
 					<DataAnnotationsValidator />
 

@@ -8,73 +8,74 @@
 
 <PageTitle>Agregar productos</PageTitle>
 <EditForm Model="@productos" OnValidSubmit="GuardarProducto">
-	<DataAnnotationsValidator />
-	<div class="container">
-		<div class="card shadow-lg">
-			<div class="card-header">
-				<h3 class="fw-bold">Registro de productos</h3>
-			</div>
-
-			<div class="card-body">
-
-				<div class="row justify-content-center">
-					<div class="col-md-4">
-						<div class="form-group">
-							<label for="nombreProducto" class="fw-bold">Nombre:</label>
-							<InputText @bind-Value="productos.Nombre" class="form-control" />
-							<ValidationMessage For="@(() => productos.Nombre)" />
-						</div>
-						<div class="form-group">
-							<label for="categoriaProducto" class="fw-bold">Categoría ID:</label>
-							<InputNumber @bind-Value="productos.CategoriaId" class="form-control" />
-							<ValidationMessage For="@(() => productos.CategoriaId)" />
-						</div>
-						<div class="form-group">
-							<label for="precioProducto" class="fw-bold">Precio:</label>
-							<InputNumber @bind-Value="productos.Precio" class="form-control" />
-							<ValidationMessage For="@(() => productos.Precio)" />
-						</div>
-						<div class="form-group">
-							<label for="codigoProducto" class="fw-bold">Código:</label>
-							<InputText @bind-Value="productos.Codigo" class="form-control" />
-							<ValidationMessage For="@(() => productos.Codigo)" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label for="cantidadProducto" class="fw-bold">Cantidad:</label>
-							<InputNumber @bind-Value="productos.Cantidad" class="form-control" />
-							<ValidationMessage For="@(() => productos.Cantidad)" />
-						</div>
-						<div class="form-group">
-							<label for="descuentoProducto" class="fw-bold">Descuento:</label>
-							<InputNumber @bind-Value="productos.Descuento" class="form-control" />
-							<ValidationMessage For="@(() => productos.Descuento)" />
-						</div>
-						<div class="form-group">
-							<label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
-							<InputNumber @bind-Value="productos.ProveedorId" class="form-control" />
-							<ValidationMessage For="@(() => productos.ProveedorId)" />
-						</div>
-						<div class="form-group">
-							<label for="itbisProducto" class="fw-bold">ITBIS:</label>
-							<InputNumber @bind-Value="productos.ITBIS" class="form-control" />
-						</div>
-						<ValidationMessage For="@(() => productos.ITBIS)" />
-					</div>
-				</div>
-
-			</div>
-			<div class="card-footer justify-content-center d-flex">
-				<button type="submit" class="btn btn-primary bi bi-floppy" @onclick="GuardarProducto">Guardar</button>
-				<button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-				@mensaje
-			</div>
-
-		</div>
-	</div>
-	<DataAnnotationsValidator />
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold">Registro de productos</h3>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="nombreProducto" class="fw-bold">Nombre:</label>
+                            <InputText @bind-Value="productos.Nombre" class="form-control" />
+                            <ValidationMessage For="@(() => productos.Nombre)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="categoriaProducto" class="fw-bold">Categoría ID:</label>
+                            <InputNumber @bind-Value="productos.CategoriaId" class="form-control" />
+                            <ValidationMessage For="@(() => productos.CategoriaId)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="precioProducto" class="fw-bold">Precio:</label>
+                            <InputNumber @bind-Value="productos.Precio" class="form-control" />
+                            <ValidationMessage For="@(() => productos.Precio)" />
+                        </div>
+                        <div class="form-group">
+                            <label class="fw-bold">Código:</label>
+                            <div class="input-group">
+                                <InputText style="margin-right: 10px;" class="form-control" @bind-Value="productos.Codigo"></InputText>
+                                <button style="background: transparent; border: none;" type="button" @onclick="Codigo">
+                                    <img style="width: 32px; height: 32px;" src="/bootstrap/img/codigo.png" />
+                                </button>
+                            </div>
+                            <ValidationMessage For="@(() => productos.Codigo)" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="cantidadProducto" class="fw-bold">Cantidad:</label>
+                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" />
+                            <ValidationMessage For="@(() => productos.Cantidad)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="descuentoProducto" class="fw-bold">Descuento:</label>
+                            <InputNumber @bind-Value="productos.Descuento" class="form-control" />
+                            <ValidationMessage For="@(() => productos.Descuento)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
+                            <InputNumber @bind-Value="productos.ProveedorId" class="form-control" />
+                            <ValidationMessage For="@(() => productos.ProveedorId)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="itbisProducto" class="fw-bold">ITBIS:</label>
+                            <InputNumber @bind-Value="productos.ITBIS" class="form-control" />
+                            <ValidationMessage For="@(() => productos.ITBIS)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer justify-content-center d-flex">
+                <button type="submit" class="btn btn-primary bi bi-floppy" @onclick="GuardarProducto">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                @mensaje
+            </div>
+        </div>
+    </div>
 </EditForm>
+
 
 @code {
 	public Productos productos { get; set; } = new Productos();
@@ -99,4 +100,9 @@
 	{
 		NavigationManager.NavigateTo("/Inventario");
 	}
+	public async Task Codigo()
+	{
+		productos.Codigo = await productosService.Random();
+	}
+
 }

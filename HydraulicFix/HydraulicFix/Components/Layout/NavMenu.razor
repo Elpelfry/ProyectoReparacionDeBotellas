@@ -1,83 +1,88 @@
 ﻿@implements IDisposable
 @inject NavigationManager NavigationManager
 
-<div class="container-fluid">
-	<div onclick="document.querySelector('.navbar-toggler').click()">
+<AuthorizeView>
+	<Authorized>
+		<div class="container-fluid">
+			<div onclick="document.querySelector('.navbar-toggler').click()">
 
-		<nav class="navbar navbar-expand navbar-dark">
-			<div class="align-items-center" style="width: 80px; height: 80px; color: #399ce7">
-				<img src="/bootstrap/img/ejemplo.png" @* style="max-width: 100%; max-height: 100%;" *@ />
-			</div>
-
-			<div class="container-fluid">
-				<span class="navbar-brand fw-bold fs-4">HydraulicFix</span>
-
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-						aria-controls="navbarNav" aria-label="Toggle navigation">
-				</button>
-
-				<div class="collapse navbar-collapse" id="navbarNav">
-
-					<div class="navbar-nav ms-auto fw-bold">
-						<div class="row">
-							<div class="nav-item">
-								<a class="nav-link text-light" href="/venta"><img src="/bootstrap/img/venta.png" style="width: 30px; height: 30px; margin-right: 5px;" />Venta</a>
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="nav-item">
-								<a class="nav-link text-light" href="/"><img src="/bootstrap/img/reparacion.png" style="width: 20px; height: 20px; margin-right: 2px;" />Reparación</a>
-							</div>
-						</div>
-						<div class="row">
-							<div class="nav-item">
-								<a class="nav-link text-light" href="/inventario"><img src="/bootstrap/img/inventario.png" style="width: 20px; height: 20px; margin-right: 2px;" />Inventario</a>
-							</div>
-						</div>
-						<AuthorizeView>
-							<Authorized>
-								<div class="row">
-									<div class="nav-item">
-										<a class="nav-link text-light" href="Account/Manage"><img src="/bootstrap/img/use.svg" style="width: 30px; height: 30px; margin-right: 5px;" />@context.User.Identity?.Name</a>
-									</div>
-								</div>
-								<div class="row">
-									<div class="nav-item">
-										<form action="Account/Logout" method="post">
-											<AntiforgeryToken />
-											<div class="border-danger rounded btn-danger">
-												<input type="hidden" name="ReturnUrl" value="@currentUrl" />
-												<button type="submit" class="btn btn-custom">
-													<i class="bi bi-box-arrow-right me-2 d-flex justify-content-center"></i>Salir
-												</button>
-											</div>
-										</form>
-									</div>
-								</div>
-
-							</Authorized>
-							<NotAuthorized>
-								<div class="row">
-
-									<div class="nav-item ">
-										<a href="Account/Register" class="nav-link text-light"><img src="/bootstrap/img/use.svg" style="width: 25px; height: 25px; margin-right: 2px;" /> Register</a>
-									</div>
-								</div>
-								<div class="row">
-									<div class="nav-item ">
-										<a href="Account/Login" class="nav-link  text-light"><img src="/bootstrap/img/use.svg" style="width: 25px; height: 25px; margin-right: 2px;" />Login</a>
-									</div>
-								</div>
-							</NotAuthorized>
-						</AuthorizeView>
+				<nav class="navbar navbar-expand navbar-dark">
+					<div class="align-items-center" style="width: 80px; height: 80px; color: #399ce7">
+						<img src="/bootstrap/img/ejemplo.png" @* style="max-width: 100%; max-height: 100%;" *@ />
 					</div>
-				</div>
-			</div>
-		</nav>
-	</div>
-</div>
 
+					<div class="container-fluid">
+						<span class="navbar-brand fw-bold fs-4">HydraulicFix</span>
+
+						<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+								aria-controls="navbarNav" aria-label="Toggle navigation">
+						</button>
+
+						<div class="collapse navbar-collapse" id="navbarNav">
+
+							<div class="navbar-nav ms-auto fw-bold">
+								<div class="row">
+									<div class="nav-item">
+										<a class="nav-link text-light" href="/venta"><img src="/bootstrap/img/venta.png" style="width: 30px; height: 30px; margin-right: 5px;" />Venta</a>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="nav-item">
+										<a class="nav-link text-light" href="/reparacion"><img src="/bootstrap/img/reparacion.png" style="width: 20px; height: 20px; margin-right: 2px;" />Reparación</a>
+									</div>
+								</div>
+								<div class="row">
+									<div class="nav-item">
+										<a class="nav-link text-light" href="/inventario"><img src="/bootstrap/img/inventario.png" style="width: 20px; height: 20px; margin-right: 2px;" />Inventario</a>
+									</div>
+								</div>
+
+								@* <AuthorizeView>
+									<Authorized> *@
+										<div class="row">
+											<div class="nav-item">
+												<a class="nav-link text-light" href="Account/Manage"><img src="/bootstrap/img/use.svg" style="width: 30px; height: 30px; margin-right: 5px;" />@context.User.Identity?.Name</a>
+											</div>
+										</div>
+										<div class="row">
+											<div class="nav-item">
+												<form action="Account/Logout" method="post">
+												 	<AntiforgeryToken /> 
+													<div class="border-danger rounded btn-danger">
+														<input type="hidden" name="ReturnUrl" value="@currentUrl" />
+												<button type="submit" class="btn btn-custom">
+													<i class="bi bi-box-arrow-right me-1"></i>Salir
+													<span class="ripple"></span>
+												</button>
+													</div>
+												</form>
+											</div>
+										</div>
+ 
+									@*</Authorized>
+								<NotAuthorized>
+										<div class="row">
+
+											<div class="nav-item ">
+												<a href="Account/Register" class="nav-link text-light"><img src="/bootstrap/img/use.svg" style="width: 25px; height: 25px; margin-right: 2px;" /> Register</a>
+											</div>
+										</div>
+										<div class="row">
+											<div class="nav-item ">
+												<a href="Account/Login" class="nav-link  text-light"><img src="/bootstrap/img/use.svg" style="width: 25px; height: 25px; margin-right: 2px;" />Login</a>
+											</div>
+										</div>
+								</NotAuthorized>
+								 </AuthorizeView> *@
+							</div>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</div>
+	</Authorized>
+</AuthorizeView>
 @code {
 	private string? currentUrl;
 

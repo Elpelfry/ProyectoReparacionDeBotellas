@@ -1,7 +1,7 @@
 ﻿@page "/Account/Pages/Manage/Configuracion"
-@using HydraulicFix.Services
+
 @inject ConfiguracionesService configuracionesService
-@using Microsoft.AspNetCore.Components.Forms
+
 @using global::Shared.Models
 @rendermode InteractiveServer
 @inject Radzen.NotificationService NotificationService
@@ -87,8 +87,6 @@
 		}
 	}
 
-
-
 	public async Task cambiar(InputFileChangeEventArgs e)
 	{
 		var archivo = e.File;
@@ -119,6 +117,4 @@
 	{
 		NavigationManager.NavigateTo("/Pages/Menu/");
 	}
-
-	
 }

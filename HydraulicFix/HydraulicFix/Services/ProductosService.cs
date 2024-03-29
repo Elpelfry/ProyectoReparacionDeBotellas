@@ -45,6 +45,17 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         _contexto.Productos.Remove(producto);
         return await _contexto.SaveChangesAsync() > 0;
     }
-   
+    public async Task<string> Random()
+    {
+        const string caracteres = "123456789abcdefghijklmnopqrstuvwxyz?_";
+        char[] codigo = new char[16];
+
+        for (int i = 0; i < 16; i++)
+        {
+            codigo[i] = caracteres[new Random().Next(caracteres.Length)];
+        }
+        return new string(codigo);
+    }
+
 
 }
