@@ -5,11 +5,13 @@ using HydraulicFix.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Radzen;
+
 using Shared.Interfaces;
 using Shared.Models;
 using Shared.Dto;
 using HydraulicFix.Client.Services;
+using Radzen;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,10 @@ builder.Services.AddScoped<IServer<Reparaciones>, ReparacionesService>();
 builder.Services.AddScoped<IServer<Ventas>, VentasService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IdentityUserService>();
+builder.Services.AddScoped<ConfiguracionesService>();
+builder.Services.AddScoped<ProductosService>();
+builder.Services.AddScoped<AbonosService>();
+builder.Services.AddScoped<MetodoPagos>();
 
 builder.Services.AddScoped<IClient<Abonos>, AbonosServiceClient>();
 builder.Services.AddScoped<IClientAsp<ApplicationUserDto>, UsersServiceClient>();
@@ -48,6 +54,7 @@ builder.Services.AddScoped<IClient<Productos>, ProductosServiceClient>();
 builder.Services.AddScoped<IClient<Proveedores>, ProveedoresServiceClient>();
 builder.Services.AddScoped<IClient<Reparaciones>, ReparacionesServiceClient>();
 builder.Services.AddScoped<IClient<Ventas>, VentasServiceClient>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -30,6 +30,11 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         return await _contexto.SaveChangesAsync() > 0;
     }
 
+    public async Task<Productos?> Search(int productoId)
+    {
+        return await _contexto.Productos.AsNoTracking().FirstOrDefaultAsync(a => a.ProductoId == productoId);
+    }
+
     public async Task<bool> DeleteObject(int id)
     {
         var producto = await _contexto.Productos.FindAsync(id);
@@ -40,4 +45,16 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
         _contexto.Productos.Remove(producto);
         return await _contexto.SaveChangesAsync() > 0;
     }
+    public async Task<string> Random()
+    {
+        const string caracteres = "123456789abcdefghijklmnopqrstuvwxyz?_";
+        char[] arreglo = new char[16];
+
+        for (int i = 0; i < 16; i++)
+        {
+            arreglo[i] = caracteres[new Random().Next(caracteres.Length)];
+        }
+        return new string(arreglo);
+    }
+
 }
