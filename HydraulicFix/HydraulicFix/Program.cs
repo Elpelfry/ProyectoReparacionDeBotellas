@@ -40,6 +40,8 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IdentityUserService>();
 builder.Services.AddScoped<ConfiguracionesService>();
 builder.Services.AddScoped<ProductosService>();
+builder.Services.AddScoped<AbonosService>();
+builder.Services.AddScoped<MetodoPagos>();
 
 builder.Services.AddScoped<IClient<Abonos>, AbonosServiceClient>();
 builder.Services.AddScoped<IClientAsp<ApplicationUserDto>, UsersServiceClient>();
