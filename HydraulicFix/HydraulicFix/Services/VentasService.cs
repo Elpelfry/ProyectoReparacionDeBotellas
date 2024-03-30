@@ -36,6 +36,7 @@ public class VentasService(ApplicationDbContext _contexto): IServer<Ventas>
         var venta = await _contexto.Ventas.FindAsync(id);
         if (venta == null)
             return false;
+
         await _contexto.VentasDetalle.Where(v => v.VentaId == id).ExecuteDeleteAsync();
         _contexto.Ventas.Remove(venta);
         return await _contexto.SaveChangesAsync() > 0;

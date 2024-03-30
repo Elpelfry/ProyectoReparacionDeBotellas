@@ -9,7 +9,8 @@
 @inject IServer<Configuraciones> configuracionesService
 @inject IServer<Condiciones> condicionesService
 @inject IServer<MetodoPagos> metodosPagosService
-
+@inject IServer<Productos> productosService
+@inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthenticationState
 @rendermode InteractiveServer
 
@@ -163,7 +164,7 @@
                                 @if (item.EstadoId == 2)
                                 {
                                     <td>
-                                        <a href="/ventas/@item.ReparacionId" style="background: transparent; border: none;" >
+                                        <a href="/venta/@item.ReparacionId" style="background: transparent; border: none;" >
                                             <img style="height: 38px;" src="/bootstrap/img/venta.png" />
                                         </a>
                                     </td>
@@ -175,7 +176,7 @@
                                 @if (item.EstadoId == 3)
                                 {
                                     <td>
-                                        <button type="button" style="background: transparent; border: none;">
+                                        <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerFactura(item.ReparacionId))>
                                             <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
                                         </button>
                                     </td>
@@ -317,7 +318,7 @@
                                     @if (item.EstadoId == 3)
                                     {
                                         <td>
-                                            <button type="button" style="background: transparent; border: none;">
+                                            <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerFactura(item.ReparacionId))>
                                                 <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
                                             </button>
                                         </td>
@@ -337,22 +338,193 @@
 </AuthorizeView>
 
 
-@if (Vender)
+@if (factura)
 {
     <div class="modal d-block opaco">
-        <div style="width: 55rem;" class="position-fixed top-50 start-50 translate-middle">
-
-            <div class="modal-content" style="border-radius: 32px;">
-
-                <div class="card-header text-white bg-gradient" style="height: 35px; border-radius: 30px 30px 0px 0px;">
-                    <h4 class="fs-6 fw-bold"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h4>
-                    <div class="text-end d-flex justify-content-end align-items-end" style="margin-top: -30px;">
-                        <button style="border-radius: 50%; background-color: red; border: none; width: 20px; height: 20px; margin-left: 3px" @onclick="CerrarVenta" ></button>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h5>
+                    <div class="justify-content-end d-flex">
+                        <button type="button" class="btn bg-muted text-white" style="background: #ffe085" @onclick="ImprimirFactura">
+                            <img style="width: 15px; height: 15px;" src="/bootstrap/img/printer.svg" />
+                        </button>
+                        <button type="button" class="btn bg-danger text-white" @onclick="CerrarFactura">
+                            <i class="bi bi-x"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="modal-body">
-                   
+                <div id="factura" class="modal-body" style="height: 35rem; overflow-y: auto;">
+
+                    <div class="position-relative modalContenedor">
+                        @if (venta.Eliminada)
+                        {
+                            <div class="letreroEliminar position-absolute top-50 start-50 translate-middle" style="transform: translate(-50%, -50%); z-index: 9999;">
+                                <img src="/bootstrap/img/returned.png">
+                            </div>
+                        }
+
+                        <div class="row d-flex align-items-center justify-content-center">
+                            @* <div id="logoEmpresa" class="text-center">
+                                <img style="width: 150px; height: 120px; border-radius: 10%;" src="/bootstrap/img/amex.svg" />
+                            </div> *@
+                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">HydraulicFix</h4>
+
+                            <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
+                                <div  class="col-4 text-start">
+                                    <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
+                                </div>
+                                <div  class="col-8 text-end">
+                                    <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
+                                </div>
+                            </div>
+                           
+                            <div id="direccionEmpresa" class="fw-bold text-center">
+                                <label> <i class="fas fa-map-marker"></i> Dirc.: <span class="fw-normal">@configuracion.Direccion</span></label>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">DATOS DE LA VENTA</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Fecha:<span class="fw-normal"> @venta.Fecha.ToString("dd/MM/yyyy")</span></label>
+                            </div>
+                            <div id="fechaFactura" class="col text-end">
+                                <label class="fw-bold" style="font-size: 12px;">Hora: <span class="fw-normal"> @venta.Fecha.ToString("h:mm tt")</span></label>
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">N°: <span class="fw-normal"> @venta.VentaId</span></label>
+                            </div>
+                            <div class="text-start">
+                                @if (venta.MetodoPagoId > 0)
+                                {
+                                    var met = metodosPagos.FirstOrDefault(x => x.MetodoPagoId == venta.MetodoPagoId);
+                                    <label class="fw-bold" style="font-size: 12px;">M&eacute;todo Pago: <span class="fw-normal">@met!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                @if (venta.CondicionId > 0)
+                                {
+                                    var condi = condiciones.FirstOrDefault(x => x.CondicionId == venta.CondicionId);
+                                    <label class="fw-bold" style="font-size: 12px;">Condici&oacute;n: <span class="fw-normal">@condi!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Cliente: <span class="fw-normal">@venta.NombreCliente</span></label>
+                            </div>
+                            @if (venta.ClienteId != null)
+                            {
+                                var cliente = usuarios.FirstOrDefault(x => x.Id == venta.ClienteId);
+                                if (cliente != null)
+                                {
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Apellido: <span class="fw-normal">@cliente!.Apellido</span></label>
+                                    </div>
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Email: <span class="fw-normal">@cliente.Email</span></label>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">PRODUCTOS</h5>
+                        <hr>
+
+                        <div class="row mb-4">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descripci&oacute;n</th>
+                                        <th class="text-end derecha">Itbis</th>
+                                        <th class="text-end derecha">Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in venta.VentasDetalle)
+                                    {
+                                        var pro = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                                        double total = item.Cantidad * (pro!.Precio - (pro!.Precio * (pro.Descuento / 100.0f)));
+                                        total = item.Cantidad * (pro!.Precio + (pro!.Precio * (pro.ITBIS / 100.0f)));
+                                        double itbisFinal = ((pro.Cantidad * pro.Precio) * (pro.ITBIS / 100.0f));
+
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <span>* @pro.Nombre</span>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <span>(@item.Cantidad x @pro!.Precio.ToString("N2"))</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-end derecha">@itbisFinal.ToString("N2")</td>
+                                            <td class="text-end derecha">@total.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (venta.ReparacionId > 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <span>* Reparaci&oacute;n</span>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <span>  Botella Hidr&aacute;ulica</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-end derecha">0.00</td>
+                                            <td class="text-end derecha">@reparacion.Costo.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-right: 10px">
+                            <div class="row mb-5" style="text-align: end">
+                                <div>
+                                    <label class="fw-bold">SubTotal:</label>
+                                    <span>RD$ @venta.SubTotal.ToString("N2")</span>
+                                </div>
+                                <div>
+                                    <label class="fw-bold">ITBIS:</label>
+                                    <span>RD$ @venta.ITBS.ToString("N2")</span>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold">Total:</label>
+                                    <span>RD$ @venta.Total.ToString("N2")</span>
+                                </div>
+
+                                <div class="datoInferior">
+                                    <div>
+                                        <label class="fw-bold">Recibido:</label>
+                                        <span>RD$ @venta.Recibido.ToString("N2")</span>
+                                    </div>
+                                    @if (venta.CondicionId == 1)
+                                    {
+                                        double deuda = venta.Total - venta.Recibido;
+                                        <div>
+                                            <label class="fw-bold">Pendiente:</label>
+                                            <span>RD$ @deuda.ToString("N2")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <label class="fw-bold">Cambio:</label>
+                                            <span>RD$ @venta.Devuelta.ToString("N2")</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center centrado datoInferior">
+                            <label class="fw-bold">@configuracion.Nota</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -364,10 +536,13 @@
 @code {
     public int Opcion { get; set; }
     public bool bandera =false, Vender = false;
+    public bool factura = false;
 
     public Reparaciones reparacion { get; set; } = new Reparaciones();
     public List<Reparaciones> reparaciones = new List<Reparaciones>();
     public List<Estados> estados = new List<Estados>();
+    public List<Productos> productos = new List<Productos>();
+    public List<Ventas> ventas = new List<Ventas>();
 
     public List<ApplicationUser> usuarios { get; set; } = new List<ApplicationUser>();
     public ApplicationUser usuario { get; set; } = new ApplicationUser();
@@ -375,8 +550,6 @@
 
     public Ventas venta { get; set; } = new Ventas();
     public Configuraciones configuracion { get; set; } = new Configuraciones();
-    public Condiciones condicion { get; set; } = new Condiciones();
-    public MetodoPagos metodoPago { get; set; } = new MetodoPagos();
 
     public List<Condiciones> condiciones { get; set; } = new List<Condiciones>();
     public List<MetodoPagos> metodosPagos { get; set; } = new List<MetodoPagos>();
@@ -390,10 +563,12 @@
         authState = await AuthenticationState.GetAuthenticationStateAsync();
         usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
         bandera = reparaciones.Any(r => r.EstadoId == 1 && r.ClienteId == usuario.Id);
+        productos = await productosService.GetAllObject();
 
         condiciones = await condicionesService.GetAllObject();
         metodosPagos = await metodosPagosService.GetAllObject();
         configuraciones = await configuracionesService.GetAllObject();
+        configuracion = configuraciones.FirstOrDefault()!;
     }
 
     public async Task Buscar()
@@ -444,5 +619,21 @@
                 Cantidad = item.CantidadUsada
             });
         }
+    }
+
+    public void CerrarFactura()
+    {
+        factura = false;
+    }
+    public async Task ImprimirFactura()
+    {
+        factura = false;
+        await JSRuntime.InvokeVoidAsync("ImprimirF");
+    }
+    public async Task VerFactura(int reparacion)
+    {
+        factura = true;
+        var buscado = await ventasService.GetObjectByCondition(x => x.ReparacionId == reparacion);
+        venta = buscado.FirstOrDefault()!;
     }
 }

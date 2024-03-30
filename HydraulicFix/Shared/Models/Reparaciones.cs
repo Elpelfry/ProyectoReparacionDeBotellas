@@ -26,7 +26,7 @@ public class Reparaciones
     public string? ApellidoCliente { get; set; }
 
     [Required(ErrorMessage = "Indique el Costo a abonar")]
-    [Range(0.01, 1000000000, ErrorMessage = "El Costo debe estar 0.01 y 1000000000")]
+    [Range(0.01f, 1000000000, ErrorMessage = "El Costo debe estar 0.01 y 1000000000")]
     public double Costo { get; set; }
 
     [Required(ErrorMessage = "La Dirección es obligatoria")]

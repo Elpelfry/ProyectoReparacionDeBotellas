@@ -38,6 +38,7 @@
 
                                 <InputNumber @bind-Value="reparacion.Costo" min="0" class="form-control" />
                                 <ValidationMessage For="@(() => reparacion.Costo)" />
+                                
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
@@ -213,7 +214,7 @@
         rol = roll.Name!;
         bandera = reparaciones.Any(r => r.EstadoId == 1 && r.ClienteId == usuario.Id);
         reparacion.Fecha = DateTime.Now;
-        reparacion.Costo = 0.01;
+        reparacion.Costo = 0.01f;
         reparacion.EstadoId = 1;
 
         if (rol == "Cliente")
@@ -234,11 +235,16 @@
         var result = await reparacionesService.AddObject(reparacion);
         if (result != null)
         {
-            foreach (var item in reparacion.ReparacionDetalle)
+            if(reparacion.ReparacionDetalle.Any())
             {
-                var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
-                producto!.Cantidad -= item.CantidadUsada;
-                await productosService.UpdateObject(producto);
+                foreach (var item in reparacion.ReparacionDetalle)
+                {
+                    var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
+                    producto!.Cantidad -= item.CantidadUsada;
+                    if (producto.Cantidad == 0)
+                        producto.EsDisponible = false;
+                    await productosService.UpdateObject(producto);
+                }
             }
             var mensaje = new NotificationMessage
             {

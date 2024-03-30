@@ -1,0 +1,106 @@
+﻿@media print {
+    @page {
+        margin: 0;
+    }
+
+    #logoEmpresa {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    h5 {
+        text-align: center;
+        font-size: 17px;
+        margin: 0;
+    }
+
+    label {
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .fila {
+        display: flex;
+    }
+
+    .titular {
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    #rnc {
+        margin-top: -12px;
+        justify-content: end;
+        text-align: end;
+    }
+
+    #direccionEmpresa {
+        justify-content: center;
+        text-align: center;
+    }
+
+    #fechaFactura {
+        margin-top: -15px;
+        justify-content: end;
+        text-align: end;
+    }
+
+    .derecha {
+        justify-content: end;
+        text-align: end;
+    }
+
+    .centrado {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .datoInferior {
+        margin-top: 15px;
+    }
+
+    span {
+        font-size: 15px;
+        font-weight: normal;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    tr {
+        font-size: 15px;
+    }
+
+        tr:not(:first-child) {
+            border-top: none;
+        }
+
+    td {
+        padding: 8px;
+    }
+
+    .modalContenedor {
+        position: relative;
+    }
+
+    .letreroEliminar {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+    }
+
+        .letreroEliminar img {
+            width: 250px;
+            height: 200px;
+        }
+}

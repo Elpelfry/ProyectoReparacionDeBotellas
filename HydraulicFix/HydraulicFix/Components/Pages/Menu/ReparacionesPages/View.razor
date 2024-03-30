@@ -40,7 +40,7 @@
                     <p><strong> Tel&eacute;fono:</strong> @reparacion.Telefono</p>
                     <p><strong> Direcci&oacute;n:</strong> @reparacion.Direccion</p>
                     <p><strong> Descripci&oacute;n:</strong> @reparacion.Descripcion</p>
-                    <p><strong> Costo Total:</strong> @reparacion.Costo.ToString("N2")</p>
+                    <p><strong> Costo Total:</strong> @total.ToString("N2")</p>
 
                 </div>
             </div>
@@ -131,7 +131,7 @@
                     valor -= (valor * ((int)producto.Descuento / 100.0f));
                     double itebis = (valor * (producto.ITBIS / 100.0f));
                     valor += itebis;
-                    reparacion.Costo += valor;
+                    total += valor;
                 }
             }
         }

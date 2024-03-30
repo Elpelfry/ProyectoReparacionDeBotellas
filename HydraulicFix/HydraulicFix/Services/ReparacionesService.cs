@@ -37,11 +37,15 @@ public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Repar
             prod!.Cantidad += item.CantidadUsada;
             _contexto.Entry(prod).State = EntityState.Modified;
         }
-        foreach (var item in type.ReparacionDetalle)
+
+        if (type.EstadoId != 4)
         {
-            var prod = await _contexto.Productos.FindAsync(item.ProductoId);
-            prod!.Cantidad -= item.CantidadUsada;
-            _contexto.Entry(prod).State = EntityState.Modified;
+            foreach (var item in type.ReparacionDetalle)
+            {
+                var prod = await _contexto.Productos.FindAsync(item.ProductoId);
+                prod!.Cantidad -= item.CantidadUsada;
+                _contexto.Entry(prod).State = EntityState.Modified;
+            }
         }
         _contexto.Entry(type).State = EntityState.Modified;
         return await _contexto.SaveChangesAsync() > 0;

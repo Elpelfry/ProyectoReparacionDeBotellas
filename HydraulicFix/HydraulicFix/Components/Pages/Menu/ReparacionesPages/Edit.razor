@@ -254,15 +254,6 @@
         var result = await reparacionesService.UpdateObject(reparacion);
         if (result)
         {
-            if (reparacion.EstadoId == 4 && reparacion.ReparacionDetalle.Any())
-            {
-                foreach (var item in reparacion.ReparacionDetalle)
-                {
-                    var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
-                    producto!.Cantidad += item.CantidadUsada;
-                    await productosService.UpdateObject(producto);
-                }
-            }
             var mensaje = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
