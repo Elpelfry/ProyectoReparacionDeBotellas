@@ -35,7 +35,8 @@ public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Repar
         {
             var prod = await _contexto.Productos.FindAsync(item.ProductoId);
             prod!.Cantidad += item.CantidadUsada;
-            _contexto.Entry(prod).State = EntityState.Modified;
+             _contexto.Entry(prod).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
         }
 
         if (type.EstadoId != 4)
@@ -45,6 +46,7 @@ public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Repar
                 var prod = await _contexto.Productos.FindAsync(item.ProductoId);
                 prod!.Cantidad -= item.CantidadUsada;
                 _contexto.Entry(prod).State = EntityState.Modified;
+                await _contexto.SaveChangesAsync();
             }
         }
         _contexto.Entry(type).State = EntityState.Modified;

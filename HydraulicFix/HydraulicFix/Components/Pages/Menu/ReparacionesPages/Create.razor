@@ -181,10 +181,10 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div class="card-footer justify-content-center d-flex">
-            <button type="button" class="btn btn-secondary bi bi-plus text-white"> Nuevo<i class="oi oi-document"></i></button>
-            <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+            <div class="card-footer justify-content-center d-flex">
+                <button type="button" class="btn btn-secondary bi bi-plus text-white" @onclick="Nuevo"> Nuevo<i class="oi oi-document"></i></button>
+                <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+            </div>
         </div>
     </div>
 </EditForm>
@@ -223,6 +223,10 @@
             reparacion.NombreCliente = usuario.Nombre;
             reparacion.ApellidoCliente = usuario.Apellido;
             reparacion.Tecnico = "Sin asignar";
+        }
+        else
+        {
+            reparacion.ClienteId = null;
         }
 
         if (bandera && rol == "Cliente")
@@ -330,7 +334,7 @@
         reparacionDetalle = new ReparacionesDetalle();
         reparacion = new Reparaciones();
         reparacion.Fecha = DateTime.Now;
-        reparacion.Costo = 0.01;
+        reparacion.Costo = 0.01f;
         reparacion.EstadoId = 1;
 
         if (rol == "Cliente")

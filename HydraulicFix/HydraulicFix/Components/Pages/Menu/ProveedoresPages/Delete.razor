@@ -1,0 +1,55 @@
+﻿@page "/Reparaciones/Borrar/{ProveedorId:int}"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager navigationManager
+@inject IServer<Proveedores> proveedoresService
+@inject NotificationService notificationService
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar</PageTitle>
+
+<div class="container">
+    <RadzenNotification />
+    <div class="card shadow">
+        <div class="card-header">
+            <h1 class="text-light">Eliminar</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <p><strong> Id:</strong> @proveedor.ProveedorId</p>
+                <p><strong> Nombre:</strong> @proveedor.Nombre</p>
+                <p><strong> Tel&eacute;fono:</strong> @proveedor.Telefono</p>
+            </div>
+        </div>
+
+        <div class="card-footer text-end">
+            <a href="/Proveedores" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+            <button type="button" class="btn btn-danger bi bi-trash-fill ms-auto" @onclick="Borrar">Borrar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public Proveedores proveedor = new Proveedores();
+    [Parameter]
+    public int ProveedorId { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        proveedor = await proveedoresService.GetObject(ProveedorId);
+    }
+
+    public async Task Borrar()
+    {
+        await proveedoresService.DeleteObject(proveedor.ProveedorId);
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Eliminado",
+                Detail = "El proveedor ha sido eliminado correctamente"
+            };
+        notificationService.Notify(mensaje);
+        await Task.Delay(2000);
+        navigationManager.NavigateTo("Proveedores");
+    }
+}

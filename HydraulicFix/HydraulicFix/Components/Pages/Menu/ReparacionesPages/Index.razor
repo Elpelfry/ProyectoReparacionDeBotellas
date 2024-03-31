@@ -372,10 +372,10 @@
                             <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">HydraulicFix</h4>
 
                             <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
-                                <div  class="col-4 text-start">
+                                <div  class="col-6 text-start">
                                     <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
                                 </div>
-                                <div  class="col-8 text-end">
+                                <div  class="col-6 text-end">
                                     <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
                                 </div>
                             </div>
@@ -448,10 +448,9 @@
                                     @foreach (var item in venta.VentasDetalle)
                                     {
                                         var pro = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
-                                        double total = item.Cantidad * (pro!.Precio - (pro!.Precio * (pro.Descuento / 100.0f)));
-                                        total = item.Cantidad * (pro!.Precio + (pro!.Precio * (pro.ITBIS / 100.0f)));
-                                        double itbisFinal = ((pro.Cantidad * pro.Precio) * (pro.ITBIS / 100.0f));
-
+                                        double subtotal = item.Cantidad * pro!.Precio;
+                                        double total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        double itbisFinal = total * (pro.ITBIS / 100.0f);
                                         <tr>
                                             <td>
                                                 <div class="row">
@@ -604,7 +603,7 @@
         Vender = false;
     }
 
-    public async Task VenderReparacion(Reparaciones reparacion)
+    public void VenderReparacion(Reparaciones reparacion)
     {
         venta.ClienteId = reparacion.ClienteId;
         venta.ReparacionId = reparacion.ReparacionId;

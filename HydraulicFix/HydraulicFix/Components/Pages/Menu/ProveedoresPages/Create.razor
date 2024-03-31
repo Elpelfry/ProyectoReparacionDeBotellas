@@ -1,0 +1,93 @@
+﻿@page "/Proveedores/Create"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager navigationManager
+@inject IServer<Proveedores> proveedoresService
+@inject NotificationService notificationService
+@rendermode InteractiveServer
+
+
+<PageTitle>Proveedores</PageTitle>
+
+<EditForm Model="proveedor" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <RadzenNotification />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold">Agregar Proveedor</h3>
+            </div>
+            <div class="card-body">
+                <div>
+                    <label class="fw-bold">Nombre</label>
+                    <InputText @bind-Value="proveedor.Nombre" class="form-control" />
+                    <ValidationMessage For="@(() => proveedor.Nombre)" />
+                </div>
+                <div>
+                    <label class="fw-bold">Tel&eacute;fono</label>
+                    <InputText @bind-Value="proveedor.Telefono" class="form-control" />
+                    <ValidationMessage For="@(() => proveedor.Telefono)" />
+                </div>
+            </div>
+            <div class="card-footer justify-content-center d-flex">
+                <a href="/Proveedores" class="btn btn-primary bi bi-house-door-fill"> Volver</a>
+                <button type="button" class="btn btn-secondary bi bi-plus text-white" @onclick="Nuevo"> Nuevo<i class="oi oi-document"></i></button>
+                <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    public Proveedores proveedor = new Proveedores();
+
+    public void Nuevo()
+    {
+        proveedor = new Proveedores();
+    }
+
+    public async Task Guardar()
+    {
+        var existe = await proveedoresService.GetObjectByCondition(x => x.Nombre!.ToLower() == proveedor.Nombre!.ToLower());
+        if (existe.Any())
+        {
+            var mensaje1 = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "El proveedor ya existe",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje1);
+            return;
+        }
+        existe = await proveedoresService.GetObjectByCondition(x => x.Telefono == proveedor.Telefono);
+        if (existe.Any())
+        {
+            var mensaje1 = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "El Numero de Teléfono ya existe",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje1);
+            return;
+        }
+
+
+        var guardar = await proveedoresService.AddObject(proveedor);
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Guardado",
+                Detail = "Proveedor guardado con éxito",
+                Duration = 5000
+            };
+        notificationService.Notify(mensaje);
+        proveedor = new Proveedores();
+        await Task.Delay(2000);
+        navigationManager.NavigateTo("Proveedores");
+    }
+}

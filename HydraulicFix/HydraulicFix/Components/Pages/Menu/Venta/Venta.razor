@@ -199,7 +199,7 @@
                 <div class="modal-body">
                     <div class="row">
 
-                        @if (usuario.Nombre != "" && reparacion.ClienteId != null)
+                        @if (usuario != null && reparacion.ClienteId != null)
                         {
                             <div class="col-12">
                                 <label class="fw-bold">Nombre de Cliente:</label>
@@ -218,13 +218,15 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    @if (usuario.Cedula != "" && venta.NombreCliente != "")
+                                    @if (usuario.Cedula == "" && venta.NombreCliente != "")
                                     {
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
                                     }
-                                    else
+                                    else if(usuario.Cedula != "")
                                     {
+                                        venta.ClienteId = null;
+                                        venta.NombreCliente = "";
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" placeholder="Nombre"></InputText>
                                     }
@@ -233,13 +235,14 @@
                             else
                             {
                                 <div class="col-12">
-                                    @if (usuario.Cedula != "" && venta.NombreCliente != "")
+                                    @if (venta.NombreCliente != null && usuario != null)
                                     {
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
                                     }
                                     else
                                     {
+                                        venta.ClienteId = null;
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" placeholder="Nombre"></InputText>
                                     }
@@ -391,7 +394,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header" style="background:#399ce7 ">
-                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h5>
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Factura</h5>
                     <div class="justify-content-end d-flex">
                         <button type="button" class="btn bg-muted text-white" style="background: #ffe085" @onclick="ImprimirFactura">
                             <img style="width: 15px; height: 15px;" src="/bootstrap/img/printer.svg" />
@@ -419,10 +422,10 @@
                             <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">HydraulicFix</h4>
 
                             <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
-                                <div class="col-4 text-start">
+                                <div class="col-6 text-start">
                                     <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
                                 </div>
-                                <div class="col-8 text-end">
+                                <div class="col-6 text-end">
                                     <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
                                 </div>
                             </div>
@@ -495,10 +498,9 @@
                                     @foreach (var item in venta.VentasDetalle)
                                     {
                                         var pro = productosVenta.FirstOrDefault(x => x.ProductoId == item.ProductoId);
-                                        double total = item.Cantidad * (pro!.Precio - (pro!.Precio * (pro.Descuento / 100.0f)));
-                                        total = item.Cantidad * (pro!.Precio + (pro!.Precio * (pro.ITBIS / 100.0f)));
-                                        double itbisFinal = ((pro.Cantidad * pro.Precio) * (pro.ITBIS / 100.0f));
-
+                                        double subtotal = item.Cantidad * pro!.Precio;
+                                        double total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        double itbisFinal = total * (pro.ITBIS / 100.0f);
                                         <tr>
                                             <td>
                                                 <div class="row">
@@ -617,13 +619,23 @@
         {
             reparacion = await reparacionesService.GetObject(ReparacionId);
             if (reparacion.ClienteId != null)
+            {
                 usuario = await usuariosService.GetObject(reparacion.ClienteId);
-            venta.NombreCliente = usuario.Nombre;
+            }
+            if(usuario != null)
+            {
+                venta.NombreCliente = usuario.Nombre;
+                venta.ClienteId = usuario.Id;
+            }
+            else
+            {
+                venta.ClienteId = " ";
+                venta.NombreCliente = " ";
+            }
             venta.Eliminada = false;
             venta.Fecha = DateTime.Now;
             await AgregarDetalle(reparacion.ReparacionDetalle);
             venta.ReparacionId = reparacion.ReparacionId;
-            venta.ClienteId = usuario.Id;
             venta.Total += reparacion.Costo;
             vender = true;
         }
@@ -828,6 +840,7 @@
         }
         venta.ClienteId = usuari.Id;
         venta.NombreCliente = usuari.Nombre;
+        usuario.Cedula = "";
     }
 
     public async Task RealizarVenta()
@@ -857,23 +870,48 @@
             notificationService.Notify(mensaje);
             return;
         }
+        if(venta.CondicionId == 1 && venta.ClienteId == null)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Debe ser un cliente registrado para ser venta al contado",
+                    Duration = 8000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        var abo = await abonosService.GetObjectByCondition(p => p.ClienteId == venta.ClienteId && !p.Pago);
+        if(abo.Any() && venta.CondicionId == 1)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Este cliente tiene una deuda pendiente",
+                    Duration = 8000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
 
         if (venta.CondicionId == 1)// contado
         {
+            if (venta.Recibido > venta.Total || venta.Recibido < 0.01f)
+            {
+                var mensaje1 = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "El monto abonado debe ser mayor a cero y menor al total",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje1);
+                return;
+            }
             if (venta.MetodoPagoId == 1)
             {
-                if (venta.Recibido > venta.Total && venta.Recibido < 0.01f)
-                {
-                    var mensaje1 = new NotificationMessage
-                        {
-                            Severity = NotificationSeverity.Error,
-                            Summary = "Error",
-                            Detail = "El monto abonado debe ser mayor a cero y menor al total",
-                            Duration = 5000
-                        };
-                    notificationService.Notify(mensaje1);
-                    return;
-                }
                 if (ReparacionId > 0)
                 {
                     reparacion.EstadoId = 3;
@@ -912,18 +950,6 @@
             }
             else
             {
-                if (venta.Recibido > venta.Total && venta.Recibido < 0.01f)
-                {
-                    var mensaje1 = new NotificationMessage
-                        {
-                            Severity = NotificationSeverity.Error,
-                            Summary = "Error",
-                            Detail = "El monto abonado debe ser mayor a cero y menor al total",
-                            Duration = 5000
-                        };
-                    notificationService.Notify(mensaje1);
-                    return;
-                }
                 if (ReparacionId > 0)
                 {
                     reparacion.EstadoId = 3;
@@ -1044,8 +1070,20 @@
             var producto = await productosService.GetObject(item.ProductoId);
             if (producto != null)
             {
-                producto.Cantidad -= item.Cantidad;
-                await productosService.UpdateObject(producto);
+                if(reparacion.ReparacionId > 0)
+                {
+                    var detalleReparacion = reparacion.ReparacionDetalle.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                    if(detalleReparacion != null)
+                    {
+                        producto.Cantidad -= (item.Cantidad - detalleReparacion.CantidadUsada);
+                        await productosService.UpdateObject(producto);
+                    }
+                }
+                else
+                {
+                    producto.Cantidad -= item.Cantidad;
+                    await productosService.UpdateObject(producto);
+                }
             }
         }
     }

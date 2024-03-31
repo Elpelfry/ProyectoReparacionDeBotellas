@@ -37,6 +37,7 @@ builder.Services.AddScoped<IServer<Ventas>, VentasService>();
 builder.Services.AddScoped<IServer<MetodoPagos>, MetodosPagosService>();
 builder.Services.AddScoped<IServer<Estados>, EstadosService>();
 builder.Services.AddScoped<IServer<Condiciones>, CondicionesService>();
+builder.Services.AddScoped<IServer<Gastos>, GastosService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IdentityUserService>();
 
