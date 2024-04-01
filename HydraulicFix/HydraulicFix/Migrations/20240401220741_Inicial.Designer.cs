@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HydraulicFix.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240331062104_Gastos")]
-    partial class Gastos
+    [Migration("20240401220741_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -406,12 +406,12 @@ namespace HydraulicFix.Migrations
                         new
                         {
                             EstadoId = 2,
-                            NombreEstado = "En Proceso"
+                            NombreEstado = "EnProceso"
                         },
                         new
                         {
                             EstadoId = 3,
-                            NombreEstado = "Completado"
+                            NombreEstado = "Terminado"
                         },
                         new
                         {
@@ -516,6 +516,151 @@ namespace HydraulicFix.Migrations
                     b.HasKey("ProductoId");
 
                     b.ToTable("Productos");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductoId = 1,
+                            Cantidad = 4,
+                            CategoriaId = 1,
+                            Codigo = "1",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Sello mecánico de cartucho",
+                            Precio = 500.0,
+                            ProveedorId = 1
+                        },
+                        new
+                        {
+                            ProductoId = 2,
+                            Cantidad = 6,
+                            CategoriaId = 2,
+                            Codigo = "2",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Limpiador hidráulio",
+                            Precio = 200.0,
+                            ProveedorId = 2
+                        },
+                        new
+                        {
+                            ProductoId = 3,
+                            Cantidad = 3,
+                            CategoriaId = 3,
+                            Codigo = "3",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Sello de pistón",
+                            Precio = 240.0,
+                            ProveedorId = 3
+                        },
+                        new
+                        {
+                            ProductoId = 4,
+                            Cantidad = 5,
+                            CategoriaId = 4,
+                            Codigo = "4",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Collarín de fijación para ejes",
+                            Precio = 450.0,
+                            ProveedorId = 4
+                        },
+                        new
+                        {
+                            ProductoId = 5,
+                            Cantidad = 6,
+                            CategoriaId = 5,
+                            Codigo = "5",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Retén de eje de goma",
+                            Precio = 200.0,
+                            ProveedorId = 5
+                        },
+                        new
+                        {
+                            ProductoId = 6,
+                            Cantidad = 3,
+                            CategoriaId = 6,
+                            Codigo = "6",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Lubricante para rodamientos",
+                            Precio = 240.0,
+                            ProveedorId = 6
+                        },
+                        new
+                        {
+                            ProductoId = 7,
+                            Cantidad = 5,
+                            CategoriaId = 7,
+                            Codigo = "7",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Filtro de aire",
+                            Precio = 450.0,
+                            ProveedorId = 7
+                        },
+                        new
+                        {
+                            ProductoId = 8,
+                            Cantidad = 6,
+                            CategoriaId = 8,
+                            Codigo = "8",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Retén de doble labio",
+                            Precio = 200.0,
+                            ProveedorId = 8
+                        },
+                        new
+                        {
+                            ProductoId = 9,
+                            Cantidad = 3,
+                            CategoriaId = 9,
+                            Codigo = "9",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Sello de vástago para cilindros neumáticos",
+                            Precio = 240.0,
+                            ProveedorId = 9
+                        },
+                        new
+                        {
+                            ProductoId = 10,
+                            Cantidad = 5,
+                            CategoriaId = 10,
+                            Codigo = "10",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Sello de fibra de cerámica.",
+                            Precio = 450.0,
+                            ProveedorId = 10
+                        },
+                        new
+                        {
+                            ProductoId = 11,
+                            Cantidad = 2,
+                            CategoriaId = 11,
+                            Codigo = "11",
+                            Descuento = 6.0,
+                            EsDisponible = true,
+                            ITBIS = 4,
+                            Nombre = "Sello de válvula de globo",
+                            Precio = 100.0,
+                            ProveedorId = 11
+                        });
                 });
 
             modelBuilder.Entity("Shared.Models.Proveedores", b =>

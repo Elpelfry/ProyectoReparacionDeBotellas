@@ -8,35 +8,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HydraulicFix.Migrations
 {
     /// <inheritdoc />
-    public partial class Models : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Apellido",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Cedula",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "NickName",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Nombre",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "Abonos",
                 columns: table => new
@@ -54,6 +30,49 @@ namespace HydraulicFix.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Abonos", x => x.AbonoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Apellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cedula = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NickName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -89,7 +108,8 @@ namespace HydraulicFix.Migrations
                     ConfiguracionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NFC = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Imagen = table.Column<byte>(type: "tinyint", nullable: false),
+                    Imagen = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ImagenUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NombreEmpresa = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Direccion = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -111,6 +131,22 @@ namespace HydraulicFix.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Estados", x => x.EstadoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Gastos",
+                columns: table => new
+                {
+                    GastoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Monto = table.Column<double>(type: "float", nullable: false),
+                    Asunto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Gastos", x => x.GastoId);
                 });
 
             migrationBuilder.CreateTable(
@@ -136,6 +172,7 @@ namespace HydraulicFix.Migrations
                     CategoriaId = table.Column<int>(type: "int", nullable: false),
                     Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Precio = table.Column<double>(type: "float", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     Descuento = table.Column<double>(type: "float", nullable: false),
                     ITBIS = table.Column<int>(type: "int", nullable: false),
@@ -168,13 +205,14 @@ namespace HydraulicFix.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClienteId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NombreCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TecnicoId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tecnico = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EstadoId = table.Column<int>(type: "int", nullable: false),
                     ApellidoCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Costo = table.Column<double>(type: "float", nullable: false),
                     Direccion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -189,6 +227,7 @@ namespace HydraulicFix.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ConfiguracionId = table.Column<int>(type: "int", nullable: false),
                     ClienteId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NombreCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReparacionId = table.Column<int>(type: "int", nullable: false),
                     MetodoPagoId = table.Column<int>(type: "int", nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -224,6 +263,112 @@ namespace HydraulicFix.Migrations
                         column: x => x.AbonoId,
                         principalTable: "Abonos",
                         principalColumn: "AbonoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -298,10 +443,67 @@ namespace HydraulicFix.Migrations
                     { 2, "Tarjeta" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Productos",
+                columns: new[] { "ProductoId", "Cantidad", "CategoriaId", "Codigo", "Descuento", "EsDisponible", "ITBIS", "Nombre", "Precio", "ProveedorId" },
+                values: new object[,]
+                {
+                    { 1, 4, 1, "1", 6.0, true, 4, "Sello mecánico de cartucho", 500.0, 1 },
+                    { 2, 6, 2, "2", 6.0, true, 4, "Limpiador hidráulio", 200.0, 2 },
+                    { 3, 3, 3, "3", 6.0, true, 4, "Sello de pistón", 240.0, 3 },
+                    { 4, 5, 4, "4", 6.0, true, 4, "Collarín de fijación para ejes", 450.0, 4 },
+                    { 5, 6, 5, "5", 6.0, true, 4, "Retén de eje de goma", 200.0, 5 },
+                    { 6, 3, 6, "6", 6.0, true, 4, "Lubricante para rodamientos", 240.0, 6 },
+                    { 7, 5, 7, "7", 6.0, true, 4, "Filtro de aire", 450.0, 7 },
+                    { 8, 6, 8, "8", 6.0, true, 4, "Retén de doble labio", 200.0, 8 },
+                    { 9, 3, 9, "9", 6.0, true, 4, "Sello de vástago para cilindros neumáticos", 240.0, 9 },
+                    { 10, 5, 10, "10", 6.0, true, 4, "Sello de fibra de cerámica.", 450.0, 10 },
+                    { 11, 2, 11, "11", 6.0, true, 4, "Sello de válvula de globo", 100.0, 11 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AbonosDetalle_AbonoId",
                 table: "AbonosDetalle",
                 column: "AbonoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReparacionesDetalle_ReparacionId",
@@ -321,6 +523,21 @@ namespace HydraulicFix.Migrations
                 name: "AbonosDetalle");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
                 name: "CategoriaProductos");
 
             migrationBuilder.DropTable(
@@ -331,6 +548,9 @@ namespace HydraulicFix.Migrations
 
             migrationBuilder.DropTable(
                 name: "Estados");
+
+            migrationBuilder.DropTable(
+                name: "Gastos");
 
             migrationBuilder.DropTable(
                 name: "MetodoPagos");
@@ -351,26 +571,16 @@ namespace HydraulicFix.Migrations
                 name: "Abonos");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
                 name: "Reparaciones");
 
             migrationBuilder.DropTable(
                 name: "Ventas");
-
-            migrationBuilder.DropColumn(
-                name: "Apellido",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "Cedula",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "NickName",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "Nombre",
-                table: "AspNetUsers");
         }
     }
 }
