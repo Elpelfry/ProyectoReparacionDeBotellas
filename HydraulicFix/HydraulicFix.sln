@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HydraulicFix.Client", "Hydr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{259194C4-183E-4AA1-9F99-F5B01E5B2956}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHydraulicFix", "TestHydraulicFix\TestHydraulicFix.csproj", "{7CEBFBF2-CBB4-42AE-BD56-50BEB4978025}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{259194C4-183E-4AA1-9F99-F5B01E5B2956}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{259194C4-183E-4AA1-9F99-F5B01E5B2956}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{259194C4-183E-4AA1-9F99-F5B01E5B2956}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CEBFBF2-CBB4-42AE-BD56-50BEB4978025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CEBFBF2-CBB4-42AE-BD56-50BEB4978025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CEBFBF2-CBB4-42AE-BD56-50BEB4978025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CEBFBF2-CBB4-42AE-BD56-50BEB4978025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
