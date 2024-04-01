@@ -17,7 +17,7 @@ Admin@123
 
 Cliente:  
 cliente@cliente.com  
-cliente@123
+Cliente@123
 
 # Tecnologías Utilizadas💻
 Lado del cliente: [HTML, CSS y Javascript]  
