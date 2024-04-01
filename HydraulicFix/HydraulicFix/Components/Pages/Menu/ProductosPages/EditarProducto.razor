@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = "Admin")]
 @rendermode InteractiveServer
 @inject ProductosService productosService
+@inject IServer<Proveedores> proveedorService
 
 <PageTitle>Editar</PageTitle>
 <EditForm Model="productos" OnValidSubmit="Editar">
@@ -44,6 +45,19 @@
 						<InputCheckbox @bind-Value="productos.EsDisponible" class="form-check-input" />
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-6">
+						<label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
+						<InputSelect @bind-Value="productos.ProveedorId" class="form-select">
+
+							@foreach (var proveedor in proveedores)
+							{
+								<option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
+							}
+						</InputSelect>
+						<ValidationMessage For="@(() => productos.ProveedorId)" />
+					</div>
+				</div>
 			</div>
 
 			<div class="card-footer">
@@ -60,12 +74,14 @@
 	[Parameter]
 	public int ProductoId { get; set; }
 	public Productos productos { get; set; } = new Productos();
+	public List<Proveedores> proveedores { get; set; } = new List<Proveedores>();
 
 	protected override async Task OnInitializedAsync()
 	{
 		if (ProductoId > 0)
 		{
 			productos = await productosService.GetObject(ProductoId);
+			proveedores = await proveedorService.GetAllObject();
 		}
 	}
 
