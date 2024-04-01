@@ -16,7 +16,7 @@ delfry@admin.com
 Admin@123  
 
 Cliente:  
-cliente@cliente.com
+cliente@cliente.com  
 cliente@123
 
 # Tecnologías Utilizadas💻
