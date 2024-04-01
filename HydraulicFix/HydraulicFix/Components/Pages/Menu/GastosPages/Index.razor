@@ -1,16 +1,15 @@
-﻿@page "/Proveedores"
+﻿@page "/Gastos"
 
 @attribute [Authorize(Roles = "Admin")]
-@inject IServer<Proveedores> proveedoresService
-
 @rendermode InteractiveServer
-<PageTitle>Proveedores</PageTitle>
+@inject IServer<Gastos> gastosService
 
+<PageTitle>Gastos</PageTitle>
 
 <div class="container">
     <div class="card shadow-lg">
         <div class="card-header">
-            <h3 class="fw-bold text-center">Proveedores</h3>
+            <h3 class="fw-bold text-center">Gastos</h3>
         </div>
         <div class="card-body">
             <div class="container">
@@ -19,10 +18,11 @@
                         <label>Filtrar por:</label>
                         <div class="col-2">
                             <InputSelect @bind-Value="Opcion" class="form-select">
-                                <option value="1">ProveedorId</option>
-                                <option value="2">Nombre</option>
-                                <option value="3">Tel&eacute;fono</option>
-                                <option value="4">Todo</option>
+                                <option value="1">Gasto Id</option>
+                                <option value="2">Asunto</option>
+                                <option value="3">Fecha</option>
+                                <option value="4">Monto</option>
+                                <option value="5">Todo</option>
                             </InputSelect>
                         </div>
                         <div class="col-auto">
@@ -30,7 +30,7 @@
                             {
                                 case 1:
                                     <div class="input-group justify-content-end">
-                                        <InputNumber @bind-Value="proveedor.ProveedorId" class="form-control" min="0"></InputNumber>
+                                        <InputNumber @bind-Value="gasto.GastoId" class="form-control" min="0"></InputNumber>
                                         <div class="input-group-append">
                                             <button class="btn btn-info" @onclick="Buscar">
                                                 <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -40,7 +40,7 @@
                                     break;
                                 case 2:
                                     <div class="input-group justify-content-end">
-                                        <InputText @bind-Value="proveedor.Nombre" class="form-control"></InputText>
+                                        <InputText @bind-Value="gasto.Asunto" class="form-control"></InputText>
                                         <div class="input-group-append">
                                             <button class="btn btn-info" @onclick="Buscar">
                                                 <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -50,7 +50,8 @@
                                     break;
                                 case 3:
                                     <div class="input-group justify-content-end">
-                                        <InputText @bind-Value="proveedor.Telefono" class="form-control"></InputText>
+                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
                                         <div class="input-group-append">
                                             <button class="btn btn-info" @onclick="Buscar">
                                                 <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -59,6 +60,16 @@
                                     </div>
                                     break;
                                 case 4:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="gasto.Monto" class="form-control"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 5:
                                     <div class="input-group justify-content-end">
                                         <button class="btn btn-info" @onclick="Buscar">
                                             <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -69,7 +80,7 @@
                         </div>
                         <div class="col text-end">
                             <div class="col-auto">
-                                <a href="/Proveedores/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                                <a href="/Gastos/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
                             </div>
                         </div>
                     </div>
@@ -80,25 +91,23 @@
             <table class="table table-light table-hover table-striped table-bordered text-center">
                 <thead>
                     <tr class="fw-bold">
-                        <th scope="col">ProveedorId</th>
-                        <th scope="col">Tel&eacute;fono</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Editar</th>
-                        <th scope="col">Eliminar</th>
+                        <th scope="col">Gasto Id</th>
+                        <th scope="col">Asunto</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Ver</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var proveedor in proveedores)
+                    @foreach (var item in gastos)
                     {
                         <tr>
-                            <td>@proveedor.ProveedorId</td>
-                            <td>@proveedor.Telefono</td>
-                            <td>@proveedor.Nombre</td>
+                            <td>@item.GastoId</td>
+                            <td>@item.Asunto</td>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Monto.ToString("N2")</td>
                             <td>
-                                <a href="/Proveedores/Edit/@proveedor.ProveedorId" class="btn btn-warning bi bi-pencil" style="height: 38px;"></a>
-                            </td>
-                            <td>
-                                <a href="/Reparaciones/Borrar/@proveedor.ProveedorId" class="btn btn-danger bi bi-trash-fill" style="height: 38px;"></a>
+                                <a href="/Gastos/ver/@item.GastoId" class="btn btn-warning bi bi-eye" style="height: 38px;"></a>
                             </td>
                         </tr>
                     }
@@ -107,26 +116,32 @@
         </div>
     </div>
 </div>
-
 @code {
-    public Proveedores proveedor = new Proveedores();
-    public List<Proveedores> proveedores = new List<Proveedores>();
+
+    private List<Gastos> gastos = new List<Gastos>();
+    public Gastos gasto { get; set; } = new Gastos();
     public int Opcion { get; set; }
+
+    public DateTime FechaInicio { get; set; } = DateTime.Today;
+    public DateTime FechaFin { get; set; } = DateTime.Today;
 
     protected override async Task OnInitializedAsync()
     {
-        proveedores = await proveedoresService.GetAllObject();
+        gastos = await gastosService.GetAllObject();
+        gasto.Fecha = DateTime.Now;
     }
 
     public async Task Buscar()
     {
-        if(Opcion == 1 && proveedor.ProveedorId > 0)
-            proveedores = await proveedoresService.GetObjectByCondition(p => p.ProveedorId == proveedor.ProveedorId);
-        else if(Opcion == 2 && !string.IsNullOrEmpty(proveedor.Nombre))
-            proveedores = await proveedoresService.GetObjectByCondition(p => p.Nombre!.ToLower().Contains(proveedor.Nombre!.ToLower()));
-        else if(Opcion == 3 && !string.IsNullOrEmpty(proveedor.Telefono))
-            proveedores = await proveedoresService.GetObjectByCondition(p => p.Telefono!.ToLower().Contains(proveedor.Telefono!.ToLower()));
-        else if(Opcion == 4)
-            proveedores = await proveedoresService.GetAllObject();
+        if(Opcion == 1 && gasto.GastoId > 0)
+            gastos = await gastosService.GetObjectByCondition(v => v.GastoId == gasto.GastoId);
+        else if(Opcion == 2 && !string.IsNullOrEmpty(gasto.Asunto))
+            gastos = await gastosService.GetObjectByCondition(v => v.Asunto!.ToLower().Contains(gasto.Asunto!.ToLower()));
+        else if (Opcion == 3 && FechaFin != default && FechaInicio != default)
+            gastos = await gastosService.GetObjectByCondition(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date);
+        else if(Opcion == 4 && gasto.Monto > 0)
+            gastos = await gastosService.GetObjectByCondition(v => v.Monto == gasto.Monto);
+        else if(Opcion == 5)
+            gastos = await gastosService.GetAllObject();
     }
 }

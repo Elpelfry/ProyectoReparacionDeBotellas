@@ -13,9 +13,9 @@
 
 <RadzenNotification />
 <PageTitle>Solicitar</PageTitle>
-<EditForm Model="reparacion" OnValidSubmit="Guardar" >
+<EditForm Model="reparacion" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
- 
+
     <div class="container">
         <div class="card shadow-lg">
             <div class="card-header">
@@ -38,7 +38,7 @@
 
                                 <InputNumber @bind-Value="reparacion.Costo" min="0" class="form-control" />
                                 <ValidationMessage For="@(() => reparacion.Costo)" />
-                                
+
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
@@ -115,16 +115,15 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-light">Detalle Reparaci&oacute;n</h3>
-                </div>
-                <AuthorizeView Roles="Admin">
-                    <ChildContent Context="authorizeContext">
+            <AuthorizeView Roles="Admin">
+                <ChildContent Context="authorizeContext">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="text-light">Detalle Reparaci&oacute;n</h3>
+                        </div>
                         <div class="card-body row">
                             <label class="fw-bold">Productos</label>
                             <div class="col-5">
-
                                 <InputSelect @bind-Value="reparacionDetalle.ProductoId" class="form-select">
                                     @foreach (var item in productos)
                                     {
@@ -140,48 +139,33 @@
                                 <button type="button" class="btn btn-success bi bi-plus" @onclick="AgregarDetalle"> Agregar</button>
                             </div>
                         </div>
-                    </ChildContent>
-                </AuthorizeView>
-                <table class="table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <AuthorizeView Roles="Admin">
-                                <ChildContent Context="authorizeContext">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
                                     <th>ProductoId</th>
-                                </ChildContent>
-                            </AuthorizeView>
-                            <th>Nombre de Producto</th>
-                            <th>Cantidad Usada</th>
-                            <AuthorizeView Roles="Admin">
-                                <ChildContent Context="authorizeContext">
+                                    <th>Nombre de Producto</th>
+                                    <th>Cantidad Usada</th>
                                     <th>Remover</th>
-                                </ChildContent>
-                                </AuthorizeView>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in reparacion.ReparacionDetalle)
-                        {
-                            var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
-                            <tr>
-                                <AuthorizeView Roles="Admin">
-                                    <ChildContent Context="authorizeContext">
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in reparacion.ReparacionDetalle)
+                                {
+                                    var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
+                                    <tr>
                                         <td>@item.ProductoId</td>
-                                    </ChildContent>
-                                </AuthorizeView>
-                                <td>@producto!.Nombre</td>
-                                <td>@item.CantidadUsada</td>
-                                <AuthorizeView Roles="Admin">
-                                    <ChildContent Context="authorizeContext">
+                                        <td>@producto!.Nombre</td>
+                                        <td>@item.CantidadUsada</td>
                                         <td><button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="() => RemoverDetalle(item)"></button></td>
-                                    </ChildContent>
-                                </AuthorizeView>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </ChildContent>
+            </AuthorizeView>
             <div class="card-footer justify-content-center d-flex">
+                <a href="/Reparacion" class="btn btn-primary bi bi-house-door-fill">Volver</a>
                 <button type="button" class="btn btn-secondary bi bi-plus text-white" @onclick="Nuevo"> Nuevo<i class="oi oi-document"></i></button>
                 <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
             </div>
@@ -239,7 +223,7 @@
         var result = await reparacionesService.AddObject(reparacion);
         if (result != null)
         {
-            if(reparacion.ReparacionDetalle.Any())
+            if (reparacion.ReparacionDetalle.Any())
             {
                 foreach (var item in reparacion.ReparacionDetalle)
                 {
@@ -251,23 +235,23 @@
                 }
             }
             var mensaje = new NotificationMessage
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Guardado",
-                Detail = "Reparacion guardada con exito",
-                Duration = 5000
-            };
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Reparacion guardada con exito",
+                    Duration = 5000
+                };
             notificationService.Notify(mensaje);
         }
         else
         {
             var mensaje = new NotificationMessage
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Error al guardar la reparacion",
-                Duration = 5000
-            };
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Error al guardar la reparacion",
+                    Duration = 5000
+                };
             notificationService.Notify(mensaje);
         }
         await Task.Delay(1000);
@@ -276,24 +260,24 @@
 
     public void AgregarDetalle()
     {
-        if(reparacion.ReparacionDetalle.Any(x => x.ProductoId == reparacionDetalle.ProductoId))
+        if (reparacion.ReparacionDetalle.Any(x => x.ProductoId == reparacionDetalle.ProductoId))
         {
             var mensaje = new NotificationMessage
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "El producto ya fue agregado",
-                Duration = 5000
-            };
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "El producto ya fue agregado",
+                    Duration = 5000
+                };
             notificationService.Notify(mensaje);
             return;
         }
 
 
-        if(reparacionDetalle.CantidadUsada > 0 && reparacionDetalle.ProductoId > 0)
+        if (reparacionDetalle.CantidadUsada > 0 && reparacionDetalle.ProductoId > 0)
         {
             var producto = productos.FirstOrDefault(p => p.ProductoId == reparacionDetalle.ProductoId);
-            if(producto!.Cantidad >= reparacionDetalle.CantidadUsada)
+            if (producto!.Cantidad >= reparacionDetalle.CantidadUsada)
             {
                 reparacion.ReparacionDetalle.Add(reparacionDetalle);
                 reparacionDetalle = new ReparacionesDetalle();
@@ -301,24 +285,24 @@
             else
             {
                 var mensaje = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "No hay suficiente cantidad de producto",
-                    Duration = 5000
-                };
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No hay suficiente cantidad de producto",
+                        Duration = 5000
+                    };
                 notificationService.Notify(mensaje);
             }
         }
         else
         {
             var mensaje = new NotificationMessage
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Debe seleccionar un producto y una cantidad",
-                Duration = 5000
-            };
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Debe seleccionar un producto y una cantidad",
+                    Duration = 5000
+                };
             notificationService.Notify(mensaje);
         }
     }

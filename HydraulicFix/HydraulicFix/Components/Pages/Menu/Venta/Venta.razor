@@ -223,10 +223,9 @@
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
                                     }
-                                    else if(usuario.Cedula != "")
+                                    else
                                     {
                                         venta.ClienteId = null;
-                                        venta.NombreCliente = "";
                                         <label class="fw-bold">Nombre de Cliente:</label>
                                         <InputText @bind-Value="venta.NombreCliente" class="form-control" placeholder="Nombre"></InputText>
                                     }
@@ -319,7 +318,7 @@
                                         }
                                     </div>
                                 </div>
-                                @if (venta.CondicionId == 2)
+                                @if (venta.CondicionId == 1)
                                 {
                                     <div class="col-12">
                                         <label class="fw-bold">Cantidad a Cobrar</label>
@@ -331,6 +330,7 @@
                                     <div class="col-12">
                                         <label class="fw-bold">Cantidad Abonar</label>
                                         <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0.01"></InputNumber>
+                                        <ValidationMessage For="@(() => venta.Recibido)" class="alert alert-danger" />
                                     </div>
                                 }
                                 <div class="input-group">
@@ -358,8 +358,7 @@
                                 <div class="col-12">
                                     <DataAnnotationsValidator />
                                     <label class="fw-bold">Recibido:</label>
-                                    <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0.01" onchange="this.blur()"></InputNumber>
-                                    <ValidationMessage For="@(() => venta.Recibido)" class="alert alert-danger" />
+                                    <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0" onchange="this.blur()"></InputNumber>
                                 </div>
                                 <div class="input-group">
                                     <div class="col-12">
@@ -552,7 +551,7 @@
                                         <label class="fw-bold">Recibido:</label>
                                         <span>RD$ @venta.Recibido.ToString("N2")</span>
                                     </div>
-                                    @if (venta.CondicionId == 1)
+                                    @if (venta.CondicionId == 2)
                                     {
                                         double deuda = venta.Total - venta.Recibido;
                                         <div>
@@ -870,20 +869,20 @@
             notificationService.Notify(mensaje);
             return;
         }
-        if(venta.CondicionId == 1 && venta.ClienteId == null)
+        if(venta.CondicionId == 2 && venta.ClienteId == null)
         {
             var mensaje = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
-                    Detail = "Debe ser un cliente registrado para ser venta al contado",
+                    Detail = "Debe ser un cliente registrado para ser venta a crédito",
                     Duration = 8000
                 };
             notificationService.Notify(mensaje);
             return;
         }
         var abo = await abonosService.GetObjectByCondition(p => p.ClienteId == venta.ClienteId && !p.Pago);
-        if(abo.Any() && venta.CondicionId == 1)
+        if(abo.Any() && venta.CondicionId == 2)
         {
             var mensaje = new NotificationMessage
                 {
@@ -896,15 +895,15 @@
             return;
         }
 
-        if (venta.CondicionId == 1)// contado
+        if (venta.CondicionId == 2)// credito
         {
-            if (venta.Recibido > venta.Total || venta.Recibido < 0.01f)
+            if (venta.Recibido > venta.Total)
             {
                 var mensaje1 = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error",
-                        Detail = "El monto abonado debe ser mayor a cero y menor al total",
+                        Detail = "El monto abonado debe ser menor al total",
                         Duration = 5000
                     };
                 notificationService.Notify(mensaje1);
@@ -924,12 +923,15 @@
                 abono.Pago = false;
                 if (venta.ClienteId != null)
                     abono.ClienteId = venta.ClienteId;
-                abono.AbonoDetalle.Add(new AbonosDetalle
-                    {
-                        Monto = venta.Recibido,
-                        Fecha = DateTime.Now,
-                        MetodoPagoId = venta.MetodoPagoId
-                    });
+                if(venta.Recibido > 0)
+                {
+                    abono.AbonoDetalle.Add(new AbonosDetalle
+                        {
+                            Monto = venta.Recibido,
+                            Fecha = DateTime.Now,
+                            MetodoPagoId = venta.MetodoPagoId
+                        });
+                }
                 venta.Devuelta = 0;
                 var realizado = await ventasService.AddObject(venta);
                 if (realizado != null)
@@ -942,7 +944,7 @@
                     {
                         Severity = NotificationSeverity.Success,
                         Summary = "Venta Realizada",
-                        Detail = "La venta al contado se ha realizado con exito",
+                        Detail = "La venta al crédito se ha realizado con exito",
                         Duration = 5000
                     };
                 notificationService.Notify(mensaje);
@@ -962,12 +964,15 @@
                 abono.Pago = false;
                 if (venta.ClienteId != null)
                     abono.ClienteId = venta.ClienteId;
-                abono.AbonoDetalle.Add(new AbonosDetalle
-                    {
-                        Monto = venta.Recibido,
-                        Fecha = DateTime.Now,
-                        MetodoPagoId = venta.MetodoPagoId
-                    });
+                if (venta.Recibido > 0)
+                {
+                    abono.AbonoDetalle.Add(new AbonosDetalle
+                        {
+                            Monto = venta.Recibido,
+                            Fecha = DateTime.Now,
+                            MetodoPagoId = venta.MetodoPagoId
+                        });
+                }
                 venta.Devuelta = 0;
                 var realizado = await ventasService.AddObject(venta);
                 if (realizado != null)
@@ -980,7 +985,7 @@
                     {
                         Severity = NotificationSeverity.Success,
                         Summary = "Venta Realizada",
-                        Detail = "La venta se ha realizado con exito",
+                        Detail = "La venta al crédito se ha realizado con exito",
                         Duration = 5000
                     };
                 notificationService.Notify(mensaje);
@@ -1076,11 +1081,15 @@
                     if(detalleReparacion != null)
                     {
                         producto.Cantidad -= (item.Cantidad - detalleReparacion.CantidadUsada);
+                        if(producto.Cantidad <= 0)
+                            producto.EsDisponible = false;
                         await productosService.UpdateObject(producto);
                     }
                 }
                 else
                 {
+                    if (producto.Cantidad <= 0)
+                        producto.EsDisponible = false;
                     producto.Cantidad -= item.Cantidad;
                     await productosService.UpdateObject(producto);
                 }
