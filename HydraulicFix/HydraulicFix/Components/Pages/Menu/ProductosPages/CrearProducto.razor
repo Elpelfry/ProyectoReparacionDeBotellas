@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject ProductosService productosService
 @inject NavigationManager NavigationManager
+@inject IServer<Proveedores> proveedorService
 @rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 
@@ -45,7 +46,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="cantidadProducto" class="fw-bold">Cantidad:</label>
-                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" />
+                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" min="1"/>
                             <ValidationMessage For="@(() => productos.Cantidad)" />
                         </div>
                         <div class="form-group">
@@ -55,7 +56,13 @@
                         </div>
                         <div class="form-group">
                             <label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
-                            <InputNumber @bind-Value="productos.ProveedorId" class="form-control" />
+                            <InputSelect @bind-Value="productos.ProveedorId" class="form-select">
+                                
+                                @foreach (var proveedor in proveedores)
+                                {
+                                    <option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
+                                }
+                                </InputSelect>
                             <ValidationMessage For="@(() => productos.ProveedorId)" />
                         </div>
                         <div class="form-group">
@@ -75,13 +82,18 @@
     </div>
 </EditForm>
 
-
 @code {
-	public Productos productos { get; set; } = new Productos();
-	public string? mensaje = "";
+    public Productos productos { get; set; } = new Productos();
+    public string? mensaje = "";
+    public List<Proveedores> proveedores { get; set; } = new List<Proveedores>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        proveedores = await proveedorService.GetAllObject();
+    }
 	public async Task GuardarProducto()
 	{
+        productos.EsDisponible = true;
 		var guarda = await productosService.AddObject(productos);
 		if (guarda != null)
 		{
