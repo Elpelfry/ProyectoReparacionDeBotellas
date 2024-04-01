@@ -403,18 +403,45 @@ namespace HydraulicFix.Migrations
                         new
                         {
                             EstadoId = 2,
-                            NombreEstado = "EnProceso"
+                            NombreEstado = "En Proceso"
                         },
                         new
                         {
                             EstadoId = 3,
-                            NombreEstado = "Terminado"
+                            NombreEstado = "Completado"
                         },
                         new
                         {
                             EstadoId = 4,
                             NombreEstado = "Cancelado"
                         });
+                });
+
+            modelBuilder.Entity("Shared.Models.Gastos", b =>
+                {
+                    b.Property<int>("GastoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GastoId"));
+
+                    b.Property<string>("Asunto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Monto")
+                        .HasColumnType("float");
+
+                    b.HasKey("GastoId");
+
+                    b.ToTable("Gastos");
                 });
 
             modelBuilder.Entity("Shared.Models.MetodoPagos", b =>
@@ -682,11 +709,14 @@ namespace HydraulicFix.Migrations
                     b.Property<int>("EstadoId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("NombreCliente")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TecnicoId")
+                    b.Property<string>("Tecnico")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -754,6 +784,10 @@ namespace HydraulicFix.Migrations
 
                     b.Property<int>("MetodoPagoId")
                         .HasColumnType("int");
+
+                    b.Property<string>("NombreCliente")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Recibido")
                         .HasColumnType("float");

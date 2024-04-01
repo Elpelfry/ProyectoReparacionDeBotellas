@@ -1,0 +1,517 @@
+﻿@page "/ventasIndex"
+
+@attribute [Authorize]
+@inject IServer<Reparaciones> reparacionesService
+@inject IServer<Abonos> abonosService
+@inject IServer<Estados> estadosService
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject IServer<Ventas> ventasService
+@inject IServer<Configuraciones> configuracionesService
+@inject IServer<Condiciones> condicionesService
+@inject IServer<MetodoPagos> metodosPagosService
+@inject IServer<Productos> productosService
+@inject NotificationService notificationService
+@inject AuthenticationStateProvider AuthenticationState
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<RadzenNotification />
+<PageTitle>Ventas</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3 class="fw-bold text-center">Ventas</h3>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div style="margin-left: 4px;">
+                    <div class="row">
+                        <label>Filtrar por:</label>
+                        <div class="col-2">
+                            <InputSelect @bind-Value="Opcion" class="form-select">
+                                <AuthorizeView Roles="Admin">
+                                    <option value="1">Venta Id</option>
+                                    <option value="2">Nombre del Cliente</option>
+                                </AuthorizeView>
+                                <option value="3">Fecha</option>
+                                <option value="4">Total</option>
+                                <option value="5">Todo</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col-auto">
+                            @switch (Opcion)
+                            {
+                                case 1:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="venta.VentaId" class="form-control" min="0"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 2:
+                                    <div class="input-group justify-content-end">
+                                        <InputText @bind-Value="venta.NombreCliente" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 3:
+                                    <div class="input-group justify-content-end">
+                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 4:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="venta.Total" class="form-control"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 5:
+                                    <div class="input-group justify-content-end">
+                                        <button class="btn btn-info" @onclick="Buscar">
+                                            <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                        </button>
+                                    </div>
+                                    break;
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="table table-light table-hover table-striped table-bordered text-center">
+                <thead>
+                    <tr class="fw-bold">
+                        <AuthorizeView Roles="Admin">
+                            <th scope="col">Venta Id</th>
+                        </AuthorizeView>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Sub-Total</th>
+                        <th scope="col">ITBIS</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Ver</th>
+                        <AuthorizeView Roles="Admin">
+                            <th scope="col">Eliminar</th>
+                        </AuthorizeView>
+                    </tr>
+                </thead>
+                <tbody>
+                    <AuthorizeView Roles="Admin">
+                        @foreach (var item in ventas)
+                        {
+                            <tr>
+                                <td>@item.VentaId</td>
+                                <td>@item.NombreCliente</td>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@item.SubTotal.ToString("N2")</td>
+                                <td>@item.ITBS.ToString("N2")</td>
+                                <td>@item.Total.ToString("N2")</td>
+                                @if (item.Eliminada)
+                                {
+                                    <td class="text-danger">Eliminada</td>
+                                }
+                                else
+                                {
+                                    <td class="text-success">Completada</td>
+                                }
+
+                                <td>
+                                    <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerFactura(item.VentaId))>
+                                        <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                    </button>
+                                </td>
+                                @if(!item.Eliminada)
+                                {
+                                    <td>
+                                        <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="() => Eliminar(item.VentaId)"></button>
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+                    </AuthorizeView>
+                    <AuthorizeView Roles="Cliente">
+                        @foreach (var item in ventas)
+                        {
+                            var usu = usuarios.FirstOrDefault(x => x.Id == item.ClienteId);
+                            if (item.ClienteId == usuario!.Id)
+                            {
+                                <tr>
+                                    <td>@item.NombreCliente</td>
+                                    <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.SubTotal.ToString("N2")</td>
+                                    <td>@item.ITBS.ToString("N2")</td>
+                                    <td>@item.Total.ToString("N2")</td>
+                                    @if (item.Eliminada)
+                                    {
+                                        <td class="text-danger">Eliminada</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-success">Completada</td>
+                                    }
+
+                                    <td>
+                                        <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerFactura(item.VentaId))>
+                                            <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </AuthorizeView>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (factura)
+{
+    <div class="modal d-block opaco">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h5>
+                    <div class="justify-content-end d-flex">
+                        <button type="button" class="btn bg-muted text-white" style="background: #ffe085" @onclick="ImprimirFactura">
+                            <img style="width: 15px; height: 15px;" src="/bootstrap/img/printer.svg" />
+                        </button>
+                        <button type="button" class="btn bg-danger text-white" @onclick="CerrarModal">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="factura" class="modal-body" style="height: 35rem; overflow-y: auto;">
+
+                    <div class="position-relative modalContenedor">
+                        @if (venta.Eliminada)
+                        {
+                            <div class="letreroEliminar position-absolute top-50 start-50 translate-middle" style="transform: translate(-50%, -50%); z-index: 9999;">
+                                <img src="/bootstrap/img/returned.png">
+                            </div>
+                        }
+
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div id="logoEmpresa" class="text-center">
+                                <img style="width: 150px; height: 120px; border-radius: 10%;" src="@getLogo()" />
+                        </div>
+                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">@configuracion.NombreEmpresa</h4>
+
+                            <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
+                                <div class="col-6 text-start">
+                                    <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
+                                </div>
+                            </div>
+
+                            <div id="direccionEmpresa" class="fw-bold text-center">
+                                <label> <i class="fas fa-map-marker"></i> Dirc.: <span class="fw-normal">@configuracion.Direccion</span></label>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">DATOS DE LA VENTA</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Fecha:<span class="fw-normal"> @venta.Fecha.ToString("dd/MM/yyyy")</span></label>
+                            </div>
+                            <div id="fechaFactura" class="col text-end">
+                                <label class="fw-bold" style="font-size: 12px;">Hora: <span class="fw-normal"> @venta.Fecha.ToString("h:mm tt")</span></label>
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">N°: <span class="fw-normal"> @venta.VentaId</span></label>
+                            </div>
+                            <div class="text-start">
+                                @if (venta.MetodoPagoId > 0)
+                                {
+                                    var met = metodosPagos.FirstOrDefault(x => x.MetodoPagoId == venta.MetodoPagoId);
+                                    <label class="fw-bold" style="font-size: 12px;">M&eacute;todo Pago: <span class="fw-normal">@met!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                @if (venta.CondicionId > 0)
+                                {
+                                    var condi = condiciones.FirstOrDefault(x => x.CondicionId == venta.CondicionId);
+                                    <label class="fw-bold" style="font-size: 12px;">Condici&oacute;n: <span class="fw-normal">@condi!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Cliente: <span class="fw-normal">@venta.NombreCliente</span></label>
+                            </div>
+                            @if (venta.ClienteId != null)
+                            {
+                                var cliente = usuarios.FirstOrDefault(x => x.Id == venta.ClienteId);
+                                if (cliente != null)
+                                {
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Apellido: <span class="fw-normal">@cliente!.Apellido</span></label>
+                                    </div>
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Email: <span class="fw-normal">@cliente.Email</span></label>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">PRODUCTOS</h5>
+                        <hr>
+
+                        <div class="row mb-4">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descripci&oacute;n</th>
+                                        <th class="text-end derecha">Itbis</th>
+                                        <th class="text-end derecha">Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in venta.VentasDetalle)
+                                    {
+                                        var pro = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                                        double subtotal = item.Cantidad * pro!.Precio;
+                                        double total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        double itbisFinal = total * (pro.ITBIS / 100.0f);
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <span>* @pro.Nombre</span>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <span>(@item.Cantidad x @pro!.Precio.ToString("N2"))</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-end derecha">@itbisFinal.ToString("N2")</td>
+                                            <td class="text-end derecha">@total.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                    @if (venta.ReparacionId > 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <span>* Reparaci&oacute;n</span>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <span>  Botella Hidr&aacute;ulica</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-end derecha">0.00</td>
+                                            <td class="text-end derecha">@reparacion.Costo.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-right: 10px">
+                            <div class="row mb-5" style="text-align: end">
+                                <div>
+                                    <label class="fw-bold">SubTotal:</label>
+                                    <span>RD$ @venta.SubTotal.ToString("N2")</span>
+                                </div>
+                                <div>
+                                    <label class="fw-bold">ITBIS:</label>
+                                    <span>RD$ @venta.ITBS.ToString("N2")</span>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold">Total:</label>
+                                    <span>RD$ @venta.Total.ToString("N2")</span>
+                                </div>
+
+                                <div class="datoInferior">
+                                    <div>
+                                        <label class="fw-bold">Recibido:</label>
+                                        <span>RD$ @venta.Recibido.ToString("N2")</span>
+                                    </div>
+                                    @if (venta.CondicionId == 2)
+                                    {
+                                        double deuda = venta.Total - venta.Recibido;
+                                        <div>
+                                            <label class="fw-bold">Pendiente:</label>
+                                            <span>RD$ @deuda.ToString("N2")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <label class="fw-bold">Cambio:</label>
+                                            <span>RD$ @venta.Devuelta.ToString("N2")</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center centrado datoInferior">
+                            <label class="fw-bold">@configuracion.Nota</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (eliminar)
+{
+    <div class="modal d-block opaco">
+        <div class="modal-dialog modal-dialog-centered">
+            <RadzenNotification />
+            <div class="modal-content">
+                <div class="modal-header text-center" style="background:#399ce7;">
+                    <h5 class="modal-title fw-bold text-white">Eliminar</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <h6>¿ESTAS SEGURO QUE DESEAS ELIMINAR LA VENTA?</h6>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger fw-bold text-light" @onclick="EliminarVenta">Eliminar</button>
+                    <button type="button" class="btn btn-secondary fw-bold text-light" @onclick="CerrarModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    public int Opcion { get; set; }
+    public Ventas venta { get; set; } = new Ventas();
+    public List<Ventas> ventas { get; set; } = new List<Ventas>();
+    public List<MetodoPagos> metodosPagos { get; set; } = new List<MetodoPagos>();
+    public List<Condiciones> condiciones { get; set; } = new List<Condiciones>();
+    public Configuraciones configuracion { get; set; } = new Configuraciones();
+    public Reparaciones reparacion { get; set; } = new Reparaciones();
+    public List<Productos> productos { get; set; } = new List<Productos>();
+    public List<ApplicationUser> usuarios { get; set; } = new List<ApplicationUser>();
+    public ApplicationUser usuario { get; set; } = new ApplicationUser();
+    public AuthenticationState authState { get; set; } = default!;
+    public bool factura { get; set; } = false;
+    public bool eliminar { get; set; } = false;
+
+    public DateTime FechaInicio { get; set; } = DateTime.Today;
+    public DateTime FechaFin { get; set; } = DateTime.Today;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ventas = await ventasService.GetAllObject();
+        metodosPagos = await metodosPagosService.GetAllObject();
+        condiciones = await condicionesService.GetAllObject();
+        var conf = await configuracionesService.GetObjectByCondition(c => true);
+        configuracion = conf.FirstOrDefault()!;
+        usuarios = await usuariosService.GetAllObject();
+        productos = await productosService.GetAllObject();
+        authState = await AuthenticationState.GetAuthenticationStateAsync();
+        usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+    }
+
+    public async Task Buscar()
+    {
+        if(Opcion == 1 && venta.VentaId > 0)
+            ventas = await ventasService.GetObjectByCondition(v => v.VentaId == venta.VentaId);
+        else if(Opcion == 2 && !string.IsNullOrEmpty(venta.NombreCliente))
+            ventas = await ventasService.GetObjectByCondition(v => v.NombreCliente!.ToLower().Contains( venta.NombreCliente!.ToLower()));
+        else if(Opcion == 3 && FechaFin != default && FechaInicio != default)
+            ventas = await ventasService.GetObjectByCondition(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date);
+        else if(Opcion == 4 && venta.Total > 0)
+            ventas = await ventasService.GetObjectByCondition(v => v.Total == venta.Total);
+        else if(Opcion == 5)
+            ventas = await ventasService.GetAllObject();
+    }
+
+    public async Task VerFactura(int id)
+    {
+        factura = true;
+        venta = await ventasService.GetObject(id);
+        if (venta.ReparacionId > 0)
+            reparacion = await reparacionesService.GetObject(venta.ReparacionId);
+    }
+
+    public async Task ImprimirFactura()
+    {
+        factura = false;
+        await JSRuntime.InvokeVoidAsync("ImprimirF");
+    }
+
+    public void CerrarModal()
+    {
+        factura = false;
+        eliminar = false;
+    }
+
+    public async Task Eliminar(int id)
+    {
+        eliminar = true;
+        venta = venta = await ventasService.GetObject(id);
+    }
+
+    public async Task EliminarVenta()
+    {
+        await ActualizarCantidadProducto(venta.VentasDetalle);
+        venta.Eliminada = true;
+        await ventasService.UpdateObject(venta);
+        eliminar = false;
+        var mensaje = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Venta eliminada",
+            Detail = "La venta ha sido eliminada correctamente",
+            Duration = 5000
+        };
+        notificationService.Notify(mensaje);
+    }
+
+    public async Task ActualizarCantidadProducto(ICollection<VentasDetalle> detalle)
+    {
+        foreach (var item in detalle)
+        {
+            var producto = await productosService.GetObject(item.ProductoId);
+            if (producto != null)
+            {
+                if (producto.Cantidad > 0)
+                    producto.EsDisponible = true;
+                producto.Cantidad += item.Cantidad;
+                await productosService.UpdateObject(producto);
+            }
+        }
+    }
+
+    public string getLogo()
+    {
+        if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
+        {
+            string base64String = Convert.ToBase64String(configuracion.Imagen);
+            return $"data:image/png;base64,{base64String}";
+        }
+        else
+        {
+            return "/bootstrap/img/ejemplo.png";
+        }
+    }
+}

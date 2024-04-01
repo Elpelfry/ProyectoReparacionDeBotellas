@@ -1,0 +1,335 @@
+﻿@page "/Reparaciones/Edit/{ReparacionId:int}"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IServer<Reparaciones> reparacionesService
+@inject IServer<Estados> estadosService
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject AuthenticationStateProvider AuthenticationState
+@inject IServer<Productos> productosService
+@inject IdentityUserService identityUserService
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+@rendermode InteractiveServer
+
+
+<PageTitle>Editar</PageTitle>
+<EditForm Model="reparacion" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <RadzenNotification />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold">Editar Reparaci&oacute;n</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                        <AuthorizeView Roles="Admin">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Estado</label>
+                                <InputSelect @bind-Value="reparacion.EstadoId" class="form-select">
+                                    @foreach (var item in estados)
+                                    {
+                                        if (item.EstadoId != 3)
+                                        {
+                                            <option value="@item.EstadoId">@item.NombreEstado</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => reparacion.EstadoId)" />
+                            </ChildContent>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Estado</label>
+                                <label class="form-control">@estados.FirstOrDefault(e => e.EstadoId == reparacion.EstadoId)?.NombreEstado</label>
+                            </ChildContent>
+                        </AuthorizeView>
+                    </div>
+                    <div class="col-4">
+                        <label class="fw-bold">Fecha</label>
+                        <label class="form-control">@reparacion.Fecha.ToString("dd/MM/yyyy")</label>
+                    </div>
+                    <div class="col-4">
+                        <label class="fw-bold">Costo</label>
+                        <AuthorizeView Roles="Admin">
+                            <ChildContent Context="authorizeContext">
+
+                                <InputNumber @bind-Value="reparacion.Costo" min="0" class="form-control" />
+                                <ValidationMessage For="@(() => reparacion.Costo)" />
+                            </ChildContent>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <ChildContent Context="authorizeContext">
+                                <label class="form-control">@reparacion.Costo.ToString("N2")</label>
+                            </ChildContent>
+                        </AuthorizeView>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <AuthorizeView Roles="Admin">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Nombre</label>
+                                <InputText @bind-Value="reparacion.NombreCliente" class="form-control" />
+                                <ValidationMessage For="@(() => reparacion.NombreCliente)" />
+                            </ChildContent>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Nombre</label>
+                                <label class="form-control">@reparacion.NombreCliente</label>
+                            </ChildContent>
+                        </AuthorizeView>
+                    </div>
+                    <div class="col-4">
+                        <AuthorizeView Roles="Admin">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Apellido</label>
+                                <InputText @bind-Value="reparacion.ApellidoCliente" class="form-control" />
+                                <ValidationMessage For="@(() => reparacion.ApellidoCliente)" />
+                            </ChildContent>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Apellido</label>
+                                <label class="form-control">@reparacion.ApellidoCliente</label>
+                            </ChildContent>
+                        </AuthorizeView>
+                    </div>
+                    <div class="col-4">
+                        <AuthorizeView Roles="Admin">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Tecnico</label>
+                                <InputText @bind-Value="reparacion.Tecnico" class="form-control" />
+                                <ValidationMessage For="@(() => reparacion.Tecnico)" />
+                            </ChildContent>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Cliente">
+                            <ChildContent Context="authorizeContext">
+                                <label class="fw-bold">Tecnico</label>
+                                <label class="form-control">@reparacion.Tecnico</label>
+                            </ChildContent>
+                        </AuthorizeView>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <label class="fw-bold">Direcci&oacute;n</label>
+                        <InputText @bind-Value="reparacion.Direccion" class="form-control" />
+                        <ValidationMessage For="@(() => reparacion.Direccion)" />
+                    </div>
+                    <div class="col-4">
+                        <label class="fw-bold">Tel&eacute;fono</label>
+                        <InputText @bind-Value="reparacion.Telefono" class="form-control" />
+                        <ValidationMessage For="@(() => reparacion.Telefono)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label class="fw-bold">Descripci&oacute;n</label>
+                        <InputTextArea @bind-Value="reparacion.Descripcion" class="form-control" />
+                        <ValidationMessage For="@(() => reparacion.Descripcion)" />
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-light">Detalle Reparaci&oacute;n</h3>
+                </div>
+                @if (reparacion.EstadoId != 4)
+                {
+                    <AuthorizeView Roles="Admin">
+                        <ChildContent Context="authorizeContext">
+                            <div class="card-body row">
+                                <label class="fw-bold">Productos</label>
+                                <div class="col-5">
+
+                                    <InputSelect @bind-Value="reparacionDetalle.ProductoId" class="form-select">
+                                        @foreach (var item in productos)
+                                        {
+                                            <option value="@item.ProductoId">@item.Nombre</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <label class="fw-bold">Cantidad Usada</label>
+                                <div class="col-3">
+                                    <InputNumber @bind-Value="reparacionDetalle.CantidadUsada" min="0" class="form-control" />
+
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-success bi bi-plus" @onclick="AgregarDetalle"> Agregar</button>
+                                </div>
+                            </div>
+                        </ChildContent>
+                    </AuthorizeView>
+                }
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <AuthorizeView Roles="Admin">
+                                <ChildContent Context="authorizeContext">
+                                    <th>ProductoId</th>
+                                </ChildContent>
+                            </AuthorizeView>
+                            <th>Nombre de Producto</th>
+                            <th>Cantidad Usada</th>
+                            <AuthorizeView Roles="Admin">
+                                <ChildContent Context="authorizeContext">
+                                    @if (reparacion.EstadoId != 4)
+                                    {
+                                        <th>Remover</th>
+                                    }
+                                </ChildContent>
+                            </AuthorizeView>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in reparacion.ReparacionDetalle)
+                        {
+                            var producto = productos.FirstOrDefault(p => p.ProductoId == item.ProductoId);
+                            <tr>
+                                <AuthorizeView Roles="Admin">
+                                    <ChildContent Context="authorizeContext">
+                                        <td>@item.ProductoId</td>
+                                    </ChildContent>
+                                </AuthorizeView>
+                                @if (producto != null)
+                                {
+                                    <td>@producto.Nombre</td>
+                                }
+                                else
+                                {
+                                    <td>Producto no encontrado</td>
+                                }
+                                <td>@item.CantidadUsada</td>
+                                <AuthorizeView Roles="Admin">
+                                    <ChildContent Context="authorizeContext">
+                                        @if (reparacion.EstadoId != 4)
+                                        {
+                                            <td><button type="button" class="btn btn-danger bi bi-trash" @onclick="() => RemoverDetalle(item)"></button></td>
+                                        }
+                                    </ChildContent>
+                                </AuthorizeView>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer justify-content-center d-flex">
+                <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public bool bandera = false;
+    [Parameter]
+    public int ReparacionId { get; set; }
+    public bool mensaje = false;
+    public Reparaciones reparacion { get; set; } = new Reparaciones();
+    public List<Estados> estados = new List<Estados>();
+    public List<ApplicationUser> usuarios = new List<ApplicationUser>();
+    public ApplicationUser usuario = new ApplicationUser();
+    public AuthenticationState authState { get; set; } = default!;
+    public List<Productos> productos = new List<Productos>();
+    public List<Reparaciones> reparaciones = new List<Reparaciones>();
+    public ReparacionesDetalle reparacionDetalle = new ReparacionesDetalle();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ReparacionId > 0)
+        {
+            reparacion = await reparacionesService.GetObject(ReparacionId);
+            productos = await productosService.GetAllObject();
+            estados = await estadosService.GetAllObject();
+            usuarios = await usuariosService.GetAllObject();
+            authState = await AuthenticationState.GetAuthenticationStateAsync();
+            usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+        }
+    }
+
+    public async Task Guardar()
+    {
+        var result = await reparacionesService.UpdateObject(reparacion);
+        if (result)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Reparación actualizada con exito",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Error al modificar la reparación",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+        await Task.Delay(1000);
+        navigationManager.NavigateTo("reparacion");
+    }
+
+    public void AgregarDetalle()
+    {
+        if (reparacion.ReparacionDetalle.Any(x => x.ProductoId == reparacionDetalle.ProductoId))
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "El producto ya fue agregado",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+
+        if (reparacionDetalle.CantidadUsada > 0 && reparacionDetalle.ProductoId > 0)
+        {
+            var producto = productos.FirstOrDefault(p => p.ProductoId == reparacionDetalle.ProductoId);
+            if (producto!.Cantidad >= reparacionDetalle.CantidadUsada)
+            {
+                reparacion.ReparacionDetalle.Add(reparacionDetalle);
+                reparacionDetalle = new ReparacionesDetalle();
+            }
+            else
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No hay suficiente cantidad de producto",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+            }
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Debe seleccionar un producto y una cantidad",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public void RemoverDetalle(ReparacionesDetalle detalle)
+    {
+        var producto = productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+        reparacion.ReparacionDetalle.Remove(detalle);
+    }
+}

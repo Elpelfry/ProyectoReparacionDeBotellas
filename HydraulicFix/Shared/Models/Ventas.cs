@@ -13,7 +13,11 @@ public class Ventas
 	[ForeignKey("ApplicationUser")]
 	public string? ClienteId { get; set; }
 
-	[ForeignKey("Reparaciones")]
+    [Required(ErrorMessage = "El Combre del cliente es obligatorio")]
+    [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "El Nombre debe contener solo letras.")]
+    public string? NombreCliente { get; set; }
+
+    [ForeignKey("Reparaciones")]
 	public int ReparacionId { get; set; }
 
 	[ForeignKey("MetodoPagos")]

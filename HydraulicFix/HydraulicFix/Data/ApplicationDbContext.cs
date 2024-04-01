@@ -19,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 	public DbSet<Condiciones> Condiciones { get; set; }
 	public DbSet<Estados> Estados { get; set; }
 	public DbSet<MetodoPagos> MetodoPagos { get; set; }
+	public DbSet<Gastos> Gastos { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

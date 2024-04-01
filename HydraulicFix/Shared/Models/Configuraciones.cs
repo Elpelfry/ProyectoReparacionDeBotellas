@@ -12,7 +12,6 @@ public class Configuraciones
     public string? NFC { get; set; }
     public byte[]? Imagen { get; set; }
     public string? ImagenUrl { get; set; }
-
     [Required(ErrorMessage = "El número de teléfono es obligatorio.")]
     [RegularExpression(@"^\d{10}$", ErrorMessage = "El número de teléfono debe tener 10 dígitos.")]
     public string? Telefono { get; set; }

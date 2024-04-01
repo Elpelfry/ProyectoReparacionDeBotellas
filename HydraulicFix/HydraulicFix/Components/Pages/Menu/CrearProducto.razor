@@ -1,10 +1,9 @@
 ﻿@page "/CrearProducto"
-
+@attribute [Authorize(Roles = "Admin")]
 @inject ProductosService productosService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
-@using Shared.Models
 
 <PageTitle>Agregar productos</PageTitle>
 <EditForm Model="@productos" OnValidSubmit="GuardarProducto">

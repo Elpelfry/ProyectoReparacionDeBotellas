@@ -1,0 +1,44 @@
+﻿@page "/Gastos/Ver/{GastoId:int}"
+
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+@inject IServer<Gastos> gastosService
+
+<PageTitle>Ver</PageTitle>
+
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header">
+            <h1 class="text-light">Ver Gasto</h1>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <p><strong> GastoId:</strong> @gasto.GastoId</p>
+                    <p><strong> Asunto:</strong> @gasto.Asunto</p>
+                    <p><strong> Fecha:</strong> @gasto.Fecha.ToString("dd/MM/yyyy")</p>
+                    <p><strong> Monto:</strong> @gasto.Monto.ToString("N2")</p>
+                    <p><strong> Descripci&oacute;n:</strong> @gasto.Descripcion</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end input-group">
+            <a href="/Gastos" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int GastoId { get; set; }
+    public Gastos gasto = new Gastos();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (GastoId > 0)
+        {
+           gasto = await gastosService.GetObject(GastoId);
+        }
+    }
+}

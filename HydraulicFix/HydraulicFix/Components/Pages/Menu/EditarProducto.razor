@@ -1,7 +1,7 @@
 ﻿@page "/EditarProductos/{ProductoId:int}"
+@attribute [Authorize(Roles = "Admin")]
 @rendermode InteractiveServer
 @inject ProductosService productosService
-@using Shared.Models
 
 <PageTitle>Editar</PageTitle>
 <EditForm Model="productos" OnValidSubmit="Editar">

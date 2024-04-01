@@ -1,9 +1,9 @@
 ﻿@page "/Inventario"
 @page "/Inventario/{ProductoId:int}"
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager NavigationManager
 @inject ProductosService productoService
 @inject ApplicationDbContext dbContext
-@using Shared.Models
 @rendermode InteractiveServer
 
 <PageTitle>Inventario</PageTitle>
@@ -14,8 +14,11 @@
 		</div>
 		<div class="card-body">
 			<div class="row">
-				<div class="col-md-3 mb-4 d-flex justify-content-end">
-					<button class="btn btn-custom w-40 mb-5" @onclick="AbrirModal">Agregar producto</button>
+				<div class="col-md-2 mb-3 ">
+					<button class="btn btn-custom w-40 mb-5" @onclick="AbrirModal">Agregar Producto</button>
+				</div>
+				<div class="col-md-2 mb-3 ">
+					<a href="/Proveedores" class="btn btn-custom w-40 mb-5">Agregar Proveedor</a>
 				</div>
 				<div class="col-3">
 					<InputSelect id="filtro" class="form-select" @bind-Value="filtro">

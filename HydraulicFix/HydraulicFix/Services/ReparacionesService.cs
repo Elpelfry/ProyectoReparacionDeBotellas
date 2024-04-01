@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
+using System.Linq.Expressions;
 
 namespace HydraulicFix.Services;
 
@@ -29,10 +30,25 @@ public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Repar
 
     public async Task<bool> UpdateObject(Reparaciones type)
     {
-        await _contexto.ReparacionesDetalle.Where(r => r.ReparacionId == type.ReparacionId).ExecuteDeleteAsync();
-        foreach (var item in type.ReparacionDetalle)
-            _contexto.ReparacionesDetalle.Add(item);
+        var detalle = await _contexto.ReparacionesDetalle.Where(r => r.ReparacionId == type.ReparacionId).ToListAsync();
+        foreach (var item in detalle)
+        {
+            var prod = await _contexto.Productos.FindAsync(item.ProductoId);
+            prod!.Cantidad += item.CantidadUsada;
+             _contexto.Entry(prod).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
+        }
 
+        if (type.EstadoId != 4)
+        {
+            foreach (var item in type.ReparacionDetalle)
+            {
+                var prod = await _contexto.Productos.FindAsync(item.ProductoId);
+                prod!.Cantidad -= item.CantidadUsada;
+                _contexto.Entry(prod).State = EntityState.Modified;
+                await _contexto.SaveChangesAsync();
+            }
+        }
         _contexto.Entry(type).State = EntityState.Modified;
         return await _contexto.SaveChangesAsync() > 0;
     }
@@ -46,5 +62,12 @@ public class ReparacionesService(ApplicationDbContext _contexto) : IServer<Repar
         _contexto.Reparaciones.Remove(repa);
         await _contexto.SaveChangesAsync();
         return true;
+    }
+    public Task<List<Reparaciones>> GetObjectByCondition(Expression<Func<Reparaciones, bool>> expression)
+    {
+        return _contexto.Reparaciones.Include(d => d.ReparacionDetalle)
+            .AsNoTracking()
+            .Where(expression)
+            .ToListAsync();
     }
 }

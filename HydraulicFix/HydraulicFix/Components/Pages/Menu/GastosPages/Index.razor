@@ -1,0 +1,147 @@
+﻿@page "/Gastos"
+
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+@inject IServer<Gastos> gastosService
+
+<PageTitle>Gastos</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3 class="fw-bold text-center">Gastos</h3>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div style="margin-left: 4px;">
+                    <div class="row">
+                        <label>Filtrar por:</label>
+                        <div class="col-2">
+                            <InputSelect @bind-Value="Opcion" class="form-select">
+                                <option value="1">Gasto Id</option>
+                                <option value="2">Asunto</option>
+                                <option value="3">Fecha</option>
+                                <option value="4">Monto</option>
+                                <option value="5">Todo</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col-auto">
+                            @switch (Opcion)
+                            {
+                                case 1:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="gasto.GastoId" class="form-control" min="0"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 2:
+                                    <div class="input-group justify-content-end">
+                                        <InputText @bind-Value="gasto.Asunto" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 3:
+                                    <div class="input-group justify-content-end">
+                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 4:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="gasto.Monto" class="form-control"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 5:
+                                    <div class="input-group justify-content-end">
+                                        <button class="btn btn-info" @onclick="Buscar">
+                                            <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                        </button>
+                                    </div>
+                                    break;
+                            }
+                        </div>
+                        <div class="col text-end">
+                            <div class="col-auto">
+                                <a href="/Gastos/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="table table-light table-hover table-striped table-bordered text-center">
+                <thead>
+                    <tr class="fw-bold">
+                        <th scope="col">Gasto Id</th>
+                        <th scope="col">Asunto</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Ver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in gastos)
+                    {
+                        <tr>
+                            <td>@item.GastoId</td>
+                            <td>@item.Asunto</td>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Monto.ToString("N2")</td>
+                            <td>
+                                <a href="/Gastos/ver/@item.GastoId" class="btn btn-warning bi bi-eye" style="height: 38px;"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@code {
+
+    private List<Gastos> gastos = new List<Gastos>();
+    public Gastos gasto { get; set; } = new Gastos();
+    public int Opcion { get; set; }
+
+    public DateTime FechaInicio { get; set; } = DateTime.Today;
+    public DateTime FechaFin { get; set; } = DateTime.Today;
+
+    protected override async Task OnInitializedAsync()
+    {
+        gastos = await gastosService.GetAllObject();
+        gasto.Fecha = DateTime.Now;
+    }
+
+    public async Task Buscar()
+    {
+        if(Opcion == 1 && gasto.GastoId > 0)
+            gastos = await gastosService.GetObjectByCondition(v => v.GastoId == gasto.GastoId);
+        else if(Opcion == 2 && !string.IsNullOrEmpty(gasto.Asunto))
+            gastos = await gastosService.GetObjectByCondition(v => v.Asunto!.ToLower().Contains(gasto.Asunto!.ToLower()));
+        else if (Opcion == 3 && FechaFin != default && FechaInicio != default)
+            gastos = await gastosService.GetObjectByCondition(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date);
+        else if(Opcion == 4 && gasto.Monto > 0)
+            gastos = await gastosService.GetObjectByCondition(v => v.Monto == gasto.Monto);
+        else if(Opcion == 5)
+            gastos = await gastosService.GetAllObject();
+    }
+}

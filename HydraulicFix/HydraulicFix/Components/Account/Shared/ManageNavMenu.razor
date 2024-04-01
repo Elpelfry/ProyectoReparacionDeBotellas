@@ -14,9 +14,11 @@
         <li class="nav-item">
             <NavLink class="nav-link" href="Account/Manage/ChangePassword">Contraseña</NavLink>
         </li>
-        <li class="nav-item">
-            <NavLink class="nav-link" href="Account/Pages/Manage/Configuracion">Empresa</NavLink>
-        </li>
+        <AuthorizeView Roles="Admin">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Account/Pages/Manage/Configuracion">Empresa</NavLink>
+            </li>
+        </AuthorizeView>
 
         @if (hasExternalLogins)
         {
