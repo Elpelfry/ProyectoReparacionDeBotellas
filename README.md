@@ -15,6 +15,10 @@ Administrador:
 delfry@admin.com  
 Admin@123  
 
+Cliente:  
+cliente@cliente.com
+cliente@123
+
 # Tecnologías Utilizadas💻
 Lado del cliente: [HTML, CSS y Javascript]  
 Lado del servidor: [Csharp]
