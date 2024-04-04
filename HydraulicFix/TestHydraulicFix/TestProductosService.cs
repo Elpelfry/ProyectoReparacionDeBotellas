@@ -20,9 +20,9 @@ public class TestProductosService
 		{
 			var service = new ProductosService(context);
 			await context.Productos.AddRangeAsync(
-				new Productos { Nombre = "Producto 1", Precio = 10.50, Cantidad = 100 },
-				new Productos { Nombre = "Producto 2", Precio = 20.75, Cantidad = 200 },
-				new Productos { Nombre = "Producto 3", Precio = 30.99, Cantidad = 150 }
+				new Productos { Nombre = "Producto 1", Precio = 10.50f, Cantidad = 100 },
+				new Productos { Nombre = "Producto 2", Precio = 20.75f, Cantidad = 200 },
+				new Productos { Nombre = "Producto 3", Precio = 30.99f, Cantidad = 150 }
 			);
 			await context.SaveChangesAsync();
 
@@ -45,7 +45,7 @@ public class TestProductosService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ProductosService(context);
-			var producto = new Productos { Nombre = "Producto nuevo", Precio = 25.99, Cantidad = 50 };
+			var producto = new Productos { Nombre = "Producto nuevo", Precio = 25.99f, Cantidad = 50 };
 
 			// Act
 			var result = await service.AddObject(producto);
@@ -69,12 +69,12 @@ public class TestProductosService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ProductosService(context);
-			var producto = new Productos { Nombre = "Producto existente", Precio = 15.99, Cantidad = 75 };
+			var producto = new Productos { Nombre = "Producto existente", Precio = 15.99f, Cantidad = 75 };
 			await context.Productos.AddAsync(producto);
 			await context.SaveChangesAsync();
 
 			// Act
-			producto.Precio = 19.99;
+			producto.Precio = 19.99f;
 			var result = await service.UpdateObject(producto);
 
 			// Assert
@@ -96,7 +96,7 @@ public class TestProductosService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ProductosService(context);
-			var producto = new Productos { Nombre = "Producto a eliminar", Precio = 50.25, Cantidad = 30 };
+			var producto = new Productos { Nombre = "Producto a eliminar", Precio = 50.25f, Cantidad = 30 };
 			await context.Productos.AddAsync(producto);
 			await context.SaveChangesAsync();
 
@@ -122,9 +122,9 @@ public class TestProductosService
 		{
 			var service = new ProductosService(context);
 			await context.Productos.AddRangeAsync(
-				new Productos { Nombre = "Producto 1", Precio = 10.50, Cantidad = 100 },
-				new Productos { Nombre = "Producto 2", Precio = 20.75, Cantidad = 200 },
-				new Productos { Nombre = "Producto 3", Precio = 30.99, Cantidad = 150 }
+				new Productos { Nombre = "Producto 1", Precio = 10.50f, Cantidad = 100 },
+				new Productos { Nombre = "Producto 2", Precio = 20.75f, Cantidad = 200 },
+				new Productos { Nombre = "Producto 3", Precio = 30.99f, Cantidad = 150 }
 			);
 			await context.SaveChangesAsync();
 

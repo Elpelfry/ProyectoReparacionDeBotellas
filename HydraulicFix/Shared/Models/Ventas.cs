@@ -26,15 +26,15 @@ public class Ventas
 	[Required(ErrorMessage = "Es requerido")]
 	public DateTime Fecha { get; set; } = DateTime.Now;
 
-	public double SubTotal { get; set; }
+	public float SubTotal { get; set; }
 
-	public double Total { get; set; }
+	public float Total { get; set; }
 
-	public double ITBS { get; set; }
+	public float ITBS { get; set; }
 
-	public double Recibido { get; set; }
+	public float Recibido { get; set; }
 
-	public double Devuelta { get; set;}
+	public float Devuelta { get; set;}
 
 	[ForeignKey("Condiciones")]
 	public int CondicionId { get; set; }

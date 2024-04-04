@@ -20,9 +20,9 @@ public class TestReparacionesService
 		{
 			var service = new ReparacionesService(context);
 			await context.Reparaciones.AddRangeAsync(
-				new Reparaciones { NombreCliente = "Cliente 1", ApellidoCliente = "Apellido 1", Tecnico = "Técnico 1", EstadoId = 1, Costo = 100.0, Direccion = "Dirección 1", Descripcion = "Descripción 1", Telefono = "1234567890", Fecha = DateTime.Now },
-				new Reparaciones { NombreCliente = "Cliente 2", ApellidoCliente = "Apellido 2", Tecnico = "Técnico 2", EstadoId = 2, Costo = 200.0, Direccion = "Dirección 2", Descripcion = "Descripción 2", Telefono = "9876543210", Fecha = DateTime.Now },
-				new Reparaciones { NombreCliente = "Cliente 3", ApellidoCliente = "Apellido 3", Tecnico = "Técnico 3", EstadoId = 3, Costo = 300.0, Direccion = "Dirección 3", Descripcion = "Descripción 3", Telefono = "9998887776", Fecha = DateTime.Now }
+				new Reparaciones { NombreCliente = "Cliente 1", ApellidoCliente = "Apellido 1", Tecnico = "Técnico 1", EstadoId = 1, Costo = 100.0f, Direccion = "Dirección 1", Descripcion = "Descripción 1", Telefono = "1234567890", Fecha = DateTime.Now },
+				new Reparaciones { NombreCliente = "Cliente 2", ApellidoCliente = "Apellido 2", Tecnico = "Técnico 2", EstadoId = 2, Costo = 200.0f, Direccion = "Dirección 2", Descripcion = "Descripción 2", Telefono = "9876543210", Fecha = DateTime.Now },
+				new Reparaciones { NombreCliente = "Cliente 3", ApellidoCliente = "Apellido 3", Tecnico = "Técnico 3", EstadoId = 3, Costo = 300.0f, Direccion = "Dirección 3", Descripcion = "Descripción 3", Telefono = "9998887776", Fecha = DateTime.Now }
 			);
 			await context.SaveChangesAsync();
 
@@ -45,7 +45,7 @@ public class TestReparacionesService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ReparacionesService(context);
-			var reparacion = new Reparaciones { NombreCliente = "Nuevo Cliente", ApellidoCliente = "Nuevo Apellido", Tecnico = "Nuevo Técnico", EstadoId = 1, Costo = 100.0, Direccion = "Nueva Dirección", Descripcion = "Nueva Descripción", Telefono = "1112223334", Fecha = DateTime.Now };
+			var reparacion = new Reparaciones { NombreCliente = "Nuevo Cliente", ApellidoCliente = "Nuevo Apellido", Tecnico = "Nuevo Técnico", EstadoId = 1, Costo = 100.0f, Direccion = "Nueva Dirección", Descripcion = "Nueva Descripción", Telefono = "1112223334", Fecha = DateTime.Now };
 
 			// Act
 			var result = await service.AddObject(reparacion);
@@ -69,12 +69,12 @@ public class TestReparacionesService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ReparacionesService(context);
-			var reparacion = new Reparaciones { NombreCliente = "Cliente Existente", ApellidoCliente = "Apellido Existente", Tecnico = "Técnico Existente", EstadoId = 1, Costo = 100.0, Direccion = "Dirección Existente", Descripcion = "Descripción Existente", Telefono = "5556667778", Fecha = DateTime.Now };
+			var reparacion = new Reparaciones { NombreCliente = "Cliente Existente", ApellidoCliente = "Apellido Existente", Tecnico = "Técnico Existente", EstadoId = 1, Costo = 100.0f, Direccion = "Dirección Existente", Descripcion = "Descripción Existente", Telefono = "5556667778", Fecha = DateTime.Now };
 			await context.Reparaciones.AddAsync(reparacion);
 			await context.SaveChangesAsync();
 
 			// Act
-			reparacion.Costo = 200.0;
+			reparacion.Costo = 200.0f;
 			var result = await service.UpdateObject(reparacion);
 
 			// Assert
@@ -96,7 +96,7 @@ public class TestReparacionesService
 		using (var context = new ApplicationDbContext(options))
 		{
 			var service = new ReparacionesService(context);
-			var reparacion = new Reparaciones { NombreCliente = "Cliente a Eliminar", ApellidoCliente = "Apellido a Eliminar", Tecnico = "Técnico a Eliminar", EstadoId = 1, Costo = 100.0, Direccion = "Dirección a Eliminar", Descripcion = "Descripción a Eliminar", Telefono = "4445556667", Fecha = DateTime.Now };
+			var reparacion = new Reparaciones { NombreCliente = "Cliente a Eliminar", ApellidoCliente = "Apellido a Eliminar", Tecnico = "Técnico a Eliminar", EstadoId = 1, Costo = 100.0f, Direccion = "Dirección a Eliminar", Descripcion = "Descripción a Eliminar", Telefono = "4445556667", Fecha = DateTime.Now };
 			await context.Reparaciones.AddAsync(reparacion);
 			await context.SaveChangesAsync();
 
@@ -122,18 +122,18 @@ public class TestReparacionesService
 		{
 			var service = new ReparacionesService(context);
 			await context.Reparaciones.AddRangeAsync(
-				new Reparaciones { NombreCliente = "Cliente 1", ApellidoCliente = "Apellido 1", Tecnico = "Técnico 1", EstadoId = 1, Costo = 100.0, Direccion = "Dirección 1", Descripcion = "Descripción 1", Telefono = "1234567890", Fecha = DateTime.Now },
-				new Reparaciones { NombreCliente = "Cliente 2", ApellidoCliente = "Apellido 2", Tecnico = "Técnico 2", EstadoId = 2, Costo = 200.0, Direccion = "Dirección 2", Descripcion = "Descripción 2", Telefono = "9876543210", Fecha = DateTime.Now },
-				new Reparaciones { NombreCliente = "Cliente 3", ApellidoCliente = "Apellido 3", Tecnico = "Técnico 3", EstadoId = 3, Costo = 300.0, Direccion = "Dirección 3", Descripcion = "Descripción 3", Telefono = "9998887776", Fecha = DateTime.Now }
+				new Reparaciones { NombreCliente = "Cliente 1", ApellidoCliente = "Apellido 1", Tecnico = "Técnico 1", EstadoId = 1, Costo = 100.0f, Direccion = "Dirección 1", Descripcion = "Descripción 1", Telefono = "1234567890", Fecha = DateTime.Now },
+				new Reparaciones { NombreCliente = "Cliente 2", ApellidoCliente = "Apellido 2", Tecnico = "Técnico 2", EstadoId = 2, Costo = 200.0f, Direccion = "Dirección 2", Descripcion = "Descripción 2", Telefono = "9876543210", Fecha = DateTime.Now },
+				new Reparaciones { NombreCliente = "Cliente 3", ApellidoCliente = "Apellido 3", Tecnico = "Técnico 3", EstadoId = 3, Costo = 300.0f, Direccion = "Dirección 3", Descripcion = "Descripción 3", Telefono = "9998887776", Fecha = DateTime.Now }
 			);
 			await context.SaveChangesAsync();
 
 			// Act
-			var result = await service.GetObjectByCondition(r => r.NombreCliente.Contains("Cliente 2"));
+			var result = await service.GetObjectByCondition(r => r.NombreCliente!.Contains("Cliente 2"));
 
 			// Assert
 			Assert.AreEqual(1, result.Count);
-			Assert.IsTrue(result.All(r => r.NombreCliente.Contains("Cliente 2")));
+			Assert.IsTrue(result.All(r => r.NombreCliente!.Contains("Cliente 2")));
 		}
 	}
 }

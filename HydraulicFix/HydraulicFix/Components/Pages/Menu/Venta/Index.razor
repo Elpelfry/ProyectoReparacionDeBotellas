@@ -297,9 +297,9 @@
                                     @foreach (var item in venta.VentasDetalle)
                                     {
                                         var pro = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
-                                        double subtotal = item.Cantidad * pro!.Precio;
-                                        double total = subtotal - (subtotal * (pro.Descuento / 100.0f));
-                                        double itbisFinal = total * (pro.ITBIS / 100.0f);
+                                        float subtotal = item.Cantidad * pro!.Precio;
+                                        float total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        float itbisFinal = total * (pro.ITBIS / 100.0f);
                                         <tr>
                                             <td>
                                                 <div class="row">
@@ -311,21 +311,6 @@
                                             </td>
                                             <td class="text-end derecha">@itbisFinal.ToString("N2")</td>
                                             <td class="text-end derecha">@total.ToString("N2")</td>
-                                        </tr>
-                                    }
-                                    @if (venta.ReparacionId > 0)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="row">
-                                                    <span>* Reparaci&oacute;n</span>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    <span>  Botella Hidr&aacute;ulica</span>
-                                                </div>
-                                            </td>
-                                            <td class="text-end derecha">0.00</td>
-                                            <td class="text-end derecha">@reparacion.Costo.ToString("N2")</td>
                                         </tr>
                                     }
                                 </tbody>

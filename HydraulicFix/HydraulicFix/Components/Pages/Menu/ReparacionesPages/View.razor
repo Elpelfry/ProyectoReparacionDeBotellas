@@ -91,7 +91,7 @@
     public List<Productos> productos { get; set; } = new List<Productos>();
     public List<ReparacionesDetalle> reparacionesDetalle { get; set; } = new List<ReparacionesDetalle>();
     public ApplicationUser usuario { get; set; } = new ApplicationUser();
-    public double total { get; set; } = 0;
+    public float total { get; set; } = 0;
     public AuthenticationState authState { get; set; } = default!;
     public List<ApplicationUser> usuarios = new List<ApplicationUser>();
 
@@ -127,11 +127,12 @@
                 if(item.ProductoId > 0)
                 {
                     var producto = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
-                    double valor = (producto!.Precio * item.CantidadUsada);
+                    float valor = (producto!.Precio * item.CantidadUsada);
                     valor -= (valor * ((int)producto.Descuento / 100.0f));
-                    double itebis = (valor * (producto.ITBIS / 100.0f));
+                    float itebis = (valor * (producto.ITBIS / 100.0f));
                     valor += itebis;
                     total += valor;
+                    total = (float)Math.Round(total, 2);
                 }
             }
         }
