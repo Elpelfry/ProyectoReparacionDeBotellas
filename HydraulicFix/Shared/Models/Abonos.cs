@@ -8,9 +8,9 @@ public class Abonos
     [Key]
     public int AbonoId { get; set; }
 
-    public double Monto { get; set; }
+    public float Monto { get; set; }
 
-    public double Restante { get; set; }
+    public float Restante { get; set; }
 
     [Required(ErrorMessage = "Es requerido")]
     public DateTime Fecha { get; set; } = DateTime.Now;

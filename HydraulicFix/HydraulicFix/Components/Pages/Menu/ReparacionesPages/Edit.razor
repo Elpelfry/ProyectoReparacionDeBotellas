@@ -27,43 +27,36 @@
                         <AuthorizeView Roles="Admin">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Estado</label>
-                                <InputSelect @bind-Value="reparacion.EstadoId" class="form-select">
+                                <InputSelect @bind-Value="reparacion.EstadoId" class="form-control text-muted" disabled>
                                     @foreach (var item in estados)
                                     {
-                                        if (item.EstadoId != 3)
+                                        if (item.EstadoId < 3 && item.EstadoId != 1)
                                         {
                                             <option value="@item.EstadoId">@item.NombreEstado</option>
                                         }
                                     }
                                 </InputSelect>
-                                <ValidationMessage For="@(() => reparacion.EstadoId)" />
+                                <ValidationMessage For="@(() => reparacion.EstadoId)" class="text-danger" />
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Estado</label>
-                                <label class="form-control">@estados.FirstOrDefault(e => e.EstadoId == reparacion.EstadoId)?.NombreEstado</label>
+                                @if (true)
+                                {
+                                    string nom = estados.FirstOrDefault(e => e.EstadoId == reparacion.EstadoId)?.NombreEstado!;
+                                    <InputText @bind-Value="nom" class="form-control text-muted" disabled />
+                                }
                             </ChildContent>
                         </AuthorizeView>
                     </div>
                     <div class="col-4">
                         <label class="fw-bold">Fecha</label>
-                        <label class="form-control">@reparacion.Fecha.ToString("dd/MM/yyyy")</label>
+                        <InputDate @bind-Value="reparacion.Fecha" class="form-control text-muted" disabled />
                     </div>
                     <div class="col-4">
                         <label class="fw-bold">Costo</label>
-                        <AuthorizeView Roles="Admin">
-                            <ChildContent Context="authorizeContext">
-
-                                <InputNumber @bind-Value="reparacion.Costo" min="0" class="form-control" />
-                                <ValidationMessage For="@(() => reparacion.Costo)" />
-                            </ChildContent>
-                        </AuthorizeView>
-                        <AuthorizeView Roles="Cliente">
-                            <ChildContent Context="authorizeContext">
-                                <label class="form-control">@reparacion.Costo.ToString("N2")</label>
-                            </ChildContent>
-                        </AuthorizeView>
+                        <InputNumber @bind-Value="reparacion.Costo" min="0.01" class="form-control text-muted" disabled />
                     </div>
                 </div>
                 <div class="row">
@@ -71,14 +64,14 @@
                         <AuthorizeView Roles="Admin">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Nombre</label>
-                                <InputText @bind-Value="reparacion.NombreCliente" class="form-control" />
-                                <ValidationMessage For="@(() => reparacion.NombreCliente)" />
+                                <InputText @bind-Value="reparacion.NombreCliente" class="form-control" disabled="@ver" />
+                                <ValidationMessage For="@(() => reparacion.NombreCliente)" class="text-danger" />
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Nombre</label>
-                                <label class="form-control">@reparacion.NombreCliente</label>
+                                <InputText @bind-Value="reparacion.NombreCliente" class="form-control text-muted" disabled />
                             </ChildContent>
                         </AuthorizeView>
                     </div>
@@ -86,14 +79,14 @@
                         <AuthorizeView Roles="Admin">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Apellido</label>
-                                <InputText @bind-Value="reparacion.ApellidoCliente" class="form-control" />
-                                <ValidationMessage For="@(() => reparacion.ApellidoCliente)" />
+                                <InputText @bind-Value="reparacion.ApellidoCliente" class="form-control" disabled="@ver" />
+                                <ValidationMessage For="@(() => reparacion.ApellidoCliente)" class="text-danger" />
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Apellido</label>
-                                <label class="form-control">@reparacion.ApellidoCliente</label>
+                                <InputText @bind-Value="reparacion.ApellidoCliente" class="form-control text-muted" disabled />
                             </ChildContent>
                         </AuthorizeView>
                     </div>
@@ -102,7 +95,7 @@
                             <ChildContent Context="authorizeContext">
                                 <label class="fw-bold">Tecnico</label>
                                 <InputText @bind-Value="reparacion.Tecnico" class="form-control" />
-                                <ValidationMessage For="@(() => reparacion.Tecnico)" />
+                                <ValidationMessage For="@(() => reparacion.Tecnico)" class="text-danger" />
                             </ChildContent>
                         </AuthorizeView>
                         <AuthorizeView Roles="Cliente">
@@ -117,19 +110,19 @@
                     <div class="col-8">
                         <label class="fw-bold">Direcci&oacute;n</label>
                         <InputText @bind-Value="reparacion.Direccion" class="form-control" />
-                        <ValidationMessage For="@(() => reparacion.Direccion)" />
+                        <ValidationMessage For="@(() => reparacion.Direccion)" class="text-danger"/>
                     </div>
                     <div class="col-4">
                         <label class="fw-bold">Tel&eacute;fono</label>
                         <InputText @bind-Value="reparacion.Telefono" class="form-control" />
-                        <ValidationMessage For="@(() => reparacion.Telefono)" />
+                        <ValidationMessage For="@(() => reparacion.Telefono)" class="text-danger"/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <label class="fw-bold">Descripci&oacute;n</label>
-                        <InputTextArea @bind-Value="reparacion.Descripcion" class="form-control" />
-                        <ValidationMessage For="@(() => reparacion.Descripcion)" />
+                        <InputTextArea @bind-Value="reparacion.Descripcion" class="form-control"/>
+                        <ValidationMessage For="@(() => reparacion.Descripcion)" class="text-danger"/>
                     </div>
                 </div>
             </div>
@@ -145,7 +138,7 @@
                                 <label class="fw-bold">Productos</label>
                                 <div class="col-5">
 
-                                    <InputSelect @bind-Value="reparacionDetalle.ProductoId" class="form-select">
+                                    <InputSelect @bind-Value="reparacionDetalleAg.ProductoId" class="form-select">
                                         @foreach (var item in productos)
                                         {
                                             <option value="@item.ProductoId">@item.Nombre</option>
@@ -154,7 +147,7 @@
                                 </div>
                                 <label class="fw-bold">Cantidad Usada</label>
                                 <div class="col-3">
-                                    <InputNumber @bind-Value="reparacionDetalle.CantidadUsada" min="0" class="form-control" />
+                                    <InputNumber @bind-Value="reparacionDetalleAg.CantidadUsada" min="0" class="form-control" />
 
                                 </div>
                                 <div class="col-auto">
@@ -227,7 +220,8 @@
     public bool bandera = false;
     [Parameter]
     public int ReparacionId { get; set; }
-    public bool mensaje = false;
+    public bool ver = false;
+    public string color = "dark";
     public Reparaciones reparacion { get; set; } = new Reparaciones();
     public List<Estados> estados = new List<Estados>();
     public List<ApplicationUser> usuarios = new List<ApplicationUser>();
@@ -236,6 +230,7 @@
     public List<Productos> productos = new List<Productos>();
     public List<Reparaciones> reparaciones = new List<Reparaciones>();
     public ReparacionesDetalle reparacionDetalle = new ReparacionesDetalle();
+    public ReparacionesDetalle reparacionDetalleAg = new ReparacionesDetalle();
 
     protected override async Task OnInitializedAsync()
     {
@@ -247,11 +242,16 @@
             usuarios = await usuariosService.GetAllObject();
             authState = await AuthenticationState.GetAuthenticationStateAsync();
             usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+            reparacion.EstadoId = 2;
+
+            if (reparacion.ClienteId != "")
+                ver = true;
         }
     }
 
     public async Task Guardar()
     {
+        reparacion.Costo = (float)Math.Round(reparacion.Costo, 2);
         var result = await reparacionesService.UpdateObject(reparacion);
         if (result)
         {
@@ -281,6 +281,11 @@
 
     public void AgregarDetalle()
     {
+        reparacionDetalle = new ReparacionesDetalle
+        {
+            ProductoId = reparacionDetalleAg.ProductoId,
+            CantidadUsada = reparacionDetalleAg.CantidadUsada
+        };
         if (reparacion.ReparacionDetalle.Any(x => x.ProductoId == reparacionDetalle.ProductoId))
         {
             var mensaje = new NotificationMessage
@@ -329,6 +334,7 @@
 
     public void RemoverDetalle(ReparacionesDetalle detalle)
     {
+        reparacionDetalleAg = detalle;
         var producto = productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
         reparacion.ReparacionDetalle.Remove(detalle);
     }

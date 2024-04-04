@@ -497,9 +497,9 @@
                                     @foreach (var item in venta.VentasDetalle)
                                     {
                                         var pro = productosVenta.FirstOrDefault(x => x.ProductoId == item.ProductoId);
-                                        double subtotal = item.Cantidad * pro!.Precio;
-                                        double total = subtotal - (subtotal * (pro.Descuento / 100.0f));
-                                        double itbisFinal = total * (pro.ITBIS / 100.0f);
+                                        float subtotal = item.Cantidad * pro!.Precio;
+                                        float total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        float itbisFinal = total * (pro.ITBIS / 100.0f);
                                         <tr>
                                             <td>
                                                 <div class="row">
@@ -511,21 +511,6 @@
                                             </td>
                                             <td class="text-end derecha">@itbisFinal.ToString("N2")</td>
                                             <td class="text-end derecha">@total.ToString("N2")</td>
-                                        </tr>
-                                    }
-                                    @if (venta.ReparacionId > 0)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="row">
-                                                    <span>* Reparaci&oacute;n</span>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    <span>  Botella Hidr&aacute;ulica</span>
-                                                </div>
-                                            </td>
-                                            <td class="text-end derecha">0.00</td>
-                                            <td class="text-end derecha">@reparacion.Costo.ToString("N2")</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -553,7 +538,7 @@
                                     </div>
                                     @if (venta.CondicionId == 2)
                                     {
-                                        double deuda = venta.Total - venta.Recibido;
+                                        float deuda = venta.Total - venta.Recibido;
                                         <div>
                                             <label class="fw-bold">Pendiente:</label>
                                             <span>RD$ @deuda.ToString("N2")</span>
@@ -635,7 +620,6 @@
             venta.Fecha = DateTime.Now;
             await AgregarDetalle(reparacion.ReparacionDetalle);
             venta.ReparacionId = reparacion.ReparacionId;
-            venta.Total += reparacion.Costo;
             vender = true;
         }
     }
@@ -692,8 +676,8 @@
 
         if (producto != null && producto.Cantidad >= prod.Cantidad)
         {
-            double precioConDescuento = producto.Precio * prod.Cantidad * (1 - producto.Descuento / 100.0);
-            double itebis = precioConDescuento * (producto.ITBIS / 100.0);
+            float precioConDescuento = producto.Precio * prod.Cantidad * (1 - producto.Descuento / 100.0f);
+            float itebis = precioConDescuento * (producto.ITBIS / 100.0f);
 
             actualizarVenta(precioConDescuento, itebis, prod.Cantidad, producto.ProductoId);
             prod.Cantidad = 1;
@@ -714,7 +698,7 @@
         notificationService.Notify(mensaje);
     }
 
-    void actualizarVenta(double precio, double itebis, int cantidad, int productoId)
+    void actualizarVenta(float precio, float itebis, int cantidad, int productoId)
     {
         venta.SubTotal += precio;
         venta.ITBS += itebis;
@@ -735,8 +719,8 @@
 
         if (detalle != null && producto != null)
         {
-            double precioConDescuento = producto.Precio * detalle.Cantidad * (1 - producto.Descuento / 100.0);
-            double itebis = precioConDescuento * (producto.ITBIS / 100.0);
+            float precioConDescuento = producto.Precio * detalle.Cantidad * (1 - producto.Descuento / 100.0f);
+            float itebis = precioConDescuento * (producto.ITBIS / 100.0f);
 
             venta.SubTotal -= precioConDescuento;
             venta.ITBS -= itebis;
@@ -799,10 +783,10 @@
             var producto = await productosService.GetObject(item.ProductoId);
             if (producto != null)
             {
-                double precioConDescuento = producto.Precio * item.CantidadUsada * (1 - producto.Descuento / 100.0);
-                double subtotal = precioConDescuento;
-                double itebis = subtotal * (producto.ITBIS / 100.0);
-                double total = subtotal + itebis;
+                float precioConDescuento = producto.Precio * item.CantidadUsada * (1 - producto.Descuento / 100.0f);
+                float subtotal = precioConDescuento;
+                float itebis = subtotal * (producto.ITBIS / 100.0f);
+                float total = subtotal + itebis;
 
                 venta.SubTotal += subtotal;
                 venta.ITBS += itebis;

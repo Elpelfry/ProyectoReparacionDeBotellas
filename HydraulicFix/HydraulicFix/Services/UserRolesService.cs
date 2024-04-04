@@ -30,14 +30,14 @@ public class UserRolesService(ApplicationDbContext _contexto) : IServerAsp<Ident
         return await _contexto.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> DeleteObject(string id)
+    public async Task<bool> DeleteObject(string roleId)
     {
-        var user = await _contexto.UserRoles.FindAsync(id);
-        if (user == null)
+        var userRole = await _contexto.UserRoles.FindAsync(roleId);
+        if (userRole == null)
         {
             return false;
         }
-        _contexto.UserRoles.Remove(user);
+        _contexto.UserRoles.Remove(userRole);
         return await _contexto.SaveChangesAsync() > 0;
     }
 }

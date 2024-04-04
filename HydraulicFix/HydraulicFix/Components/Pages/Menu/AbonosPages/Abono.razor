@@ -234,7 +234,7 @@
                             <div class="col text-start">
                                 <label class="fw-bold" style="font-size: 12px;">Emitido: <span class="fw-normal"> @abono.Fecha.ToString("dd/MM/yyyy")</span></label>
                             </div>
-                            @if(usuario != null)
+                            @if (usuario != null)
                             {
                                 <div class="text-start">
                                     <label class="fw-bold" style="font-size: 12px;">Cliente: <span class="fw-normal">@usuario.Nombre</span></label>
@@ -265,7 +265,7 @@
                                         var metodo = metodosPagos.FirstOrDefault(m => m.MetodoPagoId == item.MetodoPagoId);
                                         <tr>
                                             <td>@item.Monto.ToString("N2")</td>
-                                           @if(metodo != null)
+                                            @if (metodo != null)
                                             {
                                                 <td class="text-center derecha">@metodo.Nombre</td>
                                             }
@@ -405,6 +405,11 @@
 
     public async Task RealizarAbono()
     {
+        // if (abono.Restante < 0.01f)
+        // {
+        //     abono.Restante = 0.01f;
+        //     abono.Pago = true;
+        // }
         if (Abonodetalles.Monto > abono.Restante)
         {
             var mensaje = new NotificationMessage
@@ -436,6 +441,7 @@
         {
             abono.Pago = true;
         }
+        abono.Restante = (float)Math.Round(abono.Restante, 2);
         abono.AbonoDetalle.Add(Abonodetalles);
         await abonosService.UpdateObject(abono);
         abonar = false;
