@@ -1,0 +1,133 @@
+﻿@page "/Proveedores"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IServer<Proveedores> proveedoresService
+
+@rendermode InteractiveServer
+<PageTitle>Proveedores</PageTitle>
+
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3 class="fw-bold text-center">Proveedores</h3>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div style="margin-left: 4px;">
+                    <div class="row">
+                        <label>Filtrar por:</label>
+                        <div class="col-2">
+                            <InputSelect @bind-Value="Opcion" class="form-select">
+                                <option value="1">ProveedorId</option>
+                                <option value="2">Nombre</option>
+                                <option value="3">Tel&eacute;fono</option>
+                                <option value="4">Todo</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col-auto">
+                            @switch (Opcion)
+                            {
+                                case 1:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="proveedor.ProveedorId" class="form-control" min="0"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 2:
+                                    <div class="input-group justify-content-end">
+                                        <InputText @bind-Value="proveedor.Nombre" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 3:
+                                    <div class="input-group justify-content-end">
+                                        <InputText @bind-Value="proveedor.Telefono" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 4:
+                                    <div class="input-group justify-content-end">
+                                        <button class="btn btn-info" @onclick="Buscar">
+                                            <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                        </button>
+                                    </div>
+                                    break;
+                            }
+                        </div>
+                        <div class="col text-end">
+                            <div class="col-auto">
+                                <a href="/Inventario" class="btn btn-primary bi bi-house-fill">Volver</a>
+                                <a href="/Proveedores/Create" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="table table-light table-hover table-striped table-bordered text-center">
+                <thead>
+                    <tr class="fw-bold">
+                        <th scope="col">ProveedorId</th>
+                        <th scope="col">Tel&eacute;fono</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Editar</th>
+                        <th scope="col">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var proveedor in proveedores)
+                    {
+                        <tr>
+                            <td>@proveedor.ProveedorId</td>
+                            <td>@proveedor.Telefono</td>
+                            <td>@proveedor.Nombre</td>
+                            <td>
+                                <a href="/Proveedores/Edit/@proveedor.ProveedorId" class="btn btn-warning bi bi-pencil" style="height: 38px;"></a>
+                            </td>
+                            <td>
+                                <a href="/Reparaciones/Borrar/@proveedor.ProveedorId" class="btn btn-danger bi bi-trash-fill" style="height: 38px;"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    public Proveedores proveedor = new Proveedores();
+    public List<Proveedores> proveedores = new List<Proveedores>();
+    public int Opcion { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        proveedores = await proveedoresService.GetAllObject();
+    }
+
+    public async Task Buscar()
+    {
+        if(Opcion == 1 && proveedor.ProveedorId > 0)
+            proveedores = await proveedoresService.GetObjectByCondition(p => p.ProveedorId == proveedor.ProveedorId);
+        else if(Opcion == 2 && !string.IsNullOrEmpty(proveedor.Nombre))
+            proveedores = await proveedoresService.GetObjectByCondition(p => p.Nombre!.ToLower().Contains(proveedor.Nombre!.ToLower()));
+        else if(Opcion == 3 && !string.IsNullOrEmpty(proveedor.Telefono))
+            proveedores = await proveedoresService.GetObjectByCondition(p => p.Telefono!.ToLower().Contains(proveedor.Telefono!.ToLower()));
+        else if(Opcion == 4)
+            proveedores = await proveedoresService.GetAllObject();
+    }
+}

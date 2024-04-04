@@ -20,7 +20,7 @@ public class AbonosDetalle
 
     [Required(ErrorMessage = "Indique el monto a abonar")]
     [Range(0.01, 1000000000, ErrorMessage = "El Monto debe estar 0.01 y 1000000000")]
-    public double Monto { get; set; }
+    public float Monto { get; set; }
 
 }
 

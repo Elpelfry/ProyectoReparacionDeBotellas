@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models;
+using System.Linq.Expressions;
 
 namespace HydraulicFix.Services;
 
@@ -68,6 +69,11 @@ public class ConfiguracionesService(ApplicationDbContext _contexto) : IServer<Co
         };
 
         return configuracionActual;
+    }
+
+    public Task<List<Configuraciones>> GetObjectByCondition(Expression<Func<Configuraciones, bool>> expression)
+    {
+        return _contexto.Configuraciones.AsNoTracking().Where(expression).ToListAsync();
     }
 }
 

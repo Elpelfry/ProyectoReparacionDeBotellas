@@ -8,112 +8,110 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Configuraci&oacute;n</PageTitle>
+<div style="width: 35rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <div class="container-fluid">
+        <div class="card shadow">
+            <EditForm Model="@configuracion" OnValidSubmit="Guardar">
+                <DataAnnotationsValidator />
+                <div class="d-flex justify-content-center">
+                    <div class="row">
+                        <div class="input-group">
+                            <img class="text-center" src="@getLogo()" style="width: 100px; height: 100px;" />
+                            <label class="btn btn-primary " style="height: 40px; margin-top: 40px;">
+                                <InputFile style="display: none;" accept=".png,.jpg,.jpeg" OnChange="cambiar" /> Cambiar logo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="nombreEmpresa">Nombre de la empresa:</label>
+                        <InputText id="nombreEmpresa" @bind-Value="configuracion.NombreEmpresa" class="form-control" />
+                    </div>
 
-<div class="container-fluid">
-	<div class="col-md-6">
-		<EditForm Model="@configuracion" OnValidSubmit="Guardar">
-			<DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label for="direccion">Dirección:</label>
+                        <InputText id="direccion" @bind-Value="configuracion.Direccion" class="form-control" />
+                    </div>
 
-			<div class="d-flex justify-content-center">
-				<div class="row">
-					<div class="input-group">
-						<img class="text-center" src="@getLogo()" style="width: 100px; height: 100px;" />
-						<label class="btn btn-primary " style="height: 40px; margin-top: 40px;">
-							<InputFile style="display: none;" accept=".png,.jpg,.jpeg" OnChange="cambiar" /> Cambiar logo
-						</label>
-					</div>
-				</div>
-			</div>
+                    <div class="form-group">
+                        <label for="nota">Nota:</label>
+                        <InputText id="nota" @bind-Value="configuracion.Nota" class="form-control" />
+                    </div>
 
-			<div class="form-group">
-				<label for="nombreEmpresa">Nombre de la empresa:</label>
-				<InputText id="nombreEmpresa" @bind-Value="configuracion.NombreEmpresa" class="form-control" />
-			</div>
+                    <div class="form-group">
+                        <label for="nfc">NFC:</label>
+                        <InputText id="nfc" @bind-Value="configuracion.NFC" class="form-control" />
+                    </div>
 
-			<div class="form-group">
-				<label for="direccion">Dirección:</label>
-				<InputText id="direccion" @bind-Value="configuracion.Direccion" class="form-control" />
-			</div>
-
-			<div class="form-group">
-				<label for="nota">Nota:</label>
-				<InputText id="nota" @bind-Value="configuracion.Nota" class="form-control" />
-			</div>
-
-			<div class="form-group">
-				<label for="nfc">NFC:</label>
-				<InputText id="nfc" @bind-Value="configuracion.NFC" class="form-control" />
-			</div>
-
-			<div class="form-group">
-				<label for="telefono">Teléfono:</label>
-				<InputText id="telefono" @bind-Value="configuracion.Telefono" class="form-control" />
-			</div>
-
-			<div class="form-group text-center">
-				<button type="submit" class="btn btn-primary">Guardar</button>
-				<button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-			</div>
-		</EditForm>
-	</div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono:</label>
+                        <InputText id="telefono" @bind-Value="configuracion.Telefono" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group text-center card-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
 </div>
 
-
 @code {
-	public Configuraciones configuracion = new Configuraciones();
-	private string? mensaje = "";
+    public Configuraciones configuracion = new Configuraciones();
+    private string? mensaje = "";
 
-	protected override async Task OnInitializedAsync()
-	{
-		var buscar = await configuracionesService.Search(2);
-		if (buscar != null)
-		{
-			configuracion = buscar;
-		}
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        var buscar = await configuracionesService.Search(2);
+        if (buscar != null)
+        {
+            configuracion = buscar;
+        }
+    }
 
-	public string getLogo()
-	{
-		
-		if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
-		{
-			string base64String = Convert.ToBase64String(configuracion.Imagen);
-			return $"data:image/png;base64,{base64String}";
-		}
-		else
-		{
-			return "/bootstrap/img/ejemplo.png";
-		}
-	}
+    public string getLogo()
+    {
+        if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
+        {
+            string base64String = Convert.ToBase64String(configuracion.Imagen);
+            return $"data:image/png;base64,{base64String}";
+        }
+        else
+        {
+            return "/bootstrap/img/ejemplo.png";
+        }
+    }
 
-	public async Task cambiar(InputFileChangeEventArgs e)
-	{
-		var archivo = e.File;
-		if (archivo != null)
-		{
-			var stream = archivo.OpenReadStream();
-			using (var memoryStream = new MemoryStream())
-			{
-				await stream.CopyToAsync(memoryStream);
-				configuracion.Imagen = memoryStream.ToArray();
-			}
-		}
-	}
+    public async Task cambiar(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        if (archivo != null)
+        {
+            var stream = archivo.OpenReadStream();
+            using (var memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                configuracion.Imagen = memoryStream.ToArray();
+            }
+        }
+    }
 
-	public async Task Guardar()
-	{
-		var guardado = await configuracionesService.UpdateObject(configuracion);
-		if (guardado)
-		{
-			 mensaje = "guardado";
-		}
-		else
-		{
-			 mensaje = "error";
-		}
-	}
-	private void Cancelar()
-	{
-		NavigationManager.NavigateTo("/Account/Manage");
-	}
+    public async Task Guardar()
+    {
+        var guardado = await configuracionesService.UpdateObject(configuracion);
+        if (guardado)
+        {
+            mensaje = "guardado";
+        }
+        else
+        {
+            mensaje = "error";
+        }
+    }
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/Account/Manage");
+    }
 }

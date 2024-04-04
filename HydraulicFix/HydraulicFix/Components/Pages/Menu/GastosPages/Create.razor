@@ -1,0 +1,78 @@
+﻿@page "/Gastos/Create"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager navigationManager
+@inject IServer<Gastos> gastosService
+@inject NotificationService notificationService
+@rendermode InteractiveServer
+
+<PageTitle>A&ntilde;adir</PageTitle>
+
+<EditForm Model="gasto" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <RadzenNotification />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold">Agregar Gasto</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">Asunto</label>
+                        <InputText @bind-Value="gasto.Asunto" class="form-control" />
+                        <ValidationMessage For="@(() => gasto.Asunto)" />
+                    </div>
+                    <div class="col-6">
+                        <label class="fw-bold">Monto</label>
+                        <InputNumber @bind-Value="gasto.Monto" class="form-control" />
+                        <ValidationMessage For="@(() => gasto.Monto)" />
+                    </div>
+                </div>
+                <div>
+                    <label class="fw-bold">Descrici&oacute;n</label>
+                    <InputTextArea @bind-Value="gasto.Descripcion" class="form-control" />
+                    <ValidationMessage For="@(() => gasto.Descripcion)" />
+                </div>
+            </div>
+            <div class="card-footer justify-content-center d-flex">
+                <a href="/Gastos" class="btn btn-primary bi bi-house-door-fill"> Volver</a>
+                <button type="button" class="btn btn-secondary bi bi-plus text-white" @onclick="Nuevo"> Nuevo<i class="oi oi-document"></i></button>
+                <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    public Gastos gasto = new Gastos();
+
+    protected override void OnInitialized()
+    {
+        gasto.Fecha = DateTime.Now;
+    }
+
+    public void Nuevo()
+    {
+        gasto = new Gastos();
+        gasto.Fecha = DateTime.Now;
+    }
+
+    public async Task Guardar()
+    {
+        var guardar = await gastosService.AddObject(gasto);
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Guardado",
+                Detail = "Gasto guardado con éxito",
+                Duration = 5000
+            };
+        notificationService.Notify(mensaje);
+        gasto = new Gastos();
+        gasto.Fecha = DateTime.Now;
+        await Task.Delay(2000);
+        navigationManager.NavigateTo("Gastos");
+    }
+}

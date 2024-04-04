@@ -1,0 +1,1122 @@
+﻿@page "/Venta"
+@page "/Venta/{ReparacionId:int}"
+@using System.Text.RegularExpressions
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IServer<Reparaciones> reparacionesService
+@inject IServer<Abonos> abonosService
+@inject IServer<Estados> estadosService
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject IServer<Ventas> ventasService
+@inject IServer<Configuraciones> configuracionesService
+@inject IServer<Condiciones> condicionesService
+@inject IServer<MetodoPagos> metodosPagosService
+@inject IServer<Productos> productosService
+@inject NotificationService notificationService
+@inject AuthenticationStateProvider AuthenticationState
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+
+<PageTitle>Venta</PageTitle>
+<div class="container" style="max-height: 650px;">
+    <RadzenNotification />
+    <div class="card shadow-lg" style="background:#0174BE">
+        <div class="card-header">
+            <h3 class="fw-bold text-center">Venta</h3>
+        </div>
+        <div class="row">
+            <div class="col col-5">
+                <div class="card shadow-lg">
+                    <div class="card-header-sub" style="background: #26577C">
+                        <h3 class="fw-bold text-center">Compra</h3>
+                    </div>
+                    <div class="table-responsive" style="max-height: 320px;">
+                        <table class="table table-bordered">
+                            <thead style="background: #26577C" class="text-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th class="text-center">Precio</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">ITBIS</th>
+                                    <th class="text-center">Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody style="overflow-y: auto;">
+                                @foreach (var item in venta.VentasDetalle)
+                                {
+                                    var producto = productosVenta.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                                    if (producto != null)
+                                    {
+                                        <tr>
+                                            <td>@producto!.Nombre</td>
+                                            <td class="text-center">@producto.Precio.ToString("N2")</td>
+                                            <td class="text-center">@item.Cantidad.ToString("00")</td>
+                                            <td class="text-center">@producto.ITBIS.ToString("N2")%</td>
+                                            @if (!reparacion.ReparacionDetalle.Any(p => p.ProductoId == item.ProductoId))
+                                            {
+                                                <td class="justify-content-center text-center">
+                                                    <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick=@(() => RemoverProducto(producto) )></button>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="justify-content-center text-center">
+                                                    <button type="button" class="btn btn-danger bi bi-trash-fill" disabled></button>
+                                                </td>
+                                            }
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="col-auto">
+                            <label class="form-label"><strong>Sub-Total:</strong> RD$ @venta.SubTotal.ToString("N2")</label><br />
+                            <label class="form-label"><strong>ITBIS:</strong> RD$ @venta.ITBS.ToString("N2")</label><br />
+                            <label class="form-label"><strong>Total:</strong> RD$ @venta.Total.ToString("N2")</label>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success bi-cash-stack" @onclick="Vender"> Venta</button>
+                            <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="NuevaVenta"> Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-7 justify-content-end">
+                <div class="card shadow-lg">
+                    <div class="card-header-sub" style="background: #26577C">
+                        <h3 class="fw-bold text-center">Productos</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <label>Buscar:</label>
+                            <div class="col-3">
+                                <InputSelect @bind-Value="Opcion" class="form-select">
+                                    <option value="1">C&oacute;digo</option>
+                                    <option value="2">Nombre</option>
+                                    <option value="3">Todo</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-auto">
+                                @switch (Opcion)
+                                {
+                                    case 1:
+                                        <div class="input-group justify-content-end">
+                                            <InputText @bind-Value="producto.Codigo" class="form-control" min="0"></InputText>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+                                    case 2:
+                                        <div class="input-group justify-content-end">
+                                            <InputText @bind-Value="producto.Nombre" class="form-control"></InputText>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" @onclick="Buscar">
+                                                    <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        break;
+
+                                    case 3:
+                                        <div class="input-group justify-content-end">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height: 450px;">
+                        <table class="table table-bordered text-center">
+                            <thead style="background: #26577C" class="text-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>ITBIS</th>
+                                    <th>Descuento</th>
+                                    <th>Agregar</th>
+                                </tr>
+                            </thead>
+                            <tbody style="overflow-y:auto;">
+                                @foreach (var item in productos)
+                                {
+                                    var producto = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                                    <tr>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@item.Nombre</td>
+                                        <td>@item.Precio.ToString("N2")</td>
+                                        <td>
+                                            <div class="input-group text-center">
+                                                <button type="button" class="btn btn-success bi bi-dash" @onclick=@(() => DisminuirCantidad(item))></button>
+                                                <label class="form-control text-center">@item.Cantidad.ToString("00")</label>
+                                                <button type="button" class="btn btn-success bi bi-plus" @onclick=@(() => AumentarCantidad(item))></button>
+                                            </div>
+                                        </td>
+                                        <td>@item.ITBIS.ToString("N2")%</td>
+                                        <td>@item.Descuento.ToString("N2")%</td>
+                                        @if (!reparacion.ReparacionDetalle.Any(p => p.ProductoId == item.ProductoId))
+                                        {
+                                            <td class="justify-content-center"><button type="button" class="btn btn-muted text-white" @onclick=@(() => AgregarProducto(item!)) style="background:#2ca4f2"><i class="bi bi-plus "></i></button></td>
+                                        }
+                                        else
+                                        {
+                                            <td class="justify-content-center"><button type="button" class="btn btn-muted text-white" style="background:#2ca4f2" disabled><i class="bi bi-plus "></i></button></td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (vender)
+{
+    <div class="modal d-block opaco">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <RadzenNotification />
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Venta</h5>
+                    <button type="button" class="btn bg-danger text-white" @onclick="CerrarVenta">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        @if (usuario != null && reparacion.ClienteId != null)
+                        {
+                            <div class="col-12">
+                                <label class="fw-bold">Nombre de Cliente:</label>
+                                <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
+                            </div>
+                        }
+                        else
+                        {
+                            if(reparacion.ReparacionId <= 0)
+                            {
+                                <div class="col-6">
+                                    <label class="fw-bold">Cedula:</label>
+                                    <div class="input-group">
+                                        <InputText @bind-Value="usuario!.Cedula" class="form-control" placeholder="Cedula"></InputText>
+                                        <button class="btn btn-info text-white" @onclick="BuscarUsuario" style="background: #399ce7">Buscar</button>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    @if (usuario.Cedula == "" && venta.NombreCliente != "")
+                                    {
+                                        <label class="fw-bold">Nombre de Cliente:</label>
+                                        <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
+                                    }
+                                    else
+                                    {
+                                        venta.ClienteId = null;
+                                        <label class="fw-bold">Nombre de Cliente:</label>
+                                        <InputText @bind-Value="venta.NombreCliente" class="form-control" placeholder="Nombre"></InputText>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    @if (venta.NombreCliente != null && usuario != null)
+                                    {
+                                        <label class="fw-bold">Nombre de Cliente:</label>
+                                        <InputText @bind-Value="venta.NombreCliente" class="form-control" disabled="true"></InputText>
+                                    }
+                                    else
+                                    {
+                                        venta.ClienteId = null;
+                                        <label class="fw-bold">Nombre de Cliente:</label>
+                                        <InputText @bind-Value="venta.NombreCliente" class="form-control" placeholder="Nombre"></InputText>
+                                    }
+                                </div>
+                            }
+
+                            @if (!VerificarNombre(venta.NombreCliente!))
+                            {
+                                <div class="alert alert-info">El Nombre No puede contener numeros ni estar vacio</div>
+                            }
+                        }
+                        <div class="col-6">
+                            <label class="fw-bold">Condici&oacute;n:</label>
+                            <InputSelect @bind-Value="venta.CondicionId" class="form-select">
+                                @foreach (var item in condiciones)
+                                {
+                                    <option value="@item.CondicionId">@item.Nombre</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-6">
+                            <label class="fw-bold">Metodo de Pago:</label>
+                            <InputSelect @bind-Value="venta.MetodoPagoId" class="form-select">
+                                @foreach (var item in metodosPagos)
+                                {
+                                    <option value="@item.MetodoPagoId">@item.Nombre</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        @if (venta.MetodoPagoId == 2)
+                        {
+                            <EditForm Model="input" OnValidSubmit="RealizarVenta">
+                                <DataAnnotationsValidator />
+                                <div class="col-12">
+                                    <label class="fw-bold">Numero de Tarjeta:</label>
+                                    <div class="input-group">
+                                        <InputText @bind-Value="input.NumeroTarjeta" class="form-control">
+                                        </InputText>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <img src="/bootstrap/img/mastercard.svg" class="img-fluid" alt="Mastercard Logo" style="width: 25px; height: 25px;">
+                                                <img src="/bootstrap/img/visa.svg" class="img-fluid" alt="Visa Logo" style="width: 25px; height: 25px;">
+                                                <img src="/bootstrap/img/amex.svg" class="img-fluid" alt="Visa Logo" style="width: 25px; height: 25px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ValidationMessage For="@(() => input.NumeroTarjeta)" class="alert alert-danger" />
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="fw-bold">Numero de Seguridad:</label>
+                                            <div class="input-group">
+                                                <InputText @bind-Value="input.NumeroSeguridad" class="form-control"></InputText>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <img src="/bootstrap/img/cvv_card.svg" class="img-fluid" alt="Mastercard Logo" style="width: 25px; height: 25px;">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="fw-bold">Fecha de Expiraci&oacute;n:</label>
+                                            <InputDate @bind-Value="input.FechaExpiracion" class="form-control"></InputDate>
+                                        </div>
+                                        <ValidationMessage For="@(() => input.NumeroSeguridad)" class="alert alert-danger" />
+                                        @if (input.FechaExpiracion <= DateTime.Now)
+                                        {
+                                            var validationMessage = ValidateFechaExpiracion(input.FechaExpiracion);
+                                            if (validationMessage != null)
+                                            {
+                                                <div class="alert alert-info" role="alert">@validationMessage</div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                @if (venta.CondicionId == 1)
+                                {
+                                    <div class="col-12">
+                                        <label class="fw-bold">Cantidad a Cobrar</label>
+                                        <label class="form-control">RD$ @venta.Total</label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <label class="fw-bold">Cantidad Abonar</label>
+                                        <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0.01"></InputNumber>
+                                        <ValidationMessage For="@(() => venta.Recibido)" class="alert alert-danger" />
+                                    </div>
+                                }
+                                <div class="input-group">
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Sub-Total:</strong></label>
+                                        <label class="form-control">RD$ @venta.SubTotal.ToString("N2")</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>ITBIS:</strong></label>
+                                        <label class="form-control">RD$ @venta.ITBS.ToString("N2")</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Total:</strong></label>
+                                        <label class="form-control">RD$ @venta.Total.ToString("N2")</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer col col-12">
+                                    <button type="submit" class="btn btn-success">Realizar Venta</button>
+                                </div>
+                            </EditForm>
+                        }
+                        else if (venta.MetodoPagoId == 1)
+                        {
+                            <EditForm Model="venta.Recibido" OnValidSubmit="RealizarVenta">
+                                <div class="col-12">
+                                    <DataAnnotationsValidator />
+                                    <label class="fw-bold">Recibido:</label>
+                                    <InputNumber @bind-Value="venta.Recibido" class="form-control" min="0" onchange="this.blur()"></InputNumber>
+                                </div>
+                                <div class="input-group">
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Sub-Total:</strong></label>
+                                        <label class="form-control">RD$ @venta.SubTotal.ToString("N2")</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>ITBIS:</strong></label>
+                                        <label class="form-control">RD$ @venta.ITBS.ToString("N2")</label>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Total:</strong></label>
+                                        <label class="form-control">RD$ @venta.Total.ToString("N2")</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer col col-12">
+                                    <button type="submit" class="btn btn-success">Realizar Venta</button>
+                                </div>
+                            </EditForm>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (factura)
+{
+    <div class="modal d-block opaco">
+        <RadzenNotification />
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Factura</h5>
+                    <div class="justify-content-end d-flex">
+                        <button type="button" class="btn bg-muted text-white" style="background: #ffe085" @onclick="ImprimirFactura">
+                            <img style="width: 15px; height: 15px;" src="/bootstrap/img/printer.svg" />
+                        </button>
+                        <button type="button" class="btn bg-danger text-white" @onclick="CerrarFactura">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="factura" class="modal-body" style="height: 35rem; overflow-y: auto;">
+
+                    <div class="position-relative modalContenedor">
+                        @if (venta.Eliminada)
+                        {
+                            <div class="letreroEliminar position-absolute top-50 start-50 translate-middle" style="transform: translate(-50%, -50%); z-index: 9999;">
+                                <img src="/bootstrap/img/returned.png">
+                            </div>
+                        }
+
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div id="logoEmpresa" class="text-center">
+                                <img style="width: 150px; height: 120px; border-radius: 10%;" src="@getLogo()" />
+                        </div>
+                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">@configuracion.NombreEmpresa</h4>
+
+                            <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
+                                <div class="col-6 text-start">
+                                    <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
+                                </div>
+                            </div>
+
+                            <div id="direccionEmpresa" class="fw-bold text-center">
+                                <label> <i class="fas fa-map-marker"></i> Dirc.: <span class="fw-normal">@configuracion.Direccion</span></label>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">DATOS DE LA VENTA</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Fecha:<span class="fw-normal"> @venta.Fecha.ToString("dd/MM/yyyy")</span></label>
+                            </div>
+                            <div id="fechaFactura" class="col text-end">
+                                <label class="fw-bold" style="font-size: 12px;">Hora: <span class="fw-normal"> @venta.Fecha.ToString("h:mm tt")</span></label>
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">N°: <span class="fw-normal"> @venta.VentaId</span></label>
+                            </div>
+                            <div class="text-start">
+                                @if (true)
+                                {
+                                    var met = metodosPagos.FirstOrDefault(x => x.MetodoPagoId == venta.MetodoPagoId);
+                                    <label class="fw-bold" style="font-size: 12px;">M&eacute;todo Pago: <span class="fw-normal">@met!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                @if (true)
+                                {
+                                    var condi = condiciones.FirstOrDefault(x => x.CondicionId == venta.CondicionId);
+                                    <label class="fw-bold" style="font-size: 12px;">Condici&oacute;n: <span class="fw-normal">@condi!.Nombre</span></label>
+                                }
+                            </div>
+                            <div class="text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Cliente: <span class="fw-normal">@venta.NombreCliente</span></label>
+                            </div>
+                            @if (venta.ClienteId != null)
+                            {
+                                var cliente = usuarios.FirstOrDefault(x => x.Id == venta.ClienteId);
+                                if(cliente != null)
+                                {
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Apellido: <span class="fw-normal">@cliente!.Apellido</span></label>
+                                    </div>
+                                    <div class="text-start">
+                                        <label class="fw-bold" style="font-size: 12px;">Email: <span class="fw-normal">@cliente.Email</span></label>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">PRODUCTOS</h5>
+                        <hr>
+
+                        <div class="row mb-4">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descripci&oacute;n</th>
+                                        <th class="text-end derecha">Itbis</th>
+                                        <th class="text-end derecha">Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in venta.VentasDetalle)
+                                    {
+                                        var pro = productosVenta.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                                        float subtotal = item.Cantidad * pro!.Precio;
+                                        float total = subtotal - (subtotal * (pro.Descuento / 100.0f));
+                                        float itbisFinal = total * (pro.ITBIS / 100.0f);
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <span>* @pro.Nombre</span>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <span>(@item.Cantidad x @pro!.Precio.ToString("N2"))</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-end derecha">@itbisFinal.ToString("N2")</td>
+                                            <td class="text-end derecha">@total.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-right: 10px">
+                            <div class="row mb-5" style="text-align: end">
+                                <div>
+                                    <label class="fw-bold">SubTotal:</label>
+                                    <span>RD$ @venta.SubTotal.ToString("N2")</span>
+                                </div>
+                                <div>
+                                    <label class="fw-bold">ITBIS:</label>
+                                    <span>RD$ @venta.ITBS.ToString("N2")</span>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold">Total:</label>
+                                    <span>RD$ @venta.Total.ToString("N2")</span>
+                                </div>
+
+                                <div class="datoInferior">
+                                    <div>
+                                        <label class="fw-bold">Recibido:</label>
+                                        <span>RD$ @venta.Recibido.ToString("N2")</span>
+                                    </div>
+                                    @if (venta.CondicionId == 2)
+                                    {
+                                        float deuda = venta.Total - venta.Recibido;
+                                        <div>
+                                            <label class="fw-bold">Pendiente:</label>
+                                            <span>RD$ @deuda.ToString("N2")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <label class="fw-bold">Cambio:</label>
+                                            <span>RD$ @venta.Devuelta.ToString("N2")</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center centrado datoInferior">
+                            <label class="fw-bold">@configuracion.Nota</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int ReparacionId { get; set; }
+    public int Opcion { get; set; }
+    private bool factura = false;
+    public bool vender { get; set; } = false;
+    public List<Productos> productos { get; set; } = new List<Productos>();
+    public List<Productos> productosVenta { get; set; } = new List<Productos>();
+    public Ventas venta { get; set; } = new Ventas();
+    public Productos producto { get; set; } = new Productos();
+    private Input input { get; set; } = new();
+    public ApplicationUser usuario { get; set; } = new ApplicationUser();
+    public List<MetodoPagos> metodosPagos { get; set; } = new List<MetodoPagos>();
+    public List<Condiciones> condiciones { get; set; } = new List<Condiciones>();
+    public List<ApplicationUser> usuarios { get; set; } = new List<ApplicationUser>();
+    public Reparaciones reparacion { get; set; } = new Reparaciones();
+    public Configuraciones configuracion { get; set; } = new Configuraciones();
+    public Abonos abono { get; set; } = new Abonos();
+    public AbonosDetalle abonoDetalle { get; set; } = new AbonosDetalle();
+
+    protected override async Task OnInitializedAsync()
+    {
+        metodosPagos = await metodosPagosService.GetObjectByCondition(p => true);
+        usuarios = await usuariosService.GetAllObject();
+        condiciones = await condicionesService.GetObjectByCondition(p => true);
+        productos = await productosService.GetObjectByCondition(p => true && p.Cantidad != 0);
+        productosVenta = await productosService.GetObjectByCondition(p => true);
+        productos.ForEach(item => item.Cantidad = 1);
+        var conf = await configuracionesService.GetObjectByCondition(c => true);
+        configuracion = conf.FirstOrDefault()!;
+        venta.Fecha = DateTime.Now;
+        input.FechaExpiracion = DateTime.Now;
+        usuario.Cedula = "";
+        venta.ConfiguracionId = configuracion.ConfiguracionId;
+        if (ReparacionId > 0)
+        {
+            reparacion = await reparacionesService.GetObject(ReparacionId);
+            if (reparacion.ClienteId != null)
+            {
+                usuario = await usuariosService.GetObject(reparacion.ClienteId);
+            }
+            if(usuario != null)
+            {
+                venta.NombreCliente = usuario.Nombre;
+                venta.ClienteId = usuario.Id;
+            }
+            else
+            {
+                venta.ClienteId = " ";
+                venta.NombreCliente = " ";
+            }
+            venta.Eliminada = false;
+            venta.Fecha = DateTime.Now;
+            await AgregarDetalle(reparacion.ReparacionDetalle);
+            venta.ReparacionId = reparacion.ReparacionId;
+            vender = true;
+        }
+    }
+
+    public async Task Buscar()
+    {
+        switch (Opcion)
+        {
+            case 1:
+                productos = await productosService.GetObjectByCondition(p => p.Codigo == producto.Codigo && p.Cantidad != 0);
+                productos.ForEach(item => item.Cantidad = 1);
+                break;
+            case 2:
+                productos = await productosService.GetObjectByCondition(p => p.Nombre!.ToLower().Contains(producto.Nombre!.ToLower()) && p.Cantidad != 0);
+                productos.ForEach(item => item.Cantidad = 1);
+                break;
+            case 3:
+                productos = await productosService.GetObjectByCondition(p => true && p.Cantidad != 0);
+                productos.ForEach(item => item.Cantidad = 1);
+                break;
+        }
+    }
+
+    public void Vender()
+    {
+        if (venta.VentasDetalle.Any())
+        {
+            vender = true;
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "No hay productos en la venta",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task AgregarProducto(Productos prod)
+    {
+        var detalle = venta.VentasDetalle.FirstOrDefault(x => x.ProductoId == prod.ProductoId);
+        var producto = await productosService.GetObject(prod.ProductoId);
+
+        if (detalle != null && (detalle.Cantidad + prod.Cantidad) > producto!.Cantidad)
+        {
+            productoNoDisponibleNotification();
+            prod.Cantidad = 1;
+            return;
+        }
+
+        if (producto != null && producto.Cantidad >= prod.Cantidad)
+        {
+            float precioConDescuento = producto.Precio * prod.Cantidad * (1 - producto.Descuento / 100.0f);
+            float itebis = precioConDescuento * (producto.ITBIS / 100.0f);
+
+            actualizarVenta(precioConDescuento, itebis, prod.Cantidad, producto.ProductoId);
+            prod.Cantidad = 1;
+            return;
+        }
+        prod.Cantidad = 1;
+        productoNoDisponibleNotification();
+    }
+    void productoNoDisponibleNotification()
+    {
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No hay suficiente cantidad de este producto",
+                Duration = 5000
+            };
+        notificationService.Notify(mensaje);
+    }
+
+    void actualizarVenta(float precio, float itebis, int cantidad, int productoId)
+    {
+        venta.SubTotal += precio;
+        venta.ITBS += itebis;
+        venta.Total += precio + itebis;
+
+        var detalleExistente = venta.VentasDetalle.FirstOrDefault(x => x.ProductoId == productoId);
+        if (detalleExistente != null)
+            detalleExistente.Cantidad += cantidad;
+        else
+            venta.VentasDetalle.Add(new VentasDetalle { ProductoId = productoId, Cantidad = cantidad });
+    }
+
+
+    public async Task RemoverProducto(Productos prod)
+    {
+        var producto = await productosService.GetObject(prod.ProductoId);
+        var detalle = venta.VentasDetalle.FirstOrDefault(x => x.ProductoId == producto.ProductoId);
+
+        if (detalle != null && producto != null)
+        {
+            float precioConDescuento = producto.Precio * detalle.Cantidad * (1 - producto.Descuento / 100.0f);
+            float itebis = precioConDescuento * (producto.ITBIS / 100.0f);
+
+            venta.SubTotal -= precioConDescuento;
+            venta.ITBS -= itebis;
+            venta.Total -= precioConDescuento + itebis;
+            venta.VentasDetalle.Remove(detalle);
+
+            if (venta.SubTotal <= 0)
+                venta.SubTotal = 0;
+            if (venta.ITBS <= 0)
+                venta.ITBS = 0;
+            if (venta.Total <= 0)
+                venta.Total = 0;
+        }
+    }
+
+    public void AumentarCantidad(Productos prod)
+    {
+        prod.Cantidad++;
+    }
+
+    public void DisminuirCantidad(Productos prod)
+    {
+        if (prod.Cantidad > 1)
+        {
+            prod.Cantidad--;
+        }
+    }
+
+    public void NuevaVenta()
+    {
+        reparacion.ReparacionDetalle = new List<ReparacionesDetalle>();
+        venta = new Ventas();
+        venta.VentasDetalle = new List<VentasDetalle>();
+        venta.Fecha = DateTime.Now;
+        reparacion = new Reparaciones();
+        abono = new Abonos();
+        abonoDetalle = new AbonosDetalle();
+        input = new Input();
+        input.FechaExpiracion = DateTime.Now;
+        if (ReparacionId > 0)
+        {
+            ReparacionId = 0;
+            navigationManager.NavigateTo("venta", forceLoad: true);
+        }
+    }
+
+    public void CerrarVenta()
+    {
+        vender = false;
+    }
+    public void CerrarFactura()
+    {
+        factura = false;
+        NuevaVenta();
+    }
+    public async Task AgregarDetalle(ICollection<ReparacionesDetalle> detalle)
+    {
+        foreach (var item in detalle)
+        {
+            var producto = await productosService.GetObject(item.ProductoId);
+            if (producto != null)
+            {
+                float precioConDescuento = producto.Precio * item.CantidadUsada * (1 - producto.Descuento / 100.0f);
+                float subtotal = precioConDescuento;
+                float itebis = subtotal * (producto.ITBIS / 100.0f);
+                float total = subtotal + itebis;
+
+                venta.SubTotal += subtotal;
+                venta.ITBS += itebis;
+                venta.Total += total;
+
+                venta.VentasDetalle.Add(new VentasDetalle
+                    {
+                        ProductoId = producto.ProductoId,
+                        Cantidad = item.CantidadUsada
+                    });
+            }
+        }
+
+    }
+
+    public async Task BuscarUsuario()
+    {
+        var usuarios = await usuariosService.GetAllObject();
+        var usuari = usuarios.FirstOrDefault(c => c.Cedula == usuario.Cedula)!;
+        if (usuari == null)
+        {
+            usuario!.Nombre = "";
+            usuario.Apellido = "";
+            venta.NombreCliente = "";
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "No Existe este Usuario",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        venta.ClienteId = usuari.Id;
+        venta.NombreCliente = usuari.Nombre;
+        usuario.Cedula = "";
+    }
+
+    public async Task RealizarVenta()
+    {
+        venta.Eliminada = false;
+        if (ValidateFechaExpiracion(input.FechaExpiracion) != null && venta.MetodoPagoId == 2)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "La fecha de expiración debe ser posterior a la fecha actual.",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        if (!VerificarNombre(venta.NombreCliente!))
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "El Nombre No puede contener numeros ni estar vacio",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        if(venta.CondicionId == 2 && venta.ClienteId == null)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Debe ser un cliente registrado para ser venta a crédito",
+                    Duration = 8000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        var abo = await abonosService.GetObjectByCondition(p => p.ClienteId == venta.ClienteId && !p.Pago);
+        if(abo.Any() && venta.CondicionId == 2)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Este cliente tiene una deuda pendiente",
+                    Duration = 8000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+
+        if (venta.CondicionId == 2)// credito
+        {
+            if (venta.Recibido > venta.Total)
+            {
+                var mensaje1 = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "El monto abonado debe ser menor al total",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje1);
+                return;
+            }
+            if (venta.MetodoPagoId == 1)
+            {
+                if (ReparacionId > 0)
+                {
+                    reparacion.EstadoId = 3;
+                    await reparacionesService.UpdateObject(reparacion);
+                }
+                await ActualizarCantidadProducto(venta.VentasDetalle);
+                abono.Monto = venta.Total;
+                abono.Restante = venta.Total - venta.Recibido;
+                abono.Fecha = DateTime.Now;
+                abono.Pago = false;
+                if (venta.ClienteId != null)
+                    abono.ClienteId = venta.ClienteId;
+                if(venta.Recibido > 0)
+                {
+                    abono.AbonoDetalle.Add(new AbonosDetalle
+                        {
+                            Monto = venta.Recibido,
+                            Fecha = DateTime.Now,
+                            MetodoPagoId = venta.MetodoPagoId
+                        });
+                }
+                venta.Devuelta = 0;
+                var realizado = await ventasService.AddObject(venta);
+                if (realizado != null)
+                {
+                    abono.VentaId = realizado.VentaId;
+                    await abonosService.AddObject(abono);
+                }
+                vender = false;
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Venta Realizada",
+                        Detail = "La venta al crédito se ha realizado con exito",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                factura = true;
+            }
+            else
+            {
+                if (ReparacionId > 0)
+                {
+                    reparacion.EstadoId = 3;
+                    await reparacionesService.UpdateObject(reparacion);
+                }
+                await ActualizarCantidadProducto(venta.VentasDetalle);
+                abono.Monto = venta.Total;
+                abono.Restante = venta.Total - venta.Recibido;
+                abono.Fecha = DateTime.Now;
+                abono.Pago = false;
+                if (venta.ClienteId != null)
+                    abono.ClienteId = venta.ClienteId;
+                if (venta.Recibido > 0)
+                {
+                    abono.AbonoDetalle.Add(new AbonosDetalle
+                        {
+                            Monto = venta.Recibido,
+                            Fecha = DateTime.Now,
+                            MetodoPagoId = venta.MetodoPagoId
+                        });
+                }
+                venta.Devuelta = 0;
+                var realizado = await ventasService.AddObject(venta);
+                if (realizado != null)
+                {
+                    abono.VentaId = realizado.VentaId;
+                    await abonosService.AddObject(abono);
+                }
+                vender = false;
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Venta Realizada",
+                        Detail = "La venta al crédito se ha realizado con exito",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                factura = true;
+            }
+        }
+        else
+        {
+            if (venta.MetodoPagoId == 1)
+            {
+                if (venta.Recibido < venta.Total)
+                {
+                    var mensaje1 = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Error",
+                            Detail = "El monto recibido no puede ser menor al total",
+                            Duration = 5000
+                        };
+                    notificationService.Notify(mensaje1);
+                    return;
+                }
+                if (ReparacionId > 0)
+                {
+                    reparacion.EstadoId = 3;
+                    await reparacionesService.UpdateObject(reparacion);
+                }
+                await ActualizarCantidadProducto(venta.VentasDetalle);
+                venta.Devuelta = venta.Recibido - venta.Total;
+                vender = false;
+                await ventasService.AddObject(venta);
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Venta Realizada",
+                        Detail = "La venta se ha realizado con exito",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                factura = true;
+            }
+            else
+            {
+                if (ReparacionId > 0)
+                {
+                    reparacion.EstadoId = 3;
+                    await reparacionesService.UpdateObject(reparacion);
+                }
+                await ActualizarCantidadProducto(venta.VentasDetalle);
+                venta.Devuelta = 0;
+                venta.Recibido = venta.Total;
+                vender = false;
+                await ventasService.AddObject(venta);
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Venta Realizada",
+                        Detail = "La venta se ha realizado con exito",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                factura = true;
+            }
+        }
+    }
+
+    private string ValidateFechaExpiracion(DateTime fecha)
+    {
+        if (fecha <= DateTime.Now)
+        {
+            return "La fecha de expiración debe ser posterior a la fecha actual.";
+        }
+        return null!;
+    }
+    public bool VerificarNombre(string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return false;
+
+        return Regex.IsMatch(str, @"^[a-zA-Z ]+$");
+    }
+
+    public async Task ActualizarCantidadProducto(ICollection<VentasDetalle> detalle)
+    {
+        foreach (var item in detalle)
+        {
+            var producto = await productosService.GetObject(item.ProductoId);
+            if (producto != null)
+            {
+                if(reparacion.ReparacionId > 0)
+                {
+                    var detalleReparacion = reparacion.ReparacionDetalle.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                    if(detalleReparacion != null)
+                    {
+                        producto.Cantidad -= (item.Cantidad - detalleReparacion.CantidadUsada);
+                        if(producto.Cantidad <= 0)
+                            producto.EsDisponible = false;
+                        await productosService.UpdateObject(producto);
+                    }
+                }
+                else
+                {
+                    if (producto.Cantidad <= 0)
+                        producto.EsDisponible = false;
+                    producto.Cantidad -= item.Cantidad;
+                    await productosService.UpdateObject(producto);
+                }
+            }
+        }
+    }
+
+    public async Task ImprimirFactura()
+    {
+        factura = false;
+        await JSRuntime.InvokeVoidAsync("ImprimirF");
+        await Task.Delay(500);
+        NuevaVenta();
+    }
+
+    public string getLogo()
+    {
+        if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
+        {
+            string base64String = Convert.ToBase64String(configuracion.Imagen);
+            return $"data:image/png;base64,{base64String}";
+        }
+        else
+        {
+            return "/bootstrap/img/ejemplo.png";
+        }
+    }
+
+    private sealed class Input
+    {
+        [Required(ErrorMessage = "El número de la tarjeta es requerido")]
+        [RegularExpression(@"^[0-9]{16}$", ErrorMessage = "El número de tarjeta debe tener 16 dígitos")]
+        [Display(Name = "Numero de la Tarjeta")]
+        public string? NumeroTarjeta { get; set; }
+
+        [Required(ErrorMessage = "El número de seguridad es requerido")]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "El número de seguridad solo puede contener dígitos")]
+        [StringLength(4, MinimumLength = 3, ErrorMessage = "El número de seguridad debe tener entre 3 y 4 dígitos")]
+        [Display(Name = "Numero de Seguridad")]
+        public string? NumeroSeguridad { get; set; }
+
+        [Required(ErrorMessage = "Es requerido")]
+        [Display(Name = "Fecha de Expiración")]
+        public DateTime FechaExpiracion { get; set; }
+    }
+}

@@ -1,0 +1,140 @@
+﻿@page "/Reparaciones/Ver/{ReparacionId:int}"
+
+@attribute [Authorize]
+@inject IServer<Reparaciones> reparacionesService
+@inject IServer<Estados> estadosService
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject AuthenticationStateProvider AuthenticationState
+@inject IServer<Productos> productosService
+@inject IdentityUserService identityUserService
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+@rendermode InteractiveServer
+
+
+<PageTitle>Ver</PageTitle>
+
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header">
+            <h1 class="text-light">Ver Reparaci&oacute;n</h1>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <AuthorizeView Roles="Admin">
+                        <p><strong> ReparacionID:</strong> @reparacion.ReparacionId</p>
+                    </AuthorizeView>
+                    @if (usuario != null)
+                    {
+                        <p><strong> Nombre del Cliente:</strong> @usuario.Nombre</p>
+                        <p><strong> Apellido del Cliente:</strong> @usuario.Apellido</p>
+                    }
+                    else
+                    {
+                        <p><strong> Cliente:</strong> Usuario no registrado</p>
+                    }
+                    <p><strong> Estado:</strong> @estado.NombreEstado</p>
+                    <p><strong> Tecnico:</strong> @reparacion.Tecnico</p>
+                    <p><strong> Fecha:</strong> @reparacion.Fecha.ToString("dd/MM/yyyy")</p>
+                    <p><strong> Tel&eacute;fono:</strong> @reparacion.Telefono</p>
+                    <p><strong> Direcci&oacute;n:</strong> @reparacion.Direccion</p>
+                    <p><strong> Descripci&oacute;n:</strong> @reparacion.Descripcion</p>
+                    <p><strong> Costo Total:</strong> @total.ToString("N2")</p>
+
+                </div>
+            </div>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <AuthorizeView Roles="Admin">
+                            <th>ProductoId</th>
+                        </AuthorizeView>
+                        <th>Nombre de Producto</th>
+                        <th>Cantidad Usada</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var detalle in reparacionesDetalle)
+                    {
+                        if(detalle.ProductoId > 0)
+                        {
+                            var producto = productos.FirstOrDefault(x => x.ProductoId == detalle.ProductoId);
+                            <tr>
+                                @if (producto != null)
+                                {
+                                    <AuthorizeView Roles="Admin">
+                                        <td>@detalle.ProductoId</td>
+                                    </AuthorizeView>
+                                    <td>@producto!.Nombre</td>
+                                    <td>@detalle.CantidadUsada</td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-end input-group">
+            <a href="/Reparacion" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int ReparacionId { get; set; }
+    public string rol { get; set; } = "";
+    public Reparaciones reparacion { get; set; } = new Reparaciones();
+    public Estados estado { get; set; } = new Estados();
+    public List<Productos> productos { get; set; } = new List<Productos>();
+    public List<ReparacionesDetalle> reparacionesDetalle { get; set; } = new List<ReparacionesDetalle>();
+    public ApplicationUser usuario { get; set; } = new ApplicationUser();
+    public float total { get; set; } = 0;
+    public AuthenticationState authState { get; set; } = default!;
+    public List<ApplicationUser> usuarios = new List<ApplicationUser>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ReparacionId > 0)
+        {
+            reparacion = await reparacionesService.GetObject(ReparacionId);
+            estado = await estadosService.GetObject(reparacion.EstadoId);
+            reparacionesDetalle = reparacion.ReparacionDetalle.ToList();
+            usuarios = await usuariosService.GetAllObject();
+            authState = await AuthenticationState.GetAuthenticationStateAsync();
+            usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+            var roll = await identityUserService.GetRoleAsync(usuario);
+            rol = roll.Name!;
+
+            if (rol == "Cliente" && reparacion.ClienteId != usuario.Id)
+            {
+                navigationManager.NavigateTo("reparacion");
+            }
+            if(reparacion.ClienteId != null)
+            {
+                usuario = await usuariosService.GetObject(reparacion.ClienteId);
+            }
+            foreach (var item in reparacionesDetalle)
+            {
+                var producto = await productosService.GetObject(item.ProductoId);
+                productos.Add(producto);
+            }
+            total = reparacion.Costo;
+            foreach(var item in reparacionesDetalle)
+            {
+                if(item.ProductoId > 0)
+                {
+                    var producto = productos.FirstOrDefault(x => x.ProductoId == item.ProductoId);
+                    float valor = (producto!.Precio * item.CantidadUsada);
+                    valor -= (valor * ((int)producto.Descuento / 100.0f));
+                    float itebis = (valor * (producto.ITBIS / 100.0f));
+                    valor += itebis;
+                    total += valor;
+                    total = (float)Math.Round(total, 2);
+                }
+            }
+        }
+    }
+}

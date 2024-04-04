@@ -1,0 +1,18 @@
+﻿@page "/"
+@using HydraulicFix.Components.Account.Pages
+@using Microsoft.AspNetCore.Authorization
+@using HydraulicFix.Components.Pages.Menu.Venta
+
+<AuthorizeView>
+    <Authorized>
+        <Index />
+    </Authorized>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+}
