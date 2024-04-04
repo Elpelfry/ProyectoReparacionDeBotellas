@@ -2,49 +2,54 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="HydraulicFix.styles.css" />
-    <link rel="icon" type="image/png" href="/bootstrap/img/ejemplo.png" />
-    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/StylesProyect/Estilos.css" />
-    <link rel="stylesheet" href="/StylesProyect/factura_80mm.css" />
-    <HeadOutlet />
-    <NavMenu/>
-  <RadzenNotification/>
-  </head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<base href="/" />
+	<link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+	<link rel="stylesheet" href="app.css" />
+	<link rel="stylesheet" href="HydraulicFix.styles.css" />
+	<link rel="icon" type="image/png" href="/bootstrap/img/ejemplo.png" />
+	<link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="/StylesProyect/Estilos.css" />
+	<link rel="stylesheet" href="/StylesProyect/factura_80mm.css" />
+	<HeadOutlet />
+
+ 	<AuthorizeView>
+		<Authorized>
+			<NavMenu />
+		</Authorized>
+	</AuthorizeView> 
+	<RadzenNotification />
+</head>
 
 
 <body>
-    <Routes />
-    <script src="_framework/blazor.web.js"></script>
+	<Routes />
+	<script src="_framework/blazor.web.js"></script>
 
-    <script>
-        function ImprimirF() {
+	<script>
+		function ImprimirF() {
 
-            Tamano = "/StylesProyect/factura_80mm.css";
+			Tamano = "/StylesProyect/factura_80mm.css";
 
-            const factura = document.createElement('iframe');
-            factura.style.display = 'none';
-            document.body.appendChild(factura);
+			const factura = document.createElement('iframe');
+			factura.style.display = 'none';
+			document.body.appendChild(factura);
 
-            const contenedorticket = document.getElementById('factura');
+			const contenedorticket = document.getElementById('factura');
 
-            const facturaContenido = '<html><head><title>Factura</title> <link rel="stylesheet" href="' + Tamano + '"></head><div>' + contenedorticket.innerHTML + '</div></html>';
+			const facturaContenido = '<html><head><title>Factura</title> <link rel="stylesheet" href="' + Tamano + '"></head><div>' + contenedorticket.innerHTML + '</div></html>';
 
-            factura.contentWindow.document.open();
-            factura.contentWindow.document.write(facturaContenido);
-            factura.contentWindow.document.close();
+			factura.contentWindow.document.open();
+			factura.contentWindow.document.write(facturaContenido);
+			factura.contentWindow.document.close();
 
-            factura.onload = function () {
-                factura.contentWindow.print();
-            };
-        }
-    </script>
+			factura.onload = function () {
+				factura.contentWindow.print();
+			};
+		}
+	</script>
 </body>
 
 </html>

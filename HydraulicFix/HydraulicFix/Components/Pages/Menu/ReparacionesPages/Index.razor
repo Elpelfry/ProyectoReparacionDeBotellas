@@ -297,10 +297,10 @@
                         }
 
                         <div class="row d-flex align-items-center justify-content-center">
-                            @* <div id="logoEmpresa" class="text-center">
-                        <img style="width: 150px; height: 120px; border-radius: 10%;" src="/bootstrap/img/amex.svg" />
-                        </div> *@
-                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">HydraulicFix</h4>
+                            <div id="logoEmpresa" class="text-center">
+                                <img style="width: 150px; height: 120px; border-radius: 10%;" src="@getLogo()" />
+                        </div>
+                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">@configuracion.NombreEmpresa</h4>
 
                             <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
                                 <div class="col-6 text-start">
@@ -561,5 +561,18 @@
         factura = true;
         var buscado = await ventasService.GetObjectByCondition(x => x.ReparacionId == reparacion);
         venta = buscado.FirstOrDefault()!;
+    }
+
+    public string getLogo()
+    {
+        if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
+        {
+            string base64String = Convert.ToBase64String(configuracion.Imagen);
+            return $"data:image/png;base64,{base64String}";
+        }
+        else
+        {
+            return "/bootstrap/img/ejemplo.png";
+        }
     }
 }

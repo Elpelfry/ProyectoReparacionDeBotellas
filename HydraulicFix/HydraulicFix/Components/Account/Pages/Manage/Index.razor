@@ -9,37 +9,55 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>Perfil</PageTitle>
 
-
-<StatusMessage />
-<div class="container-fluid">
-    <h3>Perfil</h3>
-    <div class="row">
-        <div class="col-md-6">
-            <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
-                <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" role="alert" />
+<div style="width: 35rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <div class="card shadow">
+        <div class="card-header bg-primary">
+            <h3 class="text-center">Usuario</h3>
+        </div>
+        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <div class="card-body">
                 <div class="form-floating mb-3">
-                    <input type="text" value="@username" class="form-control" placeholder="Please choose your username." disabled />
-                    <label for="username" class="form-label">Username</label>
+                    <input type="text" value="@username" class="form-control" disabled />
+                    <label for="username" class="form-label">Nombre de Usuario</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
-                    <label for="phone-number" class="form-label">Phone number</label>
+                    <input type="text" value="@cedula" class="form-control" disabled />
+                    <label for="username" class="form-label">C&eacute;dula</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.NombreUsuario" class="form-control" />
+                    <label for="phone-number" class="form-label">Nombre</label>
+                    <ValidationMessage For="() => Input.NombreUsuario" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Apellido" class="form-control" />
+                    <label for="phone-number" class="form-label">Apellido</label>
+                    <ValidationMessage For="() => Input.Apellido" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.PhoneNumber" class="form-control" />
+                    <label for="phone-number" class="form-label">Numero de Tel&eacute;fono</label>
                     <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
                 </div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-            </EditForm>
-        </div>
-    </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="w-100 btn btn-lg btn-primary">Guardar</button>
+            </div>
+        </EditForm>
 
+    </div>
 </div>
 
 @code {
     private ApplicationUser user = default!;
     private string? username;
     private string? phoneNumber;
+    private string? cedula;
+    private string? apellido;
+    private string? nombre;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -50,17 +68,26 @@
     protected override async Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        username = await UserManager.GetUserNameAsync(user);
+        username = user.NickName;
+        cedula = user.Cedula;
+        apellido = user.Apellido;
+        nombre = user.Nombre;
         phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
         Input.PhoneNumber ??= phoneNumber;
+        Input.NombreUsuario = user.Nombre;
+        Input.Apellido = user.Apellido;
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        user.PhoneNumber = Input.PhoneNumber;
+        user.Nombre = Input.NombreUsuario;
+        user.Apellido = Input.Apellido;
+        if (Input.Apellido != null && Input.NombreUsuario != null && Input.PhoneNumber != null)
         {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+            var setPhoneResult = await UserManager.UpdateAsync(user);
             if (!setPhoneResult.Succeeded)
             {
                 RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
@@ -68,13 +95,21 @@
         }
 
         await SignInManager.RefreshSignInAsync(user);
-        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+        RedirectManager.RedirectToCurrentPageWithStatus("Actualizado", HttpContext);
     }
 
     private sealed class InputModel
     {
-        [Phone]
+        [Phone(ErrorMessage = "Campo requerido")]
         [Display(Name = "Phone number")]
         public string? PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "Campo requerido")]
+        [Display(Name = "Nombre Usuario")]
+        public string? NombreUsuario { get; set; } = "";
+
+        [Required(ErrorMessage = "Campo requerido")]
+        [Display(Name = "Apellido")]
+        public string? Apellido { get; set; } = "";
     }
 }

@@ -3,24 +3,31 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage" Match="NavLinkMatch.All">Perfil</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/Email">Correo</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/ChangePassword">Contraseña</NavLink>
-    </li> 
-
-    @if (hasExternalLogins)
-    {
+<div class="d-flex justify-content-start align-items-center" style="height: 75vh;">
+    <ul class="nav nav-pills flex-column">
         <li class="nav-item">
-            <NavLink class="nav-link" href="Account/Manage/ExternalLogins">External logins</NavLink>
+            <NavLink class="nav-link" href="Account/Manage" Match="NavLinkMatch.All">Perfil</NavLink>
         </li>
-    }
-</ul>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/Email">Correo</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="Account/Manage/ChangePassword">Contraseña</NavLink>
+        </li>
+        <AuthorizeView Roles="Admin">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Account/Pages/Manage/Configuracion">Empresa</NavLink>
+            </li>
+        </AuthorizeView>
+
+        @if (hasExternalLogins)
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Account/Manage/ExternalLogins">External logins</NavLink>
+            </li>
+        }
+    </ul>
+</div>
 
 @code {
     private bool hasExternalLogins;

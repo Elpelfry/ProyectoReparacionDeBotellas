@@ -25,6 +25,11 @@ public class AbonosService(ApplicationDbContext _contexto) : IServer<Abonos>
         return type;
     }
 
+    public async Task<Abonos?> Search(int abonoId)
+    {
+        return await _contexto.Abonos.AsNoTracking().FirstOrDefaultAsync(a => a.AbonoId == abonoId);
+    }
+
     public async Task<bool> UpdateObject(Abonos type)
     {
         _contexto.Entry(type).State = EntityState.Modified;

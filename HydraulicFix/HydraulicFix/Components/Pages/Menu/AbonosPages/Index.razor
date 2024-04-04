@@ -1,0 +1,375 @@
+﻿@page "/abonosindex"
+
+@attribute [Authorize]
+@inject IJSRuntime JSRuntime
+@inject IServerAsp<ApplicationUser> usuariosService
+@inject AuthenticationStateProvider AuthenticationState
+@inject AbonosService abonosService
+@inject IServer<Configuraciones> configuracionesService
+@inject IServer<MetodoPagos> metodosPagosService
+@inject IdentityUserService identityUserService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+@rendermode InteractiveServer
+
+<RadzenNotification />
+<PageTitle>Abonos</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h3 class="fw-bold text-center">Abonos</h3>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div style="margin-left: 4px;">
+                    <div class="row">
+                        <label>Filtrar por:</label>
+                        <div class="col-2">
+                            <InputSelect @bind-Value="Opcion" class="form-select">
+                                <AuthorizeView Roles="Admin">
+                                    <option value="1">Abono Id</option>
+                                    <option value="2">Cliente</option>
+                                </AuthorizeView>
+                                <option value="3">Monto</option>
+                                <option value="4">Fecha</option>
+                                <option value="5">Todo</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col-auto">
+                            @switch (Opcion)
+                            {
+                                case 1:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="abono.AbonoId" class="form-control" min="0"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 2:
+                                    <div class="input-group justify-content-end">
+                                        <InputText @bind-Value="nombre" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 3:
+                                    <div class="input-group justify-content-end">
+                                        <InputNumber @bind-Value="abono.Monto" class="form-control"></InputNumber>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 4:
+                                    <div class="input-group justify-content-end">
+                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" @onclick="Buscar">
+                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    break;
+                                case 5:
+                                    <div class="input-group justify-content-end">
+                                        <button class="btn btn-info" @onclick="Buscar">
+                                            <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                        </button>
+                                    </div>
+                                    break;
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="table table-light table-hover table-striped table-bordered text-center">
+                <thead>
+                    <tr class="fw-bold">
+                        <AuthorizeView Roles="Admin">
+                            <th scope="col">Abono Id</th>
+                            <th scope="col">Cliente</th>
+                        </AuthorizeView>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Pagar</th>
+                        <th scope="col">Ver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <AuthorizeView Roles="Admin">
+                        @foreach (var item in abonos)
+                        {
+                            var usu = usuarios.FirstOrDefault(x => x.Id == item.ClienteId);
+                            <tr>
+                                <td>@item.AbonoId</td>
+                                @if(usu != null)
+                                {
+                                    <td>@usu.Nombre</td>
+                                }
+                                else
+                                {
+                                    <td>Usuario no encontrado</td>
+                                }
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Monto.ToString("N2")</td>
+                                @if(item.Pago)
+                                {
+                                    <td class="text-success">Pagado</td>
+                                }
+                                else
+                                {
+                                    <td class="text-danger">Pendiente</td>
+                                }
+                                <td><a href="/abonosindex/abonar/@item.AbonoId" class="btn btn-warning bi bi-pencil" style="height: 38px;"></a></td>
+                               
+                                <td>
+                                    <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerAbono(item.AbonoId))>
+                                        <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </AuthorizeView>
+                    <AuthorizeView Roles="Cliente">
+                        @foreach (var item in abonos)
+                        {
+                            var usu = usuarios.FirstOrDefault(x => x.Id == item.ClienteId);
+                            if (item.ClienteId == usuario!.Id)
+                            {
+                                <tr>
+                                    <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.Monto.ToString("N2")</td>
+                                    @if (item.Pago)
+                                    {
+                                        <td class="text-success">Pagado</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-danger">Pendiente</td>
+                                    }
+                                    <td><a href="/abonosindex/abonar/@item.AbonoId" class="btn btn-warning bi bi-pencil" style="height: 38px;"></a></td>
+
+
+                                    <td>
+                                        <button type="button" style="background: transparent; border: none;" @onclick=@(() => VerAbono(item.AbonoId))>
+                                            <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </AuthorizeView>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@if (factura)
+{
+    <div class="modal d-block opaco">
+        <RadzenNotification />
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#399ce7 ">
+                    <h5 class="modal-title fw-bold text-white"><img style="width: 20px; height: 20px;" src="/bootstrap/img/venta.png" /> Factura</h5>
+                    <div class="justify-content-end d-flex">
+                        <button type="button" class="btn bg-muted text-white" style="background: #ffe085" @onclick="ImprimirFactura">
+                            <img style="width: 15px; height: 15px;" src="/bootstrap/img/printer.svg" />
+                        </button>
+                        <button type="button" class="btn bg-danger text-white" @onclick="Cerrar">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="factura" class="modal-body" style="height: 35rem; overflow-y: auto;">
+
+                    <div class="position-relative modalContenedor">
+
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div id="logoEmpresa" class="text-center">
+                                <img style="width: 150px; height: 120px; border-radius: 10%;" src="@getLogo()" />
+                            </div>
+                            <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">@configuracion.NombreEmpresa</h4>
+
+                            <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
+                                <div class="col-6 text-start">
+                                    <label class="fw-bold"> <i class="fas fa-phone"></i> Telf.: <span class="fw-normal">@configuracion.Telefono</span></label>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <label class="fw-bold"> <i class="fas fa-building"></i> RNC: <span class="fw-normal">@configuracion.NFC</span></label>
+                                </div>
+                            </div>
+
+                            <div id="direccionEmpresa" class="fw-bold text-center">
+                                <label> <i class="fas fa-map-marker"></i> Dirc.: <span class="fw-normal">@configuracion.Direccion</span></label>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">ABONO</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col text-start">
+                                <label class="fw-bold" style="font-size: 12px;">Emitido: <span class="fw-normal"> @abono.Fecha.ToString("dd/MM/yyyy")</span></label>
+                            </div>
+                            @if (usuario != null)
+                            {
+                                <div class="text-start">
+                                    <label class="fw-bold" style="font-size: 12px;">Cliente: <span class="fw-normal">@usuario.Nombre</span></label>
+                                </div>
+                                <div class="text-start">
+                                    <label class="fw-bold" style="font-size: 12px;">Apellido: <span class="fw-normal">@usuario!.Apellido</span></label>
+                                </div>
+                                <div class="text-start">
+                                    <label class="fw-bold" style="font-size: 12px;">Email: <span class="fw-normal">@usuario.Email</span></label>
+                                </div>
+                            }
+                        </div>
+                        <hr>
+                        <h5 class="fw-bold text-center titular" style="font-size: 14px; font-weight: bold;">DETALLE DEL ABONO</h5>
+                        <hr>
+                        <div class="row mb-4">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Monto Abonado</th>
+                                        <th class="text-end derecha">M&eacute;todo de Pago</th>
+                                        <th class="text-end derecha">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in abono.AbonoDetalle)
+                                    {
+                                        var metodo = metodosPagos.FirstOrDefault(m => m.MetodoPagoId == item.MetodoPagoId);
+                                        <tr>
+                                            <td>@item.Monto.ToString("N2")</td>
+                                            @if (metodo != null)
+                                            {
+                                                <td class="text-center derecha">@metodo.Nombre</td>
+                                            }
+                                            else
+                                            {
+                                                <td class="text-end derecha">Desconocido</td>
+                                            }
+                                            <td class="text-end derecha">@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-right: 10px">
+                            <div class="row mb-5" style="text-align: end">
+
+                                <div class="datoInferior">
+                                    <div>
+                                        <label class="fw-bold">Deuda:</label>
+                                        <span>RD$ @abono.Monto.ToString("N2")</span>
+                                    </div>
+                                    <div>
+                                        <label class="fw-bold">Pendiente:</label>
+                                        <span>RD$ @abono.Restante.ToString("N2")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public string rol = "";
+    public string nombre = "";
+    public bool factura = false;
+    public bool abonar = false;
+    public int Opcion { get; set; }
+    public int metodo { get; set; } = 0;
+    public Abonos abono { get; set; } = new Abonos();
+    public ApplicationUser usuario { get; set; } = new ApplicationUser();
+    public AuthenticationState authState { get; set; } = default!;
+
+    public Configuraciones configuracion { get; set; } = new Configuraciones();
+    public List<MetodoPagos> metodosPagos { get; set; } = new List<MetodoPagos>();
+    public List<Configuraciones> configuraciones { get; set; } = new List<Configuraciones>();
+    public List<ApplicationUser> usuarios { get; set; } = new List<ApplicationUser>();
+    public List<Abonos> abonos { get; set; } = new List<Abonos>();
+
+    public DateTime FechaInicio { get; set; } = DateTime.Today;
+    public DateTime FechaFin { get; set; } = DateTime.Today;
+
+    protected async override Task OnInitializedAsync()
+    {
+        abonos = await abonosService.GetAllObject();
+        usuarios = await usuariosService.GetAllObject();
+        authState = await AuthenticationState.GetAuthenticationStateAsync();
+        usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
+        metodosPagos = await metodosPagosService.GetAllObject();
+        configuraciones = await configuracionesService.GetAllObject();
+        configuracion = configuraciones.FirstOrDefault()!;
+    }
+
+    public async Task Buscar()
+    {
+        if (Opcion == 1 && abono.AbonoId > 0)
+            abonos = await abonosService.GetObjectByCondition(a => a.AbonoId == abono.AbonoId);
+        else if(Opcion == 2 && !string.IsNullOrEmpty(nombre))
+        {
+            var user = await usuariosService.GetAllObject();
+            user = user.Where(u => u.Nombre!.ToLower().Contains(nombre.ToLower())).ToList();
+            var userIDs = user.Select(u => u.Id);
+            abonos = await abonosService.GetObjectByCondition(a => userIDs.Contains(a.ClienteId));
+        }
+        else if(Opcion == 3 && abono.Monto > 0)
+            abonos = await abonosService.GetObjectByCondition(a => a.Monto == abono.Monto);
+        else if (Opcion == 4 && FechaFin != default && FechaInicio != default)
+            abonos = await abonosService.GetObjectByCondition(a => a.Fecha.Date <= FechaFin.Date && a.Fecha.Date >= FechaInicio.Date);
+        else if(Opcion == 5)
+            abonos = await abonosService.GetAllObject();
+    }
+
+    public string getLogo()
+    {
+        if (configuracion.Imagen != null && configuracion.Imagen.Length > 0)
+        {
+            string base64String = Convert.ToBase64String(configuracion.Imagen);
+            return $"data:image/png;base64,{base64String}";
+        }
+        else
+        {
+            return "/bootstrap/img/ejemplo.png";
+        }
+    }
+
+    public void Cerrar()
+    {
+        factura = false;
+    }
+
+    public async Task ImprimirFactura()
+    {
+        factura = false;
+        await JSRuntime.InvokeVoidAsync("ImprimirF");
+    }
+
+    public async Task VerAbono(int abo)
+    {
+        abono = await abonosService.GetObject(abo);
+        factura = true;
+    }
+}
