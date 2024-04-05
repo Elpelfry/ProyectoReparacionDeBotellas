@@ -1,0 +1,117 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using Shared.Models
+@attribute [Authorize]
+
+@inject UserManager<ApplicationUser> UserManager
+@inject UsersService userService
+@inject IServer<Reparaciones> reparacionService
+@inject IServer<Ventas> ventaService
+@inject AuthenticationStateProvider AuthenticationState
+<PageTitle>Dashboard</PageTitle>
+
+@if (cliente != null)
+{
+	<div class="container-fluid">
+		<div class="row d-flex justify-content-center mt-4">
+			<div class="col-md-8">
+				<div class="col-md-12 vh-100">
+					<div class="card-body">
+						<h3 class="text-center">Hola otra vez, @cliente.Nombre 👋</h3>
+						<p>No te abrumes! <strong>HydraulicFix</strong> te permite solicitar productos y servicios al alcance de tus dedos, con nuestra página web te rescatamos de una falla repentina de forma rápida y eficiente. A través de nuestro sitio, puedes asegurarte de obtener los productos que necesitas desde la comodidad de tu hogar o de donde te encuentres.</p>
+						<div class="text-center">
+							<img src="/bootstrap/img/3.gif" alt="Imagen 3" class="inline-img" style="width: 250px; height: auto;"><hr />
+						</div>
+						<div class="text-center">
+							<a href="/Reparaciones/Create" class="btn btn-primary btn-movimiento">Solicita el servicio haciendo clic aquí</a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-9">
+					<div class="card">
+						<div class="card-header btn btn-link text-white">
+							<h5 class="card-title">Tus Reparaciones</h5>
+						</div>
+						<div class="card-body">
+							<ul class="list-group">
+								@foreach (var reparacion in reparaciones)
+								{
+									<li class="list-group-item">@reparacion.Descripcion - Fecha: @reparacion.Fecha</li>
+								}
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div id="accordion" role="tablist">
+						<div class="card">
+							<div class="card-header" role="tab" id="headingOne">
+								<h5 class="mb-0">
+									<a class="btn btn-link text-white" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+										¿Cómo solicito una solicitud de reparación? ⚙️
+									</a>
+								</h5>
+							</div>
+							<div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+								<div class="card-body">
+									Para realizar una solicitud, simplemente haz clic en el botón "Reparaciones" en tu menú o <a href="Reparaciones/Create">haz clic aquí</a> y sigue los pasos indicados.
+								</div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header" role="tab" id="headingThree">
+								<h5 class="mb-0">
+									<a class="btn btn-link text-white collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+										¿Cómo hago un abono? 💵
+									</a>
+								</h5>
+							</div>
+							<div id="collapseThree" class="collapse show" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+								<div class="card-body">
+									Debes dirigirte al apartado Abono o puedes <a href="/abonosindex">dar clic aquí</a>, presionas el botón <strong>PAGAR</strong> y realizar el abono siempre y cuando tengas deudas.
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-4">
+				<div class="col-md-12 text-center">
+					<footer class="footer text-center">
+						<div class="container">
+							<span class="text-muted">© 2024 HydraulicFix. Todos los derechos reservados.</span>
+						</div>
+					</footer>
+				</div>
+			</div>
+		</div>
+	</div>
+			
+
+}
+
+@code {
+	public ApplicationUser cliente;
+	public List<Reparaciones> reparaciones { get; set; } = new List<Reparaciones>();
+	public List<Ventas> ventas { get; set; } = new List<Ventas>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationState.GetAuthenticationStateAsync();
+		var user = authState.User;
+		if (user.Identity?.IsAuthenticated == true)
+		{
+			cliente = await UserManager.GetUserAsync(user);
+			reparaciones = await reparacionService.GetObjectByCondition(r => r.ClienteId == cliente.Id);
+			ventas = await ventaService.GetObjectByCondition(v => v.ClienteId == cliente.Id);
+		}
+	}
+}

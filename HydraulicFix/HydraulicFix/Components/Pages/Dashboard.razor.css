@@ -1,0 +1,51 @@
+﻿
+
+/* Estilo para el título de la sección de tus reparaciones */
+.reparaciones-title {
+    color: #007bff; /* Color azul claro */
+}
+
+/* Estilo para el fondo del cuerpo de la tarjeta */
+.card-body {
+    background-color: #f8f9fa; /* Color de fondo gris claro */
+}
+
+    /* Estilo para el texto en los botones de la tarjeta */
+    .card-body .btn {
+        color: #fff; /* Texto blanco en los botones */
+    }
+
+.a {
+    width: 5px; /* Ancho deseado */
+    height: 5px; /* Altura automática para mantener la proporción */
+}
+
+.inline-img {
+    display: inline-block;
+    margin-right: 10px; /* Espacio entre imágenes */
+    position:center;
+}
+
+.arrow-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.arrow {
+    display: block;
+    width: 50px;
+    height: 50px;
+    background-color: #007bff; /* Color de fondo de la flecha */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c-1.1 0-2 .9-2 2v11.17L5.41 13.41 4 14.83l4.58 4.58L12 21l3.41-3.41L20 14.83l-1.41-1.42L14 15.17V4c0-1.1-.9-2-2-2z"/></svg>'); /* Ícono de la flecha (puedes cambiarlo por otro ícono) */
+    background-size: 24px; /* Tamaño del ícono */
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease; /* Transición al pasar el mouse */
+}
+
+    .arrow:hover {
+        background-color: #0056b3; /* Cambiar color al pasar el mouse */
+    }
