@@ -1,7 +1,6 @@
 ﻿@page "/Dashboard"
 @rendermode InteractiveServer
-@using Shared.Models
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Cliente")]
 
 @inject UserManager<ApplicationUser> UserManager
 @inject UsersService userService
