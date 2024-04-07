@@ -3,90 +3,145 @@
 @rendermode InteractiveServer
 @inject ProductosService productosService
 @inject IServer<Proveedores> proveedorService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
 
 <PageTitle>Editar</PageTitle>
 <EditForm Model="productos" OnValidSubmit="Editar">
-	<DataAnnotationsValidator />
 
-	<div class="container">
-		<div class="card shadow-lg">
-			<div class="card-header">
-				<h3 class="fw-bold">Editar</h3>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="col-6">
-						<label class="fw-bold">Nombre</label>
-						<InputText @bind-Value="productos.Nombre" class="form-control" />
-						<ValidationMessage For="@(()=> productos.Nombre)" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6">
-						<label class="fw-bold">Precio</label>
-						<InputNumber @bind-Value="productos.Precio" class="form-control" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6">
-						<label class="fw-bold">Descuento</label>
-						<InputNumber @bind-Value="productos.Descuento" class="form-control" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6">
-						<label class="fw-bold">ITBIS</label>
-						<InputNumber @bind-Value="productos.ITBIS" class="form-control" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6">
-						<label class="fw-bold">Disponible</label>
-						<InputCheckbox @bind-Value="productos.EsDisponible" class="form-check-input" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6">
-						<label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
-						<InputSelect @bind-Value="productos.ProveedorId" class="form-select">
+    <div class="container">
+        <DataAnnotationsValidator />
+        <RadzenNotification />
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3 class="fw-bold">Editar</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">Nombre</label>
+                        <InputText @bind-Value="productos.Nombre" class="form-control" />
+                        <ValidationMessage For="@(()=> productos.Nombre)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">Precio</label>
+                        <InputNumber @bind-Value="productos.Precio" class="form-control" />
+                        <ValidationMessage For="@(()=> productos.Precio)" class="text-danger" />
+                    </div>
+                </div>
+                @if (bloqueo)
+                {
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="fw-bold">Cantidad</label>
+                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" disabled />
+                            <ValidationMessage For="@(()=> productos.Cantidad)" class="text-danger" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="fw-bold">Cantidad</label>
+                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" />
+                            <ValidationMessage For="@(()=> productos.Cantidad)" class="text-danger" />
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">Descuento</label>
+                        <InputNumber @bind-Value="productos.Descuento" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">ITBIS</label>
+                        <InputNumber @bind-Value="productos.ITBIS" class="form-control" />
+                    </div>
+                </div>
 
-							@foreach (var proveedor in proveedores)
-							{
-								<option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
-							}
-						</InputSelect>
-						<ValidationMessage For="@(() => productos.ProveedorId)" />
-					</div>
-				</div>
-			</div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
+                        <InputSelect @bind-Value="productos.ProveedorId" class="form-select">
 
-			<div class="card-footer">
-				<a href="/Inventario" class="btn btn-danger">Retroceder</a>
-				<button type="submit" class="btn btn-primary bi bi-check">Listo</button>
-			</div>
-		</div>
-		
-	</div>
+                            @foreach (var proveedor in proveedores)
+                            {
+                                <option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => productos.ProveedorId)" class="text-danger" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="fw-bold">Disponible</label>
+                        <InputCheckbox @bind-Value="productos.EsDisponible" class="form-check-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/Inventario" class="btn btn-danger">Retroceder</a>
+                <button type="submit" class="btn btn-primary bi bi-check">Listo</button>
+            </div>
+        </div>
+
+    </div>
 
 </EditForm>
 
 @code {
-	[Parameter]
-	public int ProductoId { get; set; }
-	public Productos productos { get; set; } = new Productos();
-	public List<Proveedores> proveedores { get; set; } = new List<Proveedores>();
+    [Parameter]
+    public int ProductoId { get; set; }
+    public bool bloqueo { get; set; } = false;
+    public Productos productos { get; set; } = new Productos();
+    public List<Proveedores> proveedores { get; set; } = new List<Proveedores>();
 
-	protected override async Task OnInitializedAsync()
-	{
-		if (ProductoId > 0)
-		{
-			productos = await productosService.GetObject(ProductoId);
-			proveedores = await proveedorService.GetAllObject();
-		}
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        if (ProductoId > 0)
+        {
+            productos = await productosService.GetObject(ProductoId);
+            proveedores = await proveedorService.GetAllObject();
+            if (productos.Cantidad > 0)
+            {
+                bloqueo = true;
+            }
+        }
+    }
 
-	public async Task Editar()
-	{
-		var buscado = await productosService.UpdateObject(productos);
-	}
+    public async Task Editar()
+    {
+        var buscado = await productosService.UpdateObject(productos);
+        if (buscado)
+        {
+
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Producto modificado con éxito",
+                    Duration = 5000
+                };
+            NotificationService.Notify(mensaje);
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "No Guardado",
+                    Detail = "Producto No modificado",
+                    Duration = 5000
+                };
+            NotificationService.Notify(mensaje);
+        }
+        await Task.Delay(3000);
+        NavigationManager.NavigateTo("Inventario");
+
+    }
 }

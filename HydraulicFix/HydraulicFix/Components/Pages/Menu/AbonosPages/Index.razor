@@ -32,8 +32,7 @@
                                     <option value="2">Cliente</option>
                                 </AuthorizeView>
                                 <option value="3">Monto</option>
-                                <option value="4">Fecha</option>
-                                <option value="5">Todo</option>
+                                <option value="4">Todo</option>
                             </InputSelect>
                         </div>
                         <div class="col-auto">
@@ -68,19 +67,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    break;
+                                    break; 
                                 case 4:
-                                    <div class="input-group justify-content-end">
-                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
-                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-info" @onclick="Buscar">
-                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
-                                            </button>
-                                        </div>
-                                    </div>
-                                    break;
-                                case 5:
                                     <div class="input-group justify-content-end">
                                         <button class="btn btn-info" @onclick="Buscar">
                                             <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -88,6 +76,17 @@
                                     </div>
                                     break;
                             }
+                        </div>
+                        <div class="col col-auto">
+                            <div class="input-group justify-content-end">
+                                <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                <div class="input-group-append">
+                                    <button class="btn btn-info" @onclick="FiltrarFecha">
+                                        <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -337,11 +336,15 @@
         }
         else if(Opcion == 3 && abono.Monto > 0)
             abonos = await abonosService.GetObjectByCondition(a => a.Monto == abono.Monto);
-        else if (Opcion == 4 && FechaFin != default && FechaInicio != default)
-            abonos = await abonosService.GetObjectByCondition(a => a.Fecha.Date <= FechaFin.Date && a.Fecha.Date >= FechaInicio.Date);
-        else if(Opcion == 5)
+        else if(Opcion == 4)
             abonos = await abonosService.GetAllObject();
     }
+
+    public async Task FiltrarFecha()
+    {
+        await Buscar();
+        abonos = abonos.Where(a => a.Fecha.Date <= FechaFin.Date && a.Fecha.Date >= FechaInicio.Date).ToList();
+    } 
 
     public string getLogo()
     {

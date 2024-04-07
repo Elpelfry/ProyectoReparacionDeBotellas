@@ -110,19 +110,18 @@
                     <div class="col-8">
                         <label class="fw-bold">Direcci&oacute;n</label>
                         <InputText @bind-Value="reparacion.Direccion" class="form-control" />
-                        <ValidationMessage For="@(() => reparacion.Direccion)" class="text-danger"/>
+                        <ValidationMessage For="@(() => reparacion.Direccion)" class="text-danger" />
                     </div>
                     <div class="col-4">
                         <label class="fw-bold">Tel&eacute;fono</label>
-                        <InputText @bind-Value="reparacion.Telefono" class="form-control" />
-                        <ValidationMessage For="@(() => reparacion.Telefono)" class="text-danger"/>
+                        <InputText @bind-Value="reparacion.Telefono" class="form-control" disabled />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <label class="fw-bold">Descripci&oacute;n</label>
-                        <InputTextArea @bind-Value="reparacion.Descripcion" class="form-control"/>
-                        <ValidationMessage For="@(() => reparacion.Descripcion)" class="text-danger"/>
+                        <InputTextArea @bind-Value="reparacion.Descripcion" class="form-control" />
+                        <ValidationMessage For="@(() => reparacion.Descripcion)" class="text-danger" />
                     </div>
                 </div>
             </div>
@@ -200,7 +199,14 @@
                                     <ChildContent Context="authorizeContext">
                                         @if (reparacion.EstadoId != 4)
                                         {
-                                            <td><button type="button" class="btn btn-danger bi bi-trash" @onclick="() => RemoverDetalle(item)"></button></td>
+                                            if (detallesRep.Any(p => p.ProductoId == item.ProductoId))
+                                            {
+                                                <td><button type="button" class="btn btn-danger bi bi-trash" disabled></button></td>
+                                            }
+                                            else
+                                            {
+                                                <td><button type="button" class="btn btn-danger bi bi-trash" @onclick="() => RemoverDetalle(item)"></button></td>
+                                            }
                                         }
                                     </ChildContent>
                                 </AuthorizeView>
@@ -210,7 +216,16 @@
                 </table>
             </div>
             <div class="card-footer justify-content-center d-flex">
-                <button type="submit" class="btn btn-primary bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
+                <a href="/Reparacion" class="btn btn-primary bi bi-house-door-fill"> Volver</a>
+                @if (reparacion.ReparacionDetalle.Any())
+                {
+                    <button type="button" class="btn btn-danger bi bi-trash-fill" disabled> Cancelar Reparaci&oacute;n</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Cancelar"> Cancelar Reparaci&oacute;n</button>
+                }
+                <button type="submit" class="btn btn-success bi bi-floppy text-white"> Guardar<i class="oi oi-document"></i></button>
             </div>
         </div>
     </div>
@@ -231,6 +246,7 @@
     public List<Reparaciones> reparaciones = new List<Reparaciones>();
     public ReparacionesDetalle reparacionDetalle = new ReparacionesDetalle();
     public ReparacionesDetalle reparacionDetalleAg = new ReparacionesDetalle();
+    public List<ReparacionesDetalle> detallesRep = new List<ReparacionesDetalle>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -243,7 +259,7 @@
             authState = await AuthenticationState.GetAuthenticationStateAsync();
             usuario = (usuarios.FirstOrDefault(u => u.UserName == authState.User.Identity?.Name))!;
             reparacion.EstadoId = 2;
-
+            detallesRep = reparacion.ReparacionDetalle.ToList();
             if (reparacion.ClienteId != "")
                 ver = true;
         }
@@ -282,10 +298,10 @@
     public void AgregarDetalle()
     {
         reparacionDetalle = new ReparacionesDetalle
-        {
-            ProductoId = reparacionDetalleAg.ProductoId,
-            CantidadUsada = reparacionDetalleAg.CantidadUsada
-        };
+            {
+                ProductoId = reparacionDetalleAg.ProductoId,
+                CantidadUsada = reparacionDetalleAg.CantidadUsada
+            };
         if (reparacion.ReparacionDetalle.Any(x => x.ProductoId == reparacionDetalle.ProductoId))
         {
             var mensaje = new NotificationMessage
@@ -337,5 +353,11 @@
         reparacionDetalleAg = detalle;
         var producto = productos.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
         reparacion.ReparacionDetalle.Remove(detalle);
+    }
+
+    public void Cancelar()
+    {
+        reparacion.EstadoId = 4;
+        Guardar();
     }
 }

@@ -20,10 +20,10 @@ namespace Shared.Models
         [Required(ErrorMessage = "Indique el Precio")]
         [Range(0.01, 1000000000, ErrorMessage = "El Precio debe estar 0.01 y 1000000000")]
         public float Precio { get; set; }
-        [Required(ErrorMessage = "Indique la Cantidad")]
-        [Range(1, 1000, ErrorMessage = "El Monto debe estar 1 y 1000")]
+        [Required(ErrorMessage = "Es Requerido")]
         public string ? Nombre { get; set; }
         [Range(1, 1000, ErrorMessage = "La Cantidad debe estar 1 y 1000")]
+        [Required(ErrorMessage = "Indique la Cantidad")]
         public int Cantidad { get; set; }
         public int Descuento { get; set; }
         public int ITBIS { get; set; }

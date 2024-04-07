@@ -228,12 +228,12 @@
 
         [Required(ErrorMessage = "Campo requerido")]
 		[Display(Name = "Telefono")]
-		[RegularExpression(@"^[0-9]{10}$", ErrorMessage = "El número de teléfono debe tener 10 dígitos")]
+        [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "El número de teléfono debe tener el formato 999-999-9999")]
 		public string? Telefono { get; set; } = "";
 
         [Required(ErrorMessage = "Campo requerido")]
 		[Display(Name = "Cedula")]
-		[RegularExpression(@"^[0-9]{11}$", ErrorMessage = "La cédula debe tener 11 dígitos")]
+        [RegularExpression(@"^\d{3}-\d{7}-\d{1}$", ErrorMessage = "La Cedula debe tener el formato 999-9999999-9")]
 		public string? Cedula { get; set; } = "";
 
         [Required(ErrorMessage = "Campo requerido")]
