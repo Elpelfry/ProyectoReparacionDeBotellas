@@ -1,17 +1,16 @@
 ﻿@page "/Account/Pages/Manage/Configuracion"
 
-@inject ConfiguracionesService configuracionesService
-
-@using global::Shared.Models
 @rendermode InteractiveServer
-@inject Radzen.NotificationService NotificationService
+@inject ConfiguracionesService configuracionesService
+@inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Configuraci&oacute;n</PageTitle>
 <div style="width: 35rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);">
     <div class="container-fluid">
         <div class="card shadow">
-            <EditForm Model="@configuracion" OnValidSubmit="Guardar">
+            <EditForm Model="configuracion" OnValidSubmit="Guardar">
+                <RadzenNotification/>
                 <DataAnnotationsValidator />
                 <div class="d-flex justify-content-center">
                     <div class="row">
@@ -60,14 +59,14 @@
 
 @code {
     public Configuraciones configuracion = new Configuraciones();
-    private string? mensaje = "";
 
     protected override async Task OnInitializedAsync()
     {
-        var buscar = await configuracionesService.Search(2);
+
+        var buscar = await configuracionesService.GetAllObject();
         if (buscar != null)
         {
-            configuracion = buscar;
+            configuracion = buscar.FirstOrDefault()!;
         }
     }
 
@@ -103,11 +102,24 @@
         var guardado = await configuracionesService.UpdateObject(configuracion);
         if (guardado)
         {
-            mensaje = "guardado";
+            var mensaje = new NotificationMessage { 
+                Severity = NotificationSeverity.Success, 
+                Summary = "Guardado", 
+                Detail = "Configuración guardada correctamente",
+                Duration = 5000
+            };
+            NotificationService.Notify(mensaje);
         }
         else
         {
-            mensaje = "error";
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "No Guardado",
+                    Detail = "Configuración no guardada correctamente",
+                    Duration = 5000
+                };
+            NotificationService.Notify(mensaje);
         }
     }
     private void Cancelar()
