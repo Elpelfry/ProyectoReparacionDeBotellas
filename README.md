@@ -26,8 +26,26 @@ Lado del servidor: [Csharp]
 # Uso 🪴
 El primer usuario es el Administrador, este tiene acceso a todas las configuraciones y aspectos del proyecto.  
 Al clonar el repositorio podrás ejecutar el proyecto e iniciar sesión como un Cliente o registrarte como Cliente nuevo.  
-Como cliente tienes acceso a solicitar un servicio/sello/herramienta/producto desde la página web y observar tus pedidos y abonos.  
-Como administrador puedes manejar el inventario, las configuraciones de la empresa y todo lo que se ha registrado en el sistema.  
+Como cliente tienes acceso a solicitar un servicio/sello/herramienta/producto desde la página web y observar tus pedidos y realizar tus abonos.  
+Como administrador puedes manejar el inventario, las configuraciones de la empresa, los gastos que tiene la empresa y todo lo que se ha registrado en el sistema como los abonos de los clientes. 
+
+Registros en total:  
+1- Solicitar reparación (cliente)  
+2- Venta  
+3- Configuración  
+4- Gastos  
+5- Abonos  
+6- Crear reparación (admin)  
+7- Proveedor  
+8- Producto  
+9- Control de usuario  
+
+# Foto de prueba del programa corriendo
+
+![image](https://github.com/Elpelfry/ProyectoReparacionDeBotellas/assets/145587561/16df8378-042b-4d6e-a4ff-11113a4426f1)  
+
+![image](https://github.com/Elpelfry/ProyectoReparacionDeBotellas/assets/145587561/75664044-a18e-44f5-adb6-b4a8e9ed5edd)  
+
 
 # Contacto📲
 yudelkaguillen07@gmail.com  
