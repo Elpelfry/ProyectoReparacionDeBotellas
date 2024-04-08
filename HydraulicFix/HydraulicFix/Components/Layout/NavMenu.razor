@@ -21,7 +21,15 @@
                         <div class="collapse navbar-collapse" id="navbarNav">
 
                             <div class="navbar-nav ms-auto fw-bold">
-
+                                <AuthorizeView Roles="Cliente">
+                                    <ChildContent Context="authorizeContext">
+                                        <div class="row">
+                                            <div class="nav-item">
+                                                <a class="nav-link text-light" href="/Dashboard"><img src="/bootstrap/img/home.svg" style="width: 20px; height: 20px; margin-right: 2px;" />Inicio</a>
+                                            </div>
+                                        </div>
+                                    </ChildContent>
+                                </AuthorizeView>
                                 <div class="row">
                                     <div class="nav-item">
                                         <a class="nav-link text-light" href="/ventasIndex"><img src="/bootstrap/img/factura.svg" style="width: 20px; height: 20px; margin-right: 2px;" />Ventas</a>

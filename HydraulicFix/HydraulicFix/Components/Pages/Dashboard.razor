@@ -17,7 +17,7 @@
 	<div class="container-fluid">
 		<div class="row d-flex justify-content-center mt-4">
 			<div class="col-md-8">
-				<div class="col-md-12 vh-100">
+				<div class="col-md-12">
 					<div class="card-body">
 						<h3 class="text-center">Hola otra vez, @cliente.Nombre 👋</h3>
 						<p>No te abrumes! <strong>HydraulicFix</strong> te permite solicitar productos y servicios al alcance de tus dedos, con nuestra página web te rescatamos de una falla repentina de forma rápida y eficiente. A través de nuestro sitio, puedes asegurarte de obtener los productos que necesitas desde la comodidad de tu hogar o de donde te encuentres.</p>
@@ -44,7 +44,7 @@
 							<ul class="list-group">
 								@foreach (var reparacion in reparaciones)
 								{
-									<li class="list-group-item">@reparacion.Descripcion - Fecha: @reparacion.Fecha</li>
+									<li class="list-group-item">@reparacion.Descripcion - Fecha: @reparacion.Fecha.ToString("dd/MM/yyyy")</li>
 								}
 							</ul>
 						</div>
