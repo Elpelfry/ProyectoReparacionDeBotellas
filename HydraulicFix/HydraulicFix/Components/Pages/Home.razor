@@ -3,15 +3,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using HydraulicFix.Components.Pages.Menu.Venta
 
-<AuthorizeView>
+<AuthorizeView Roles="Cliente">
     <Authorized>
-        <Index />
+        <Dashboard />
     </Authorized>
     <NotAuthorized>
-        <Login />
+        <Venta />
     </NotAuthorized>
 </AuthorizeView>
-
 
 @code {
 
