@@ -36,7 +36,7 @@ public class Reparaciones
     public string? Descripcion { get; set; }
 
     [Required(ErrorMessage = "El Teléfono es obligatorio")]
-    [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "El número de teléfono debe tener 10 dígitos")]
+    [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "El número de teléfono debe tener el formato 999-999-9999")]
     public string? Telefono { get; set; }
 
     [Required(ErrorMessage = "La Fecha es obligatoria")]

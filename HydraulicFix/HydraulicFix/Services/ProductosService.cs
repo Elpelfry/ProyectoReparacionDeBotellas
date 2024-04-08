@@ -55,9 +55,8 @@ public class ProductosService(ApplicationDbContext _contexto) : IServer<Producto
     }
     public async Task<string> Random()
     {
-        const string caracteres = "123456789abcdefghijklmnopqrstuvwxyz?_";
+        const string caracteres = "123456789ABCDEFGHIJKMNLOPQRSTUVWXYZ?_";
         char[] arreglo = new char[16];
-
         for (int i = 0; i < 16; i++)
         {
             arreglo[i] = caracteres[new Random().Next(caracteres.Length)];

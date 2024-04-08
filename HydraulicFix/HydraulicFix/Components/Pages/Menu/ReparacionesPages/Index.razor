@@ -32,8 +32,7 @@
                                     <option value="1">Reparaci&oacute;n Id</option>
                                 </AuthorizeView>
                                 <option value="2">T&eacute;cnico</option>
-                                <option value="3">Fecha</option>
-                                <option value="4">Todo</option>
+                                <option value="3">Todo</option>
                             </InputSelect>
                         </div>
                         <div class="col-auto">
@@ -61,23 +60,23 @@
                                     break;
                                 case 3:
                                     <div class="input-group justify-content-end">
-                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
-                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-info" @onclick="Buscar">
-                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
-                                            </button>
-                                        </div>
-                                    </div>
-                                    break;
-                                case 4:
-                                    <div class="input-group justify-content-end">
                                         <button class="btn btn-info" @onclick="Buscar">
                                             <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
                                         </button>
                                     </div>
                                     break;
                             }
+                        </div>
+                        <div class="col col-auto">
+                            <div class="input-group justify-content-end">
+                                <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                <div class="input-group-append">
+                                    <button class="btn btn-info" @onclick="FiltrarFecha">
+                                        <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <AuthorizeView Roles="Cliente">
                             @if (!bandera)
@@ -140,7 +139,7 @@
                                 <td>@item.ReparacionId</td>
                                 @if (usuario != null)
                                 {
-                                    <td>@usuario!.NickName</td>
+                                    <td>@usuario!.Email</td>
                                 }
                                 else
                                 {
@@ -213,7 +212,7 @@
                             if (item.ClienteId == usuario!.Id)
                             {
                                 <tr>
-                                    <td>@usu!.NickName</td>
+                                    <td>@usu!.Email</td>
                                     <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                                     @if (item.Tecnico != null)
                                     {
@@ -494,10 +493,14 @@
             reparaciones = await reparacionesService.GetObjectByCondition(x => x.ReparacionId == reparacion.ReparacionId);
         else if (Opcion == 2 && !string.IsNullOrEmpty(reparacion.Tecnico))
             reparaciones = await reparacionesService.GetObjectByCondition(x => x.Tecnico!.ToLower().Contains(reparacion.Tecnico.ToLower()));
-        else if (Opcion == 3 && FechaFin != default && FechaInicio != default)
-            reparaciones = await reparacionesService.GetObjectByCondition(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date);
-        else if (Opcion == 4)
+        else if (Opcion == 3)
             reparaciones = await reparacionesService.GetObjectByCondition(x => true);
+    }
+
+    public async Task FiltrarFecha()
+    {
+        await Buscar();
+        reparaciones = reparaciones.Where(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date).ToList();
     }
 
     public async Task CambiarEstado(string estado)

@@ -2,14 +2,17 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject ProductosService productosService
 @inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
 @inject IServer<Proveedores> proveedorService
+@inject IServer<CategoriaProductos> categoriaService
 @rendermode InteractiveServer
-@using Microsoft.EntityFrameworkCore
 
 <PageTitle>Agregar productos</PageTitle>
-<EditForm Model="@productos" OnValidSubmit="GuardarProducto">
-    <DataAnnotationsValidator />
+<EditForm Model="productos" OnValidSubmit="GuardarProducto">
+    
     <div class="container">
+        <DataAnnotationsValidator />
+        <RadzenNotification/>
         <div class="card shadow-lg">
             <div class="card-header">
                 <h3 class="fw-bold">Registro de productos</h3>
@@ -20,17 +23,22 @@
                         <div class="form-group">
                             <label for="nombreProducto" class="fw-bold">Nombre:</label>
                             <InputText @bind-Value="productos.Nombre" class="form-control" />
-                            <ValidationMessage For="@(() => productos.Nombre)" />
+                            <ValidationMessage For="@(() => productos.Nombre)" class="text-danger"/>
                         </div>
                         <div class="form-group">
-                            <label for="categoriaProducto" class="fw-bold">Categoría ID:</label>
-                            <InputNumber @bind-Value="productos.CategoriaId" class="form-control" />
-                            <ValidationMessage For="@(() => productos.CategoriaId)" />
+                            <label for="categoriaProducto" class="fw-bold">Categor&iacute;a:</label>
+                            <InputSelect @bind-Value="productos.CategoriaId" class="form-select">
+                                @foreach (var categoria in categorias)
+                                {
+                                    <option value="@categoria.CategoriaId">@categoria.Nombre</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => productos.CategoriaId)" class="text-danger" />
                         </div>
                         <div class="form-group">
                             <label for="precioProducto" class="fw-bold">Precio:</label>
                             <InputNumber @bind-Value="productos.Precio" class="form-control" />
-                            <ValidationMessage For="@(() => productos.Precio)" />
+                            <ValidationMessage For="@(() => productos.Precio)" class="text-danger" />
                         </div>
                         <div class="form-group">
                             <label class="fw-bold">Código:</label>
@@ -40,19 +48,19 @@
                                     <img style="width: 32px; height: 32px;" src="/bootstrap/img/codigo.png" />
                                 </button>
                             </div>
-                            <ValidationMessage For="@(() => productos.Codigo)" />
+                            <ValidationMessage For="@(() => productos.Codigo)" class="text-danger" />
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="cantidadProducto" class="fw-bold">Cantidad:</label>
-                            <InputNumber @bind-Value="productos.Cantidad" class="form-control" min="1"/>
-                            <ValidationMessage For="@(() => productos.Cantidad)" />
+                            <InputNumber @bind-Value="productos.Cantidad" class="form-control"/>
+                            <ValidationMessage For="@(() => productos.Cantidad)" class="text-danger" />
                         </div>
                         <div class="form-group">
                             <label for="descuentoProducto" class="fw-bold">Descuento:</label>
                             <InputNumber @bind-Value="productos.Descuento" class="form-control" />
-                            <ValidationMessage For="@(() => productos.Descuento)" />
+                            <ValidationMessage For="@(() => productos.Descuento)" class="text-danger" />
                         </div>
                         <div class="form-group">
                             <label for="proveedorProducto" class="fw-bold">Proveedor ID:</label>
@@ -63,20 +71,19 @@
                                     <option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
                                 }
                                 </InputSelect>
-                            <ValidationMessage For="@(() => productos.ProveedorId)" />
+                            <ValidationMessage For="@(() => productos.ProveedorId)" class="text-danger" />
                         </div>
                         <div class="form-group">
                             <label for="itbisProducto" class="fw-bold">ITBIS:</label>
                             <InputNumber @bind-Value="productos.ITBIS" class="form-control" />
-                            <ValidationMessage For="@(() => productos.ITBIS)" />
+                            <ValidationMessage For="@(() => productos.ITBIS)" class="text-danger" />
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-footer justify-content-center d-flex">
-                <button type="submit" class="btn btn-primary bi bi-floppy" @onclick="GuardarProducto">Guardar</button>
+                <button type="submit" class="btn btn-primary bi bi-floppy">Guardar</button>
                 <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-                @mensaje
             </div>
         </div>
     </div>
@@ -84,31 +91,54 @@
 
 @code {
     public Productos productos { get; set; } = new Productos();
-    public string? mensaje = "";
     public List<Proveedores> proveedores { get; set; } = new List<Proveedores>();
+    public List<CategoriaProductos> categorias { get; set; } = new List<CategoriaProductos>();
 
     protected override async Task OnInitializedAsync()
     {
         proveedores = await proveedorService.GetAllObject();
+        categorias = await categoriaService.GetAllObject();
     }
-	public async Task GuardarProducto()
-	{
+    public async Task GuardarProducto()
+    {
+        var list = await productosService.GetObjectByCondition(p => p.Codigo == productos.Codigo);
+        while (list.Any())
+        {
+            await Codigo();
+            list = await productosService.GetObjectByCondition(p => p.Codigo == productos.Codigo);
+        }
+
         productos.EsDisponible = true;
 		var guarda = await productosService.AddObject(productos);
 		if (guarda != null)
 		{
-			mensaje = "Guardado exitosamente";
-			productos = new Productos();
+			
+			var mensaje = new NotificationMessage{ 
+                Severity = NotificationSeverity.Success, 
+                Summary = "Guardado", 
+                Detail = "Producto guardado con éxito",
+                Duration = 5000
+            };
+            NotificationService.Notify(mensaje);
 		}
 		else
 		{
-			mensaje = "Error al guardar el producto";
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "No Guardado",
+                    Detail = "Producto No guardado",
+                    Duration = 5000
+                };
+            NotificationService.Notify(mensaje);
 		}
+        await Task.Delay(3000);
+        NavigationManager.NavigateTo("Inventario");
 	}
 
 	private void Cancelar()
 	{
-		NavigationManager.NavigateTo("/Inventario");
+		NavigationManager.NavigateTo("Inventario");
 	}
 
 	public async Task Codigo()

@@ -35,9 +35,8 @@
                                     <option value="1">Venta Id</option>
                                     <option value="2">Nombre del Cliente</option>
                                 </AuthorizeView>
-                                <option value="3">Fecha</option>
-                                <option value="4">Total</option>
-                                <option value="5">Todo</option>
+                                <option value="3">Total</option>
+                                <option value="4">Todo</option>
                             </InputSelect>
                         </div>
                         <div class="col-auto">
@@ -65,8 +64,7 @@
                                     break;
                                 case 3:
                                     <div class="input-group justify-content-end">
-                                        <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
-                                        <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                        <InputNumber @bind-Value="venta.Total" class="form-control"></InputNumber>
                                         <div class="input-group-append">
                                             <button class="btn btn-info" @onclick="Buscar">
                                                 <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
@@ -76,22 +74,23 @@
                                     break;
                                 case 4:
                                     <div class="input-group justify-content-end">
-                                        <InputNumber @bind-Value="venta.Total" class="form-control"></InputNumber>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-info" @onclick="Buscar">
-                                                <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
-                                            </button>
-                                        </div>
-                                    </div>
-                                    break;
-                                case 5:
-                                    <div class="input-group justify-content-end">
                                         <button class="btn btn-info" @onclick="Buscar">
                                             <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
                                         </button>
                                     </div>
                                     break;
                             }
+                        </div>
+                        <div class="col col-auto">
+                            <div class="input-group justify-content-end">
+                                <InputDate @bind-Value="FechaInicio" class="form-control"></InputDate>
+                                <InputDate @bind-Value="FechaFin" class="form-control"></InputDate>
+                                <div class="input-group-append">
+                                    <button class="btn btn-info" @onclick="FiltraFecha">
+                                        <img src="/bootstrap/img/buscar.png" alt="Buscar" style="width: 24px; height: 24px; margin-right: 2px;">
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,7 +140,7 @@
                                         <img style="height: 38px;" src="/bootstrap/img/factura.svg" />
                                     </button>
                                 </td>
-                                @if(!item.Eliminada)
+                                @if (!item.Eliminada)
                                 {
                                     <td>
                                         <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="() => Eliminar(item.VentaId)"></button>
@@ -217,7 +216,7 @@
                         <div class="row d-flex align-items-center justify-content-center">
                             <div id="logoEmpresa" class="text-center">
                                 <img style="width: 150px; height: 120px; border-radius: 10%;" src="@getLogo()" />
-                        </div>
+                            </div>
                             <h4 class="fw-bold fs-4 text-center" style="margin-top: -8px; justify-content: center; text-align: center;">@configuracion.NombreEmpresa</h4>
 
                             <div class="row" style="margin-top: -12px; justify-content: center; text-align: center;">
@@ -418,16 +417,20 @@
 
     public async Task Buscar()
     {
-        if(Opcion == 1 && venta.VentaId > 0)
+        if (Opcion == 1 && venta.VentaId > 0)
             ventas = await ventasService.GetObjectByCondition(v => v.VentaId == venta.VentaId);
-        else if(Opcion == 2 && !string.IsNullOrEmpty(venta.NombreCliente))
-            ventas = await ventasService.GetObjectByCondition(v => v.NombreCliente!.ToLower().Contains( venta.NombreCliente!.ToLower()));
-        else if(Opcion == 3 && FechaFin != default && FechaInicio != default)
-            ventas = await ventasService.GetObjectByCondition(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date);
-        else if(Opcion == 4 && venta.Total > 0)
+        else if (Opcion == 2 && !string.IsNullOrEmpty(venta.NombreCliente))
+            ventas = await ventasService.GetObjectByCondition(v => v.NombreCliente!.ToLower().Contains(venta.NombreCliente!.ToLower()));
+        else if (Opcion == 3 && venta.Total > 0)
             ventas = await ventasService.GetObjectByCondition(v => v.Total == venta.Total);
-        else if(Opcion == 5)
+        else if (Opcion == 4)
             ventas = await ventasService.GetAllObject();
+    }
+
+    public async Task FiltraFecha()
+    {
+        await Buscar();
+        ventas = ventas.Where(v => v.Fecha.Date <= FechaFin.Date && v.Fecha.Date >= FechaInicio.Date).ToList();
     }
 
     public async Task VerFactura(int id)
@@ -463,12 +466,12 @@
         await ventasService.UpdateObject(venta);
         eliminar = false;
         var mensaje = new NotificationMessage
-        {
-            Severity = NotificationSeverity.Success,
-            Summary = "Venta eliminada",
-            Detail = "La venta ha sido eliminada correctamente",
-            Duration = 5000
-        };
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Venta eliminada",
+                Detail = "La venta ha sido eliminada correctamente",
+                Duration = 5000
+            };
         notificationService.Notify(mensaje);
     }
 
