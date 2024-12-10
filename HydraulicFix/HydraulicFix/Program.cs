@@ -5,7 +5,6 @@ using HydraulicFix.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 using Shared.Interfaces;
 using Shared.Models;
 using Shared.Dto;
@@ -60,7 +59,6 @@ builder.Services.AddScoped<IClient<Proveedores>, ProveedoresServiceClient>();
 builder.Services.AddScoped<IClient<Reparaciones>, ReparacionesServiceClient>();
 builder.Services.AddScoped<IClient<Ventas>, VentasServiceClient>();
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -74,7 +72,7 @@ builder.Services.AddAuthentication(options =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+           options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 30))));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped(a => 
