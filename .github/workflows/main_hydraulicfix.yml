@@ -19,7 +19,8 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '3.1'
+          dotnet-version: '8.x'
+          include-prerelease: true
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -30,7 +31,7 @@ jobs:
         working-directory: HydraulicFix
         
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
@@ -44,13 +45,13 @@ jobs:
     
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: .net-app
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'HydraulicFix'
           slot-name: 'Production'
