@@ -24,6 +24,8 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
 
+builder.Configuration.AddEnvironmentVariables();
+
 //Servicios
 builder.Services.AddScoped<IServerAsp<ApplicationUser>, UsersService>();
 builder.Services.AddScoped<IServerAsp<IdentityRole>, RolesService>();
